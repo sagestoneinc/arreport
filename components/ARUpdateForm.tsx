@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import MetricRow from './MetricRow';
 import MIDSection from './MIDSection';
 import OutputDisplay from './OutputDisplay';
 import TelegramSender from './TelegramSender';
-import { ARUpdateData, MIDData } from '@/lib/types';
+import { ARUpdateData } from '@/lib/types';
 import { formatMessage } from '@/lib/formatters';
 
 const TIMEZONES = ['EST', 'CST', 'MST', 'PST', 'UTC'];
@@ -52,7 +52,7 @@ export default function ARUpdateForm() {
   // Format time for input field (HH:mm)
   const getTimeInputValue = () => {
     const [time, period] = data.time.split(' ');
-    let [hours, minutes] = time. split(':');
+    const [hours, minutes] = time. split(':');
     let hourNum = parseInt(hours);
 
     if (period === 'PM' && hourNum !== 12) hourNum += 12;

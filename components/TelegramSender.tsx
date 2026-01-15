@@ -42,7 +42,7 @@ export default function TelegramSender({ message }: TelegramSenderProps) {
       } else {
         setStatus({ type: 'error', message:  data.error || 'Failed to send message' });
       }
-    } catch (error) {
+    } catch {
       setStatus({ type: 'error', message: 'Network error. Please try again.' });
     } finally {
       setLoading(false);

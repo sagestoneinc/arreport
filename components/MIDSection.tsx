@@ -45,7 +45,7 @@ export default function MIDSection({ title, mids, onMidsChange }: MIDSectionProp
       <div className="space-y-3">
         {mids.length === 0 ? (
           <div className="text-center text-gray-500 py-8">
-            No MIDs added.  Click "Add MID" to get started.
+            No MIDs added. Click &quot;Add MID&quot; to get started.
           </div>
         ) : (
           mids.map((mid, index) => (

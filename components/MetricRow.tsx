@@ -18,6 +18,7 @@ export default function MetricRow({
   declines,
   onSalesChange,
   onDeclinesChange,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isOverall = false,
 }: MetricRowProps) {
   const ar = calculateAR(sales, declines);
