@@ -6,10 +6,7 @@ export async function POST(request: NextRequest) {
     const { message, chatId } = body;
 
     if (!message) {
-      return NextResponse.json(
-        { ok: false, error: 'Message is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ ok: false, error: 'Message is required' }, { status: 400 });
     }
 
     // Use provided chat ID or fall back to environment variable
@@ -30,26 +27,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           ok: false,
-          error: 'Chat ID is required. Either provide it in the request or set TELEGRAM_CHAT_ID environment variable.',
+          error:
+            'Chat ID is required. Either provide it in the request or set TELEGRAM_CHAT_ID environment variable.',
         },
         { status: 400 }
       );
     }
 
     // Send message to Telegram
-    const telegramResponse = await fetch(
-      `https://api.telegram.org/bot${token}/sendMessage`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          chat_id: chat,
-          text: message,
-        }),
-      }
-    );
+    const telegramResponse = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: chat,
+        text: message,
+      }),
+    });
 
     const telegramData = await telegramResponse.json();
 
@@ -68,9 +63,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Telegram API error:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

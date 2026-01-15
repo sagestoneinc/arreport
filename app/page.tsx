@@ -55,9 +55,7 @@ export default function Home() {
         );
       }
     } else {
-      setState(
-        templateType === 'template-b' ? DEFAULT_STATE_TEMPLATE_B : DEFAULT_STATE_TEMPLATE_A
-      );
+      setState(templateType === 'template-b' ? DEFAULT_STATE_TEMPLATE_B : DEFAULT_STATE_TEMPLATE_A);
     }
     setGeneratedMessage('');
   };

@@ -27,31 +27,33 @@ describe('formatTemplateA', () => {
     };
 
     const output = formatTemplateA(state);
-    
+
     // Check header
     expect(output).toContain('📊 AR Update – MID Optimization');
     expect(output).toContain('🗓️ 01/15/2026 | 🕐 1:00 AM EST');
     expect(output).toContain('🎯 Threshold (Performing): 38%');
-    
+
     // Check daily summary
     expect(output).toContain('📌 DAILY SUMMARY');
     expect(output).toContain('Overall AR: 24.73% (918 sales / 2794 declines)');
-    
+
     // Check VISA sections
     expect(output).toContain('✅ VISA – PERFORMING MIDs');
     expect(output).toContain('CS_396_SkinPuraVida_0100: 40.95% (43 / 62)');
     expect(output).toContain('⚠️ VISA – LOW MIDs');
     expect(output).toContain('CS_395_VitalComplexion_0164: 35.00% (28 / 52)');
-    
+
     // Check MASTERCARD sections
     expect(output).toContain('✅ MASTERCARD – PERFORMING MIDs');
     expect(output).toContain('PAY-REV_372_FitFlexDiet_6315: 64.52% (20 / 11)');
     expect(output).toContain('⚠️ MASTERCARD – LOW MIDs');
     expect(output).toContain('(none)');
-    
+
     // Check notes
     expect(output).toContain('📝 Notes / Action Taken:');
-    expect(output).toContain('Enter optimization notes, routing changes, or monitoring actions here.');
+    expect(output).toContain(
+      'Enter optimization notes, routing changes, or monitoring actions here.'
+    );
   });
 
   it('handles empty MID lists correctly', () => {
@@ -67,7 +69,7 @@ describe('formatTemplateA', () => {
     };
 
     const output = formatTemplateA(state);
-    
+
     // Should show sections but be empty or show (none)
     expect(output).toContain('✅ VISA – PERFORMING MIDs');
     expect(output).toContain('⚠️ VISA – LOW MIDs');

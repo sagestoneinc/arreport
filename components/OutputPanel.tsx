@@ -75,19 +75,12 @@ export default function OutputPanel({ message, state, onImport }: OutputPanelPro
           </button>
           <label className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors cursor-pointer">
             📤 Import JSON
-            <input
-              type="file"
-              accept=".json"
-              onChange={handleImport}
-              className="hidden"
-            />
+            <input type="file" accept=".json" onChange={handleImport} className="hidden" />
           </label>
           <button
             onClick={handleCopy}
             className={`px-4 py-2 rounded-md transition-colors ${
-              copySuccess
-                ? 'bg-green-600 text-white'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
+              copySuccess ? 'bg-green-600 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'
             }`}
           >
             {copySuccess ? '✓ Copied!' : '📋 Copy to Clipboard'}
