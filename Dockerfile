@@ -24,7 +24,7 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -34,12 +34,14 @@ COPY --from=builder /app/next.config.js ./
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package*.json ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
+
+# Install only production dependencies
+RUN npm ci --only=production
 
 USER nextjs
 
 EXPOSE 8080
 
-ENV PORT 8080
+ENV PORT=${PORT:-8080}
 
 CMD ["npm", "start"]
