@@ -22,7 +22,7 @@ export default function MIDSection({ title, mids, onMidsChange }: MIDSectionProp
   };
 
   const updateMID = (index: number, updatedMID: MIDData) => {
-    const newMids = [... mids];
+    const newMids = [...mids];
     newMids[index] = updatedMID;
     onMidsChange(newMids);
   };

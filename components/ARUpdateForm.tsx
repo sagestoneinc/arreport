@@ -45,14 +45,14 @@ export default function ARUpdateForm() {
 
   // Format date for input field (YYYY-MM-DD)
   const getDateInputValue = () => {
-    const [month, day, year] = data. date.split('/');
+    const [month, day, year] = data.date.split('/');
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
   };
 
   // Format time for input field (HH:mm)
   const getTimeInputValue = () => {
     const [time, period] = data.time.split(' ');
-    const [hours, minutes] = time. split(':');
+    const [hours, minutes] = time.split(':');
     let hourNum = parseInt(hours);
 
     if (period === 'PM' && hourNum !== 12) hourNum += 12;
@@ -61,13 +61,13 @@ export default function ARUpdateForm() {
     return `${hourNum.toString().padStart(2, '0')}:${minutes}`;
   };
 
-  const handleDateChange = (e: React. ChangeEvent<HTMLInputElement>) => {
-    const [year, month, day] = e. target.value.split('-');
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const [year, month, day] = e.target.value.split('-');
     setData({ ...data, date: `${month}/${day}/${year}` });
   };
 
-  const handleTimeChange = (e: React. ChangeEvent<HTMLInputElement>) => {
-    const [hours, minutes] = e.target. value.split(':');
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const [hours, minutes] = e.target.value.split(':');
     let hourNum = parseInt(hours);
     const period = hourNum >= 12 ? 'PM' : 'AM';
 
@@ -146,8 +146,8 @@ export default function ARUpdateForm() {
         <div className="space-y-4">
           <MetricRow
             label="Overall"
-            sales={data.dailySummary. overall.sales}
-            declines={data.dailySummary. overall.declines}
+            sales={data.dailySummary.overall.sales}
+            declines={data.dailySummary.overall.declines}
             onSalesChange={(value) =>
               setData({
                 ...data,
@@ -162,7 +162,7 @@ export default function ARUpdateForm() {
                 ...data,
                 dailySummary: {
                   ...data.dailySummary,
-                  overall:  { ...data.dailySummary.overall, declines: value },
+                  overall: { ...data.dailySummary.overall, declines: value },
                 },
               })
             }
@@ -170,14 +170,14 @@ export default function ARUpdateForm() {
           />
           <MetricRow
             label="VISA"
-            sales={data. dailySummary.visa.sales}
-            declines={data. dailySummary.visa.declines}
+            sales={data.dailySummary.visa.sales}
+            declines={data.dailySummary.visa.declines}
             onSalesChange={(value) =>
               setData({
                 ...data,
                 dailySummary: {
                   ...data.dailySummary,
-                  visa: { ... data.dailySummary.visa, sales: value },
+                  visa: { ...data.dailySummary.visa, sales: value },
                 },
               })
             }
@@ -193,12 +193,12 @@ export default function ARUpdateForm() {
           />
           <MetricRow
             label="MC"
-            sales={data.dailySummary. mc.sales}
-            declines={data.dailySummary. mc.declines}
+            sales={data.dailySummary.mc.sales}
+            declines={data.dailySummary.mc.declines}
             onSalesChange={(value) =>
               setData({
                 ...data,
-                dailySummary:  {
+                dailySummary: {
                   ...data.dailySummary,
                   mc: { ...data.dailySummary.mc, sales: value },
                 },
@@ -209,7 +209,7 @@ export default function ARUpdateForm() {
                 ...data,
                 dailySummary: {
                   ...data.dailySummary,
-                  mc: { ... data.dailySummary.mc, declines: value },
+                  mc: { ...data.dailySummary.mc, declines: value },
                 },
               })
             }
@@ -224,12 +224,12 @@ export default function ARUpdateForm() {
           <MetricRow
             label="Overall"
             sales={data.hourlyUpdate.overall.sales}
-            declines={data. hourlyUpdate.overall.declines}
+            declines={data.hourlyUpdate.overall.declines}
             onSalesChange={(value) =>
               setData({
                 ...data,
                 hourlyUpdate: {
-                  ... data.hourlyUpdate,
+                  ...data.hourlyUpdate,
                   overall: { ...data.hourlyUpdate.overall, sales: value },
                 },
               })
@@ -247,7 +247,7 @@ export default function ARUpdateForm() {
           />
           <MetricRow
             label="VISA"
-            sales={data. hourlyUpdate.visa.sales}
+            sales={data.hourlyUpdate.visa.sales}
             declines={data.hourlyUpdate.visa.declines}
             onSalesChange={(value) =>
               setData({
@@ -263,7 +263,7 @@ export default function ARUpdateForm() {
                 ...data,
                 hourlyUpdate: {
                   ...data.hourlyUpdate,
-                  visa: { ...data. hourlyUpdate.visa, declines: value },
+                  visa: { ...data.hourlyUpdate.visa, declines: value },
                 },
               })
             }
@@ -271,12 +271,12 @@ export default function ARUpdateForm() {
           <MetricRow
             label="MC"
             sales={data.hourlyUpdate.mc.sales}
-            declines={data. hourlyUpdate.mc.declines}
+            declines={data.hourlyUpdate.mc.declines}
             onSalesChange={(value) =>
               setData({
                 ...data,
                 hourlyUpdate: {
-                  ... data.hourlyUpdate,
+                  ...data.hourlyUpdate,
                   mc: { ...data.hourlyUpdate.mc, sales: value },
                 },
               })
@@ -304,7 +304,7 @@ export default function ARUpdateForm() {
       <MIDSection
         title="VISA — Worst MIDs"
         mids={data.visaWorstMids}
-        onMidsChange={(mids) => setData({ ...data, visaWorstMids:  mids })}
+        onMidsChange={(mids) => setData({ ...data, visaWorstMids: mids })}
       />
 
       <MIDSection
@@ -315,7 +315,7 @@ export default function ARUpdateForm() {
 
       <MIDSection
         title="MASTERCARD — Worst MIDs"
-        mids={data. mastercardWorstMids}
+        mids={data.mastercardWorstMids}
         onMidsChange={(mids) => setData({ ...data, mastercardWorstMids: mids })}
       />
 
