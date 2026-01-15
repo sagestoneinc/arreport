@@ -10,7 +10,7 @@ export default function TelegramPanel({ message }: TelegramPanelProps) {
   const [chatId, setChatId] = useState('');
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   const handleSend = async () => {
     setSending(true);
@@ -45,7 +45,7 @@ export default function TelegramPanel({ message }: TelegramPanelProps) {
         onClick={() => setExpanded(!expanded)}
         className="w-full flex justify-between items-center text-left"
       >
-        <h2 className="text-2xl font-semibold text-gray-800">📱 Send to Telegram (Optional)</h2>
+        <h2 className="text-2xl font-semibold text-gray-800">📱 Send to Telegram</h2>
         <span className="text-2xl">{expanded ? '−' : '+'}</span>
       </button>
 
