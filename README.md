@@ -1,9 +1,13 @@
 # AR MID Optimization Generator
 
-A production-ready Next.js web application for generating Telegram-formatted Approval Rate (AR) updates for MID optimization tracking. Takes sales/declines inputs and produces messages matching an exact format with emojis, thresholds, and status indicators.
+A production-ready Next.js web application for generating Telegram-formatted Approval Rate (AR) updates for MID optimization tracking. Supports **two output templates** with dynamic MID management, real-time AR calculation, and threshold-based status determination.
 
 ## Features
 
+- ✅ **Dual Template Support**:
+  - **Template A**: Top/Worst MIDs format with daily summary and hourly updates
+  - **Template B**: Threshold Performing/Low format with sales/declines grouping
+- ✅ Template-specific localStorage persistence
 - ✅ Exact Telegram message formatting with emojis
 - ✅ Dynamic MID management (VISA: up to 4, MASTERCARD: up to 5)
 - ✅ Real-time AR calculation and status determination
@@ -13,11 +17,15 @@ A production-ready Next.js web application for generating Telegram-formatted App
 - ✅ Optional Telegram Bot API integration
 - ✅ Responsive mobile-friendly design
 - ✅ Pre-filled demo data matching exact sample output
+- ✅ Full test coverage with Vitest
+- ✅ ESLint + Prettier for code quality
+- ✅ SEO optimization
 
 ## Tech Stack
 
 - **Next.js 14+** (App Router) + TypeScript
 - **Tailwind CSS** for styling
+- **Vitest** for testing
 - **No database** (all client state, optional localStorage)
 - Strong typing (no `any` types)
 
@@ -32,8 +40,8 @@ A production-ready Next.js web application for generating Telegram-formatted App
 
 1. Clone the repository:
 ```bash
-git clone <your-repo-url>
-cd ar-mid-optimization-generator
+git clone https://github.com/sagestoneinc/arreport.git
+cd arreport
 ```
 
 2. Install dependencies:
@@ -58,6 +66,19 @@ npm run dev
 ```
 
 6. Open [http://localhost:3000](http://localhost:3000)
+
+## Development Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm start            # Start production server
+npm run lint         # Run ESLint
+npm run format       # Format code with Prettier
+npm run format:check # Check code formatting
+npm test             # Run tests
+npm run test:watch   # Run tests in watch mode
+```
 
 ## Environment Variables
 
@@ -85,20 +106,23 @@ TELEGRAM_CHAT_ID=your_default_chat_id_here
 
 ## Usage
 
-1. **Report Date/Time**: Set the date and time for the AR update (defaults to sample data)
-2. **Threshold**: Enter the performing AR threshold percentage (default: 38%)
-3. **Daily Summary**: Enter daily sales and declines (auto-calculates AR)
-4. **VISA MIDs**: Add up to 4 VISA MIDs with sales/declines (auto-calculates AR and status)
-5. **MASTERCARD MIDs**: Add up to 5 MASTERCARD MIDs with sales/declines
-6. **Notes**: Add optimization notes or action taken
-7. **Generate**: Click "Generate Message" to create formatted output
-8. **Copy**: Click "Copy to Clipboard" to copy the message
-9. **Export/Import**: Save/load state as JSON for reuse
-10. **Send** (Optional): Expand "Send to Telegram" and send directly via Bot API
+1. **Select Template**: Choose between Template A (Top/Worst) or Template B (Threshold Performing/Low)
+2. **Report Date/Time**: Set the date and time for the AR update (defaults to sample data)
+3. **Threshold**: Enter the performing AR threshold percentage (default: 38%)
+4. **Daily Summary**: Enter daily sales and declines (auto-calculates AR)
+5. **VISA MIDs**: Add up to 4 VISA MIDs with sales/declines (auto-calculates AR and status)
+6. **MASTERCARD MIDs**: Add up to 5 MASTERCARD MIDs with sales/declines
+7. **Notes**: Add optimization notes or action taken
+8. **Generate**: Click "Generate Message" to create formatted output
+9. **Copy**: Click "Copy to Clipboard" to copy the message
+10. **Export/Import**: Save/load state as JSON for reuse
+11. **Send** (Optional): Expand "Send to Telegram" and send directly via Bot API
 
-## Exact Output Format
+## Template Formats
 
-The application generates messages in this precise format:
+### Template A: Top/Worst MIDs
+
+Classic format showing PERFORMING and LOW MIDs with AR percentages:
 
 ```
 📊 AR Update – MID Optimization
@@ -128,6 +152,13 @@ Overall AR: 24.73% (918 sales / 2794 declines)
 Enter optimization notes, routing changes, or monitoring actions here.
 ```
 
+### Template B: Threshold Performing/Low
+
+Same format as Template A but with emphasis on threshold-based grouping:
+- Output MID line format: `- {MID}: {AR}% ({sales} / {declines})`
+- Daily line format: `Overall AR: {AR}% ({sales} sales / {declines} declines)`
+- Shows "(none)" for empty sections
+
 ### Calculation Rules
 
 - **AR%** = sales / (sales + declines) × 100
@@ -136,8 +167,8 @@ Enter optimization notes, routing changes, or monitoring actions here.
 - **Status logic**:
   - if AR% >= threshold => "PERFORMING"
   - else => "LOW"
-- For MID lines: `(sales / declines)` format
-- For Daily Summary: `(X sales / Y declines)` format
+- For MID lines: `{AR}% (sales / declines)` format
+- For Daily Summary: `{AR}% (X sales / Y declines)` format
 
 ### Formatting Rules
 
@@ -147,6 +178,7 @@ Enter optimization notes, routing changes, or monitoring actions here.
 - Blank lines match exact specification
 - Empty LOW sections show "(none)" on next line
 - All headers present even if empty
+- Double blank line before Notes section
 
 ## Deployment
 
@@ -174,16 +206,17 @@ The app can be deployed to any platform that supports Next.js:
 ## Project Structure
 
 ```
-ar-mid-optimization-generator/
+arreport/
 ├── app/
 │   ├── api/
 │   │   └── telegram/
 │   │       └── send/
 │   │           └── route.ts       # Telegram API endpoint
-│   ├── layout.tsx                 # Root layout
-│   ├── page.tsx                   # Main page (client component)
+│   ├── layout.tsx                 # Root layout with SEO
+│   ├── page.tsx                   # Main page with template switching
 │   └── globals.css                # Global styles
 ├── components/
+│   ├── TemplateSelector.tsx       # Template A/B selector
 │   ├── HeaderInputs.tsx           # Date, time, threshold inputs
 │   ├── DailySummaryInputs.tsx     # Daily summary inputs
 │   ├── MidTableEditor.tsx         # Dynamic MID row editor
@@ -192,17 +225,41 @@ ar-mid-optimization-generator/
 │   └── TelegramPanel.tsx          # Optional Telegram sender
 ├── lib/
 │   ├── types.ts                   # TypeScript interfaces
-│   ├── defaults.ts                # Default sample data
+│   ├── defaults.ts                # Default sample data (both templates)
 │   ├── calc.ts                    # AR calculations & status
-│   ├── format.ts                  # Telegram message formatter
+│   ├── format.ts                  # Main formatter dispatcher
+│   ├── formatTemplateA.ts         # Template A formatter
+│   ├── formatTemplateB.ts         # Template B formatter
 │   └── validate.ts                # JSON import validation
+├── __tests__/
+│   ├── calc.test.ts               # Calculation tests
+│   ├── formatTemplateA.test.ts    # Template A output tests
+│   └── formatTemplateB.test.ts    # Template B output tests
 ├── .env.example                   # Environment variable template
+├── .eslintrc.json                 # ESLint configuration
+├── .prettierrc.json               # Prettier configuration
+├── .prettierignore                # Prettier ignore rules
 ├── .gitignore                     # Git ignore rules
+├── vitest.config.ts               # Vitest configuration
 ├── LICENSE                        # MIT License
 ├── README.md                      # This file
-├── package.json                   # Dependencies
+├── package.json                   # Dependencies and scripts
 ├── tailwind.config.ts             # Tailwind configuration
 └── tsconfig.json                  # TypeScript configuration
+```
+
+## Testing
+
+The application includes comprehensive tests for:
+- Calculation functions (AR%, formatting, status determination)
+- Template A output format
+- Template B output format
+- Edge cases (empty lists, zero values, etc.)
+
+Run tests with:
+```bash
+npm test              # Run once
+npm run test:watch    # Watch mode
 ```
 
 ## Security Notes
@@ -214,26 +271,6 @@ ar-mid-optimization-generator/
 - Use environment variables in production
 - Keep your bot token private
 - Token must come from environment only (never hardcoded)
-
-## Development
-
-### Build
-
-```bash
-npm run build
-```
-
-### Lint
-
-```bash
-npm run lint
-```
-
-### Start Production Server
-
-```bash
-npm start
-```
 
 ## License
 

@@ -31,9 +31,7 @@ export default function MidTableEditor({
   };
 
   const updateRow = (id: string, field: keyof MidRow, value: string | number) => {
-    onMidsChange(
-      mids.map((mid) => (mid.id === id ? { ...mid, [field]: value } : mid))
-    );
+    onMidsChange(mids.map((mid) => (mid.id === id ? { ...mid, [field]: value } : mid)));
   };
 
   return (
@@ -50,7 +48,9 @@ export default function MidTableEditor({
       </div>
 
       {mids.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">No MIDs added yet. Click &quot;Add MID&quot; to start.</p>
+        <p className="text-gray-500 text-center py-8">
+          No MIDs added yet. Click &quot;Add MID&quot; to start.
+        </p>
       ) : (
         <div className="space-y-3">
           {mids.map((mid) => {

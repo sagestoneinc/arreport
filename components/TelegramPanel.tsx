@@ -88,8 +88,11 @@ export default function TelegramPanel({ message }: TelegramPanelProps) {
           <div className="text-sm text-gray-600 bg-gray-50 p-4 rounded-md">
             <p className="font-semibold mb-2">ℹ️ Note:</p>
             <p>
-              To use Telegram integration, set <code className="bg-gray-200 px-1 rounded">TELEGRAM_BOT_TOKEN</code> in your environment variables.
-              You can optionally set a default <code className="bg-gray-200 px-1 rounded">TELEGRAM_CHAT_ID</code> or provide it above.
+              To use Telegram integration, set{' '}
+              <code className="bg-gray-200 px-1 rounded">TELEGRAM_BOT_TOKEN</code> in your
+              environment variables. You can optionally set a default{' '}
+              <code className="bg-gray-200 px-1 rounded">TELEGRAM_CHAT_ID</code> or provide it
+              above.
             </p>
           </div>
         </div>
