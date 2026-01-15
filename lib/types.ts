@@ -10,7 +10,10 @@ export interface Summary {
   declines: number;
 }
 
+export type TemplateType = 'template-a' | 'template-b';
+
 export interface AppState {
+  templateType: TemplateType;
   dateISO: string; // YYYY-MM-DD
   timeHHMM: string; // HH:mm
   threshold: number;
