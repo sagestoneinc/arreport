@@ -3,24 +3,34 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { message, botToken, chatId } = body;
+    const { message, chatId } = body;
 
     if (!message) {
       return NextResponse.json(
-        { error: 'Message is required' },
+        { ok: false, error: 'Message is required' },
         { status: 400 }
       );
     }
 
-    // Use provided credentials or fall back to environment variables
-    const token = botToken || process.env.TELEGRAM_BOT_TOKEN;
+    // Use provided chat ID or fall back to environment variable
+    const token = process.env.TELEGRAM_BOT_TOKEN;
     const chat = chatId || process.env.TELEGRAM_CHAT_ID;
 
-    if (!token || !chat) {
+    if (!token) {
       return NextResponse.json(
         {
-          error: 
-            'Bot token and chat ID are required. Either provide them in the request or set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID environment variables.',
+          ok: false,
+          error: 'TELEGRAM_BOT_TOKEN environment variable is not set.',
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!chat) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Chat ID is required. Either provide it in the request or set TELEGRAM_CHAT_ID environment variable.',
         },
         { status: 400 }
       );
@@ -37,7 +47,6 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           chat_id: chat,
           text: message,
-          parse_mode: 'HTML',
         }),
       }
     );
@@ -47,22 +56,20 @@ export async function POST(request: NextRequest) {
     if (!telegramResponse.ok) {
       return NextResponse.json(
         {
+          ok: false,
           error: telegramData.description || 'Failed to send message to Telegram',
-          details: telegramData,
         },
         { status: telegramResponse.status }
       );
     }
 
     return NextResponse.json({
-      success: true,
-      message: 'Message sent successfully',
-      data: telegramData,
+      ok: true,
     });
   } catch (error) {
     console.error('Telegram API error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { ok: false, error: 'Internal server error' },
       { status: 500 }
     );
   }

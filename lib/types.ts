@@ -1,33 +1,21 @@
-export interface MetricData {
-  sales: number;
-  declines: number;
-  approvalRate?: number; // calculated or manual override
-}
-
-export interface MIDData {
+export interface MidRow {
   id: string;
-  midName: string;
+  name: string;
   sales: number;
   declines: number;
 }
 
-export interface ARUpdateData {
-  date: string; // MM/DD/YYYY
-  time: string; // h:mm AM/PM
-  timezone: string;
-  keyAction: string;
-  dailySummary: {
-    overall: MetricData;
-    visa: MetricData;
-    mc: MetricData;
-  };
-  hourlyUpdate: {
-    overall: MetricData;
-    visa: MetricData;
-    mc: MetricData;
-  };
-  visaTopMids: MIDData[];
-  visaWorstMids: MIDData[];
-  mastercardTopMids: MIDData[];
-  mastercardWorstMids: MIDData[];
+export interface Summary {
+  sales: number;
+  declines: number;
+}
+
+export interface AppState {
+  dateISO: string; // YYYY-MM-DD
+  timeHHMM: string; // HH:mm
+  threshold: number;
+  dailySummary: Summary;
+  visaMids: MidRow[];
+  mcMids: MidRow[];
+  notes: string;
 }
