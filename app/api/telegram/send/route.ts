@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
     // Use provided credentials or fall back to environment variables
     const token = botToken || process.env.TELEGRAM_BOT_TOKEN;
-    const chat = chatId || process.env. TELEGRAM_CHAT_ID;
+    const chat = chatId || process.env.TELEGRAM_CHAT_ID;
 
     if (!token || !chat) {
       return NextResponse.json(
@@ -42,15 +42,15 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    const telegramData = await telegramResponse. json();
+    const telegramData = await telegramResponse.json();
 
     if (!telegramResponse.ok) {
       return NextResponse.json(
         {
-          error: telegramData. description || 'Failed to send message to Telegram',
+          error: telegramData.description || 'Failed to send message to Telegram',
           details: telegramData,
         },
-        { status:  telegramResponse.status }
+        { status: telegramResponse.status }
       );
     }
 

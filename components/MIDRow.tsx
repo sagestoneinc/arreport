@@ -20,7 +20,7 @@ export default function MIDRow({ mid, onUpdate, onRemove }: MIDRowProps) {
         <input
           type="text"
           value={mid.midName}
-          onChange={(e) => onUpdate({ ...mid, midName: e. target.value })}
+          onChange={(e) => onUpdate({ ...mid, midName: e.target.value })}
           placeholder="e.g., CS_395"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
@@ -40,7 +40,7 @@ export default function MIDRow({ mid, onUpdate, onRemove }: MIDRowProps) {
         <input
           type="number"
           min="0"
-          value={mid. declines}
+          value={mid.declines}
           onChange={(e) => onUpdate({ ...mid, declines: Math.max(0, parseInt(e.target.value) || 0) })}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus: ring-blue-500 focus: border-transparent"
         />
