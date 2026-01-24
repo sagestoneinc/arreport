@@ -545,5 +545,17 @@ describe('taskParser', () => {
       const result = parseDoneCommand(message);
       expect(result).toEqual({ type: 'text', value: '-1' });
     });
+
+    it('treats numbers with leading zeros as text argument', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/done 007',
+        date: Date.now(),
+      };
+
+      const result = parseDoneCommand(message);
+      expect(result).toEqual({ type: 'text', value: '007' });
+    });
   });
 });

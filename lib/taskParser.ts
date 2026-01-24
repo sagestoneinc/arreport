@@ -82,6 +82,9 @@ export function isOpenTaskCommand(message: TelegramMessage): boolean {
  * Formats:
  * - /done <task_number> - marks task by number (1-indexed from open task list)
  * - /done <partial_description> - marks task by matching description
+ * 
+ * Note: Numbers with leading zeros (e.g., "007") are treated as text, not numbers.
+ * This is intentional to allow searching for task descriptions containing numbers.
  */
 export function parseDoneCommand(message: TelegramMessage): { type: 'number'; value: number } | { type: 'text'; value: string } | null {
   if (!message.text) {
@@ -95,7 +98,8 @@ export function parseDoneCommand(message: TelegramMessage): { type: 'number'; va
   }
   
   const arg = match[1].trim();
-  // Check if it's a number
+  // Check if it's a positive integer (strict check: no leading zeros, no decimals)
+  // Leading zeros are treated as text to allow searching for "007" etc.
   const num = parseInt(arg, 10);
   if (!isNaN(num) && num > 0 && num.toString() === arg) {
     return { type: 'number', value: num };
