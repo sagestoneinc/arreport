@@ -98,6 +98,8 @@ export class MySQLTaskStorage implements ITaskStorage {
         errorMessage = `Access denied for MySQL user '${user}'. Please check your credentials.`;
       } else if (err.code === 'ENOTFOUND') {
         errorMessage = `MySQL host '${host}' not found. Please check your MYSQL_HOST configuration.`;
+      } else if (err.code === 'ETIMEDOUT') {
+        errorMessage = `Connection to MySQL server at ${host}:${port} timed out. Please ensure the server is reachable and not overloaded.`;
       }
 
       console.error('[MySQL] Failed to initialize database:', {
