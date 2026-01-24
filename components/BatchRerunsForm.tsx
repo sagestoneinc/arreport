@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { ProcessorsConfig } from '@/lib/templates';
+import ProcessorSelector from './ProcessorSelector';
 
 export interface CommonDecline {
   reason: string;
@@ -41,10 +43,18 @@ export interface BatchRerunsFormData {
   other_decline3_count: number;
 }
 
+export interface ProcessorSelections {
+  usca: string;
+  other: string;
+}
+
 interface BatchRerunsFormProps {
   formData: BatchRerunsFormData;
   onChange: (name: string, value: string | number) => void;
   onGenerate: () => void;
+  processors?: ProcessorsConfig;
+  processorSelections: ProcessorSelections;
+  onProcessorChange: (sectionKey: string, value: string) => void;
 }
 
 function computeShare(count: number, total: number): string | null {
@@ -65,7 +75,24 @@ function computeCardNetworkRate(approvals: number, txns: number): string | null 
   return percentage.toFixed(2);
 }
 
-export default function BatchRerunsForm({ formData, onChange, onGenerate }: BatchRerunsFormProps) {
+/**
+ * Determine if a section has zero volume
+ * Zero-volume: reruns == 0 OR reruns is empty AND sales == 0 (treat blank as 0)
+ */
+function isZeroVolume(reruns: number, sales: number): boolean {
+  const actualReruns = reruns || 0;
+  const actualSales = sales || 0;
+  return actualReruns === 0 && actualSales === 0;
+}
+
+export default function BatchRerunsForm({
+  formData,
+  onChange,
+  onGenerate,
+  processors,
+  processorSelections,
+  onProcessorChange,
+}: BatchRerunsFormProps) {
   // Compute all percentages
   const uscaApprovalRate = useMemo(() => {
     return computeApprovalRate(formData.usca_sales, formData.usca_reruns);
@@ -117,6 +144,30 @@ export default function BatchRerunsForm({ formData, onChange, onGenerate }: Batc
     formData.other_decline3_count,
     formData.other_reruns,
   ]);
+
+  // Zero-volume detection
+  const uscaZeroVolume = useMemo(
+    () => isZeroVolume(formData.usca_reruns, formData.usca_sales),
+    [formData.usca_reruns, formData.usca_sales]
+  );
+
+  const otherZeroVolume = useMemo(
+    () => isZeroVolume(formData.other_reruns, formData.other_sales),
+    [formData.other_reruns, formData.other_sales]
+  );
+
+  // Get the section header text with selected processor
+  const getUscaHeaderText = () => {
+    const label = processors?.usca?.label ?? 'US/CA Declines';
+    const processor = processorSelections.usca;
+    return `${label} → ${processor}`;
+  };
+
+  const getOtherHeaderText = () => {
+    const label = processors?.other?.label ?? 'All Other Geos';
+    const processor = processorSelections.other;
+    return `${label} → ${processor}`;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -185,11 +236,34 @@ export default function BatchRerunsForm({ formData, onChange, onGenerate }: Batc
         {renderInputField('date', 'Date', 'date', true)}
       </div>
 
-      {/* US/CA Declines → Revolv3 Card */}
-      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
-          US/CA Declines → Revolv3
-        </h3>
+      {/* US/CA Declines Card */}
+      <div
+        className={`rounded-lg border p-6 ${
+          uscaZeroVolume
+            ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700'
+            : 'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700'
+        }`}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div className="flex items-center gap-3">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+              {getUscaHeaderText()}
+            </h3>
+            {uscaZeroVolume && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200">
+                No volume
+              </span>
+            )}
+          </div>
+          {processors?.usca && (
+            <ProcessorSelector
+              config={processors.usca}
+              value={processorSelections.usca}
+              onChange={(value) => onProcessorChange('usca', value)}
+              sectionKey="usca"
+            />
+          )}
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {/* Summary Section */}
@@ -234,11 +308,34 @@ export default function BatchRerunsForm({ formData, onChange, onGenerate }: Batc
         </div>
       </div>
 
-      {/* Other Geos → Quantum Card */}
-      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
-          All Other Geos → Quantum
-        </h3>
+      {/* Other Geos Card */}
+      <div
+        className={`rounded-lg border p-6 ${
+          otherZeroVolume
+            ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700'
+            : 'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700'
+        }`}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div className="flex items-center gap-3">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+              {getOtherHeaderText()}
+            </h3>
+            {otherZeroVolume && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200">
+                No volume
+              </span>
+            )}
+          </div>
+          {processors?.other && (
+            <ProcessorSelector
+              config={processors.other}
+              value={processorSelections.other}
+              onChange={(value) => onProcessorChange('other', value)}
+              sectionKey="other"
+            />
+          )}
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {/* Summary Section */}

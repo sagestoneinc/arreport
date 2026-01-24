@@ -6,7 +6,10 @@ import Link from 'next/link';
 import { getTemplateBySlug, MidRowData } from '@/lib/templates';
 import { formatMessage } from '@/lib/formatters';
 import ReportForm from '@/components/ReportForm';
-import BatchRerunsForm, { BatchRerunsFormData } from '@/components/BatchRerunsForm';
+import BatchRerunsForm, {
+  BatchRerunsFormData,
+  ProcessorSelections,
+} from '@/components/BatchRerunsForm';
 import ManualRebillsForm, { ManualRebillsFormData } from '@/components/ManualRebillsForm';
 import Preview from '@/components/Preview';
 import TelegramButton from '@/components/TelegramButton';
@@ -14,6 +17,7 @@ import StickyToolbar from '@/components/StickyToolbar';
 import { saveToHistory } from '@/lib/historyStorage';
 
 const STORAGE_KEY_PREFIX = 'ar-report-';
+const PROCESSOR_STORAGE_KEY_PREFIX = 'ar-processor-';
 
 type FormDataValue = string | number | MidRowData[];
 
@@ -29,6 +33,12 @@ export default function ReportBuilderPage() {
   const [isSending, setIsSending] = useState(false);
   const [lastSentAt, setLastSentAt] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Processor selections state (for batch-reruns)
+  const [processorSelections, setProcessorSelections] = useState<ProcessorSelections>({
+    usca: 'Revolv3',
+    other: 'NS',
+  });
 
   // Initialize form data with defaults
   useEffect(() => {
@@ -49,13 +59,30 @@ export default function ReportBuilderPage() {
     } else {
       initializeDefaults();
     }
-    
+
     // Load lastSentAt for batch-reruns
     if (slug === 'batch-reruns') {
       const savedLastSentAt = localStorage.getItem(`lastSentAt:${slug}`);
       if (savedLastSentAt) {
         setLastSentAt(savedLastSentAt);
       }
+
+      // Load processor selections from localStorage
+      const savedUscaProcessor = localStorage.getItem(
+        `${PROCESSOR_STORAGE_KEY_PREFIX}${slug}:processor_usca`
+      );
+      const savedOtherProcessor = localStorage.getItem(
+        `${PROCESSOR_STORAGE_KEY_PREFIX}${slug}:processor_other`
+      );
+
+      // Initialize from template defaults if available
+      const uscaDefault = template.processors?.usca?.defaultProcessor ?? 'Revolv3';
+      const otherDefault = template.processors?.other?.defaultProcessor ?? 'NS';
+
+      setProcessorSelections({
+        usca: savedUscaProcessor || uscaDefault,
+        other: savedOtherProcessor || otherDefault,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug, template]);
@@ -77,6 +104,20 @@ export default function ReportBuilderPage() {
     }
   }, [formData, slug, isClient]);
 
+  // Save processor selections to localStorage
+  useEffect(() => {
+    if (isClient && slug === 'batch-reruns') {
+      localStorage.setItem(
+        `${PROCESSOR_STORAGE_KEY_PREFIX}${slug}:processor_usca`,
+        processorSelections.usca
+      );
+      localStorage.setItem(
+        `${PROCESSOR_STORAGE_KEY_PREFIX}${slug}:processor_other`,
+        processorSelections.other
+      );
+    }
+  }, [processorSelections, slug, isClient]);
+
   const handleFieldChange = (name: string, value: FormDataValue) => {
     setFormData((prev) => ({
       ...prev,
@@ -84,18 +125,48 @@ export default function ReportBuilderPage() {
     }));
   };
 
+  const handleProcessorChange = (sectionKey: string, value: string) => {
+    setProcessorSelections((prev) => ({
+      ...prev,
+      [sectionKey]: value,
+    }));
+  };
+
   const handleGenerate = () => {
     if (!template) return;
-    const message = formatMessage(slug, formData);
-    setGeneratedMessage(message);
-    // Save to history
-    saveToHistory(slug, message);
+
+    // For batch-reruns, pass processor config
+    if (slug === 'batch-reruns') {
+      const message = formatMessage(slug, formData, {
+        mode: 'telegram',
+        processorConfig: {
+          uscaLabel: template.processors?.usca?.label ?? 'US/CA Declines',
+          uscaProcessor: processorSelections.usca,
+          otherLabel: template.processors?.other?.label ?? 'All Other Geos',
+          otherProcessor: processorSelections.other,
+        },
+      });
+      setGeneratedMessage(message);
+      saveToHistory(slug, message);
+    } else {
+      const message = formatMessage(slug, formData);
+      setGeneratedMessage(message);
+      saveToHistory(slug, message);
+    }
   };
 
   const handleReset = () => {
     if (confirm('Are you sure you want to reset all fields?')) {
       initializeDefaults();
       setGeneratedMessage('');
+
+      // Reset processor selections to defaults
+      if (slug === 'batch-reruns' && template?.processors) {
+        setProcessorSelections({
+          usca: template.processors.usca?.defaultProcessor ?? 'Revolv3',
+          other: template.processors.other?.defaultProcessor ?? 'NS',
+        });
+      }
     }
   };
 
@@ -201,6 +272,9 @@ export default function ReportBuilderPage() {
                   formData={formData as unknown as BatchRerunsFormData}
                   onChange={handleFieldChange}
                   onGenerate={handleGenerate}
+                  processors={template.processors}
+                  processorSelections={processorSelections}
+                  onProcessorChange={handleProcessorChange}
                 />
               ) : slug === 'manual-rebills' ? (
                 <ManualRebillsForm

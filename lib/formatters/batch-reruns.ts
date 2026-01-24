@@ -41,6 +41,26 @@ export interface BatchRerunsData {
   other_decline3_count: number;
 }
 
+/**
+ * Processor configuration for batch reruns formatter
+ */
+export interface BatchRerunsProcessorConfig {
+  uscaLabel?: string;
+  uscaProcessor?: string;
+  otherLabel?: string;
+  otherProcessor?: string;
+}
+
+/**
+ * Default processor configuration
+ */
+const DEFAULT_PROCESSOR_CONFIG: Required<BatchRerunsProcessorConfig> = {
+  uscaLabel: 'US/CA Declines',
+  uscaProcessor: 'Revolv3',
+  otherLabel: 'All Other Geos',
+  otherProcessor: 'NS',
+};
+
 function computeApprovalRate(approvals: number, txns: number): number {
   if (txns === 0) return 0;
   return Math.round((approvals / txns) * 10000) / 100;
@@ -57,7 +77,24 @@ function formatDeclineWithShare(reason: string, share: string): string {
   return `${reason} — ${share}`;
 }
 
-export function formatBatchReruns(data: BatchRerunsData, mode: FormatMode = 'telegram'): string {
+/**
+ * Check if a section has zero volume
+ * Zero-volume: reruns == 0 OR reruns is empty AND sales == 0
+ */
+function isZeroVolume(reruns: number, sales: number): boolean {
+  const actualReruns = reruns || 0;
+  const actualSales = sales || 0;
+  return actualReruns === 0 && actualSales === 0;
+}
+
+export function formatBatchReruns(
+  data: BatchRerunsData,
+  mode: FormatMode = 'telegram',
+  processorConfig?: BatchRerunsProcessorConfig
+): string {
+  // Merge with defaults
+  const config = { ...DEFAULT_PROCESSOR_CONFIG, ...processorConfig };
+
   // Compute approval percentages if needed
   const uscaVisaAppr =
     data.usca_visa_appr || computeApprovalRate(data.usca_visa_approvals, data.usca_visa_txns);
@@ -88,6 +125,10 @@ export function formatBatchReruns(data: BatchRerunsData, mode: FormatMode = 'tel
   const otherDecline2Share = computeShare(data.other_decline2_count, data.other_reruns);
   const otherDecline3Share = computeShare(data.other_decline3_count, data.other_reruns);
 
+  // Check for zero volume sections
+  const uscaZeroVolume = isZeroVolume(data.usca_reruns, data.usca_sales);
+  const otherZeroVolume = isZeroVolume(data.other_reruns, data.other_sales);
+
   const lines: string[] = [];
   const dateFormatted = formatDateForReport(data.date);
 
@@ -97,8 +138,15 @@ export function formatBatchReruns(data: BatchRerunsData, mode: FormatMode = 'tel
   );
   lines.push('');
 
-  // US/CA Section
-  lines.push(formatSectionHeader(EMOJI.US_FLAG, 'US/CA Declines → Revolv3', mode));
+  // US/CA Section - using dynamic labels
+  const uscaSectionHeader = `${config.uscaLabel} → ${config.uscaProcessor}`;
+  lines.push(formatSectionHeader(EMOJI.US_FLAG, uscaSectionHeader, mode));
+
+  // Add zero-volume callout if needed
+  if (uscaZeroVolume) {
+    lines.push(escapeIfNeeded('🟠 No volume for this segment (0 re-runs).', mode));
+  }
+
   lines.push(escapeIfNeeded(`- Re-runs: ${data.usca_reruns}`, mode));
   lines.push(escapeIfNeeded(`- Sales: ${data.usca_sales}`, mode));
   lines.push(escapeIfNeeded(`- Approval Rate: ${uscaApproval}%`, mode));
@@ -135,8 +183,15 @@ export function formatBatchReruns(data: BatchRerunsData, mode: FormatMode = 'tel
 
   lines.push('');
 
-  // Other Geos Section
-  lines.push(formatSectionHeader(EMOJI.GLOBE, 'All Other Geos → Quantum', mode));
+  // Other Geos Section - using dynamic labels
+  const otherSectionHeader = `${config.otherLabel} → ${config.otherProcessor}`;
+  lines.push(formatSectionHeader(EMOJI.GLOBE, otherSectionHeader, mode));
+
+  // Add zero-volume callout if needed
+  if (otherZeroVolume) {
+    lines.push(escapeIfNeeded('🟠 No volume for this segment (0 re-runs).', mode));
+  }
+
   lines.push(escapeIfNeeded(`- Re-runs: ${data.other_reruns}`, mode));
   lines.push(escapeIfNeeded(`- Sales: ${data.other_sales}`, mode));
   lines.push(escapeIfNeeded(`- Approval Rate: ${otherApproval}%`, mode));
