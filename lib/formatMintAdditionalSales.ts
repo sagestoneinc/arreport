@@ -1,19 +1,22 @@
 import { AppState } from './types';
-import { formatDate, formatTime } from './dateTimeUtils';
 
 /**
  * Format the Mint Additional Sales Report message
+ * Template format:
+ * Hey guys, we re-ran yesterday's declines and got an additional X sales for you:
+ * MID: count
+ * MID: count
+ * ...
+ * 
+ * c1 & c3's:
+ * MID - transaction_id
+ * MID - transaction_id
+ * ...
  */
 export function formatMintAdditionalSales(state: AppState): string {
   const lines: string[] = [];
 
-  // Header
-  lines.push('📊 Mint Additional Sales Report');
-  lines.push(`🗓️ ${formatDate(state.dateISO)} | 🕐 ${formatTime(state.timeHHMM)} EST`);
-  lines.push('');
-
-  // Notes
-  lines.push('📝 Additional Sales Details:');
+  // Content from notes (contains the full formatted message)
   lines.push(state.notes);
 
   return lines.join('\n');
