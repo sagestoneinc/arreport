@@ -21,11 +21,28 @@ export interface TemplateField {
   };
 }
 
+/**
+ * Processor configuration for a section
+ */
+export interface ProcessorConfig {
+  label: string;
+  defaultProcessor: string;
+  processorOptions: string[];
+}
+
+/**
+ * Processor configuration for template sections
+ */
+export interface ProcessorsConfig {
+  [key: string]: ProcessorConfig;
+}
+
 export interface TemplateDefinition {
   slug: string;
   name: string;
   description: string;
   fields: TemplateField[];
+  processors?: ProcessorsConfig;
 }
 
 export const TEMPLATES: TemplateDefinition[] = [
@@ -33,6 +50,18 @@ export const TEMPLATES: TemplateDefinition[] = [
     slug: 'batch-reruns',
     name: 'Daily Batch Re-runs',
     description: 'Generate daily batch re-runs summary with US/CA and other geo declines',
+    processors: {
+      usca: {
+        label: 'US/CA Declines',
+        defaultProcessor: 'Revolv3',
+        processorOptions: ['Revolv3', 'NS', 'Quantum', 'PayCafe'],
+      },
+      other: {
+        label: 'All Other Geos',
+        defaultProcessor: 'NS',
+        processorOptions: ['NS', 'Quantum', 'Revolv3', 'PayCafe'],
+      },
+    },
     fields: [
       {
         name: 'date',
