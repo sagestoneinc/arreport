@@ -5,6 +5,7 @@ import {
   formatSectionHeader,
   escapeIfNeeded,
   formatDateForReport,
+  bold,
 } from '../telegram-format';
 
 export interface HourlyApprovalRateData {
@@ -79,16 +80,6 @@ function getPerformanceEmoji(index: number, total: number): string {
   }
 }
 
-/**
- * Format MID name as bold for Telegram MarkdownV2
- * @param midName - The MID name to format
- * @returns Bold formatted MID name (escaped for MarkdownV2)
- */
-function formatBoldMID(midName: string): string {
-  // Use the bold function from telegram-format which handles escaping
-  return `*${escapeIfNeeded(midName, 'telegram')}*`;
-}
-
 function formatMidSection(mids: MidWithAR[], mode: FormatMode): string[] {
   const lines: string[] = [];
 
@@ -101,7 +92,7 @@ function formatMidSection(mids: MidWithAR[], mode: FormatMode): string[] {
 
       if (mode === 'telegram') {
         // Bold the MID name only, keep emoji and stats outside
-        const boldMidName = formatBoldMID(mid.mid_name);
+        const boldMidName = bold(mid.mid_name);
         const stats = `${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`;
         const escapedStats = escapeIfNeeded(stats, mode);
         lines.push(`${emoji} ${boldMidName} — ${escapedStats}`);

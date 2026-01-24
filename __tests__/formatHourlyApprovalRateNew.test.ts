@@ -267,11 +267,7 @@ describe('formatHourlyApprovalRate - New Template System', () => {
     console.log(output);
     console.log('=================================\n');
   });
-});
-import { describe, it, expect } from 'vitest';
-import { formatHourlyApprovalRate } from '../lib/formatters/hourly-approval-rate';
 
-describe('Test 2 MIDs scenario', () => {
   it('handles 2 MIDs correctly (shows top and bottom performers only)', () => {
     const data = {
       date: '2026-01-24',
