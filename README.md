@@ -2,8 +2,11 @@
 
 A production-ready Next.js web application for generating Telegram-formatted Approval Rate (AR) updates for MID optimization tracking. Supports **two output templates** with dynamic MID management, real-time AR calculation, and threshold-based status determination.
 
+**NEW:** Now includes a **Telegram Task Collector Bot** that captures tasks from group chats and provides a web interface to manage them!
+
 ## Features
 
+### AR Report Templates
 - ✅ **Dual Template Support**:
   - **Template A**: Top/Worst MIDs format with daily summary and hourly updates
   - **Template B**: Threshold Performing/Low format with sales/declines grouping
@@ -17,16 +20,32 @@ A production-ready Next.js web application for generating Telegram-formatted App
 - ✅ Optional Telegram Bot API integration
 - ✅ Responsive mobile-friendly design
 - ✅ Pre-filled demo data matching exact sample output
+
+### Task Collector Bot (NEW!)
+- ✅ **Webhook-based Telegram bot** for capturing tasks from group chats
+- ✅ Multiple task trigger formats (`@botname - task`, `/task`, `/todo`)
+- ✅ **SQLite database** for persistent task storage
+- ✅ **Web UI** for viewing and managing tasks
+- ✅ Filter tasks by status (open/done) and chat
+- ✅ Mark tasks as done/open with one click
+- ✅ Export open tasks as text (copy/download)
+- ✅ Delete tasks
+- ✅ Support for edited messages
+- ✅ Rate limiting to prevent loops
+- ✅ Serverless-friendly architecture
+
+### Quality Assurance
 - ✅ Full test coverage with Vitest
 - ✅ ESLint + Prettier for code quality
 - ✅ SEO optimization
+- ✅ Strong typing (no `any` types)
 
 ## Tech Stack
 
 - **Next.js 14+** (App Router) + TypeScript
 - **Tailwind CSS** for styling
 - **Vitest** for testing
-- **No database** (all client state, optional localStorage)
+- **SQLite** (better-sqlite3) for task storage
 - Strong typing (no `any` types)
 
 ## Getting Started
@@ -55,9 +74,16 @@ cp .env.example .env.local
 ```
 
 4. (Optional) Add your Telegram credentials to `.env.local`:
-```
+```env
+# For sending AR reports
 TELEGRAM_BOT_TOKEN=your_bot_token_here
 TELEGRAM_CHAT_ID=your_default_chat_id_here
+
+# For Task Collector Bot (see Task Collector Setup section)
+TELEGRAM_WEBHOOK_SECRET=your_random_secret_here
+APP_BASE_URL=https://your-app-domain.com
+BOT_USERNAME=your_bot_username
+TASKS_STORAGE=sqlite
 ```
 
 5. Run the development server:
@@ -82,11 +108,32 @@ npm run test:watch   # Run tests in watch mode
 
 ## Environment Variables
 
+### AR Report Generator Variables
+
 Create a `.env.local` file in the root directory:
 
 ```env
 TELEGRAM_BOT_TOKEN=your_bot_token_here
 TELEGRAM_CHAT_ID=your_default_chat_id_here
+```
+
+### Task Collector Bot Variables (NEW!)
+
+Additional variables needed for the Task Collector bot:
+
+```env
+# Telegram webhook secret (generate a random string)
+TELEGRAM_WEBHOOK_SECRET=your_random_secret_token
+
+# Your app's public URL (required for webhook)
+APP_BASE_URL=https://arreport.example.com
+
+# Bot username (without @, for mention matching)
+BOT_USERNAME=your_bot_username
+
+# Task storage type (default: sqlite)
+# Options: "file" | "sqlite" | "memory"
+TASKS_STORAGE=sqlite
 ```
 
 ### How to Get Telegram Credentials
@@ -180,6 +227,202 @@ Same format as Template A but with emphasis on threshold-based grouping:
 - All headers present even if empty
 - Double blank line before Notes section
 
+## Task Collector Bot (NEW!)
+
+The Task Collector Bot is a Telegram webhook-based bot that captures tasks from group chats and provides a web interface to manage them.
+
+### Features
+
+- 📋 **Multiple trigger formats**: `@botname - task`, `/task`, `/todo`
+- 💾 **Persistent storage**: SQLite database for reliable task tracking
+- 🌐 **Web UI**: View, filter, and manage tasks from any browser
+- ✅ **Task management**: Mark as done/open, delete, or export
+- 🔄 **Edit support**: Updates tasks when Telegram messages are edited
+- 🛡️ **Security**: Webhook secret verification, rate limiting
+- 🚀 **Serverless-friendly**: Works on Vercel, Netlify, and other platforms
+
+### Task Trigger Formats
+
+The bot recognizes the following message formats:
+
+1. **Command format**:
+   ```
+   /task Review the pull request
+   /todo Update documentation
+   ```
+
+2. **Mention with dash**:
+   ```
+   @yourbotname - Deploy to staging
+   ```
+
+3. **Mention without dash**:
+   ```
+   @yourbotname Check the logs
+   ```
+
+### Setup Instructions
+
+#### 1. Create or Configure Your Bot
+
+If you already have a bot token from setting up the AR report feature, you can reuse it. Otherwise:
+
+1. Open Telegram and search for [@BotFather](https://t.me/botfather)
+2. Send `/newbot` and follow instructions
+3. Copy the bot token provided
+4. Send `/setcommands` to BotFather and add these commands:
+   ```
+   task - Add a new task
+   todo - Add a new task
+   ```
+
+#### 2. Add Bot to Your Group
+
+1. Add your bot to the Telegram group where you want to collect tasks
+2. Make sure the bot has permission to read messages:
+   - Go to BotFather → select your bot → Bot Settings → Group Privacy → Disable
+
+#### 3. Configure Environment Variables
+
+Add these to your `.env.local` file:
+
+```env
+# Your bot token from BotFather
+TELEGRAM_BOT_TOKEN=123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
+
+# Generate a random secret (use a password generator)
+TELEGRAM_WEBHOOK_SECRET=your_random_secret_string_here
+
+# Your app's public URL (IMPORTANT: must be HTTPS in production)
+APP_BASE_URL=https://arreport.example.com
+
+# Your bot's username (without @)
+BOT_USERNAME=your_bot_name
+
+# Storage type (default: sqlite)
+TASKS_STORAGE=sqlite
+```
+
+#### 4. Deploy Your Application
+
+Deploy to a platform with HTTPS support (required for Telegram webhooks):
+
+- **Vercel** (recommended): Add all environment variables in project settings
+- **Netlify**: Add environment variables in site settings
+- **Railway/Render**: Add environment variables in dashboard
+
+#### 5. Set Up the Webhook
+
+After deploying, run the webhook setup script:
+
+```bash
+node scripts/setup-webhook.js
+```
+
+You should see:
+```
+✅ Webhook set successfully!
+📝 Description: Webhook was set
+```
+
+**Alternative**: Manually set the webhook using curl:
+
+```bash
+curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://your-app-domain.com/api/telegram/webhook",
+    "secret_token": "your_random_secret",
+    "allowed_updates": ["message", "edited_message"]
+  }'
+```
+
+### Using the Task Collector
+
+#### In Telegram
+
+Send messages in any of these formats:
+
+```
+/task Review the quarterly report
+/todo Fix bug in login page
+@yourbotname - Deploy v2.0 to production
+```
+
+The bot will:
+- ✅ Save the task to the database
+- 💬 Reply with "✅ Task saved: {description}" (for `/task`, `/todo`, or mentions with `-`)
+
+#### In the Web Interface
+
+1. Visit `/tasks` on your deployed app (or click "📋 View Tasks" from the home page)
+2. **Filter tasks**:
+   - By status: All, Open, or Done
+   - By chat: Select from dropdown
+3. **Manage tasks**:
+   - ✅ Click checkbox to mark done/open
+   - 🗑️ Click trash icon to delete
+4. **Export tasks**:
+   - 📋 "Copy Open" - Copy open tasks to clipboard
+   - 💾 "Download" - Download as text file
+
+### Storage Options
+
+The bot supports three storage backends:
+
+1. **SQLite** (default, recommended):
+   - Persistent storage in `/data/tasks.db`
+   - Works on most platforms
+   - Note: Vercel requires [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres) for persistent data
+
+2. **Memory**:
+   - Set `TASKS_STORAGE=memory`
+   - Tasks lost on restart
+   - Good for testing
+
+3. **File** (deprecated):
+   - Uses SQLite file storage (same as sqlite option)
+
+### Rate Limiting
+
+The bot includes built-in rate limiting (5 requests per chat per minute) to prevent:
+- Infinite loops if the bot responds to itself
+- Spam in busy groups
+- Resource exhaustion
+
+### Troubleshooting
+
+**Bot doesn't respond to messages:**
+- Verify bot is in the group and has message reading permission
+- Check webhook is set: `curl https://api.telegram.org/bot<TOKEN>/getWebhookInfo`
+- Check application logs for errors
+
+**Webhook verification fails:**
+- Ensure `TELEGRAM_WEBHOOK_SECRET` matches in both environment and webhook setup
+- Verify the secret is set when configuring the webhook
+
+**Tasks not persisting:**
+- Check `/data` directory exists and is writable
+- Verify `TASKS_STORAGE=sqlite` in environment variables
+- On Vercel, use a proper database solution (Vercel Postgres, external DB)
+
+**"Error fetching tasks" in UI:**
+- Verify the application is running
+- Check browser console for errors
+- Ensure API routes are accessible
+
+### Security Considerations
+
+✅ **Webhook Secret**: Always set `TELEGRAM_WEBHOOK_SECRET` to prevent unauthorized webhook calls
+
+✅ **HTTPS Required**: Telegram only sends webhooks to HTTPS endpoints
+
+✅ **No Client Secrets**: All sensitive data stays server-side
+
+✅ **Rate Limiting**: Built-in protection against spam and loops
+
+⚠️ **Access Control**: The `/tasks` page is publicly accessible. Add authentication if needed.
+
 ## Deployment
 
 ### Deploy to Vercel (Recommended)
@@ -189,8 +432,15 @@ Same format as Template A but with emphasis on threshold-based grouping:
 3. Import your repository
 4. Add environment variables in Vercel dashboard:
    - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_CHAT_ID` (optional)
+   - `TELEGRAM_CHAT_ID` (optional, for AR reports)
+   - `TELEGRAM_WEBHOOK_SECRET` (for Task Collector)
+   - `APP_BASE_URL` (for Task Collector)
+   - `BOT_USERNAME` (for Task Collector)
+   - `TASKS_STORAGE` (optional, default: sqlite)
 5. Deploy
+6. After deployment, run `node scripts/setup-webhook.js` to configure the Telegram webhook
+
+**Note**: For persistent task storage on Vercel, consider using [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres) or an external database, as the serverless file system is ephemeral.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
@@ -209,9 +459,16 @@ The app can be deployed to any platform that supports Next.js:
 arreport/
 ├── app/
 │   ├── api/
+│   │   ├── tasks/
+│   │   │   ├── [id]/
+│   │   │   │   └── route.ts       # PATCH/DELETE individual task
+│   │   │   └── route.ts           # GET tasks with filters
 │   │   └── telegram/
-│   │       └── send/
-│   │           └── route.ts       # Telegram API endpoint
+│   │       ├── webhook/
+│   │       │   └── route.ts       # Telegram webhook endpoint
+│   │       └── route.ts           # Send messages endpoint
+│   ├── tasks/
+│   │   └── page.tsx               # Tasks management UI (NEW!)
 │   ├── layout.tsx                 # Root layout with SEO
 │   ├── page.tsx                   # Main page with template switching
 │   └── globals.css                # Global styles
@@ -224,6 +481,9 @@ arreport/
 │   ├── OutputPanel.tsx            # Generated output + export/import
 │   └── TelegramPanel.tsx          # Optional Telegram sender
 ├── lib/
+│   ├── taskTypes.ts               # Task-related TypeScript types (NEW!)
+│   ├── taskParser.ts              # Telegram message parser (NEW!)
+│   ├── taskStorage.ts             # SQLite storage layer (NEW!)
 │   ├── types.ts                   # TypeScript interfaces
 │   ├── defaults.ts                # Default sample data (both templates)
 │   ├── calc.ts                    # AR calculations & status
@@ -231,10 +491,15 @@ arreport/
 │   ├── formatTemplateA.ts         # Template A formatter
 │   ├── formatTemplateB.ts         # Template B formatter
 │   └── validate.ts                # JSON import validation
+├── scripts/
+│   └── setup-webhook.js           # Webhook configuration script (NEW!)
 ├── __tests__/
+│   ├── taskParser.test.ts         # Task parser tests (NEW!)
 │   ├── calc.test.ts               # Calculation tests
 │   ├── formatTemplateA.test.ts    # Template A output tests
 │   └── formatTemplateB.test.ts    # Template B output tests
+├── data/                          # Task database (gitignored, NEW!)
+│   └── tasks.db                   # SQLite database
 ├── .env.example                   # Environment variable template
 ├── .eslintrc.json                 # ESLint configuration
 ├── .prettierrc.json               # Prettier configuration
@@ -254,6 +519,7 @@ The application includes comprehensive tests for:
 - Calculation functions (AR%, formatting, status determination)
 - Template A output format
 - Template B output format
+- Task parser (Telegram message parsing, trigger detection)
 - Edge cases (empty lists, zero values, etc.)
 
 Run tests with:
@@ -271,6 +537,9 @@ npm run test:watch    # Watch mode
 - Use environment variables in production
 - Keep your bot token private
 - Token must come from environment only (never hardcoded)
+- **Task Collector**: Use a strong random string for `TELEGRAM_WEBHOOK_SECRET`
+- **Task Collector**: Webhook endpoint verifies secret token on every request
+- **Task Collector**: Rate limiting prevents spam and infinite loops
 
 ## License
 
