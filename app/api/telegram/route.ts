@@ -1,14 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { MAX_TELEGRAM_MESSAGE_LENGTH } from '../../../lib/telegram-format';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { message } = body;
+    const { message, parseMode = 'MarkdownV2' } = body;
 
     // Validate message
     if (!message || typeof message !== 'string' || message.trim() === '') {
       return NextResponse.json(
         { ok: false, error: 'Message is required and must be non-empty' },
+        { status: 400 }
+      );
+    }
+
+    // Validate message length
+    if (message.length > MAX_TELEGRAM_MESSAGE_LENGTH) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: `Message is too long. Maximum length is ${MAX_TELEGRAM_MESSAGE_LENGTH} characters, got ${message.length}`,
+        },
         { status: 400 }
       );
     }
@@ -28,7 +40,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send message to Telegram
+    // Send message to Telegram with parse_mode
     const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
     const response = await fetch(telegramUrl, {
       method: 'POST',
@@ -38,6 +50,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         chat_id: chatId,
         text: message,
+        parse_mode: parseMode,
       }),
     });
 

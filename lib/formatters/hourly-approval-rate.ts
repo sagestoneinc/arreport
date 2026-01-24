@@ -1,3 +1,12 @@
+import {
+  FormatMode,
+  EMOJI,
+  formatTitle,
+  formatSectionHeader,
+  escapeIfNeeded,
+  formatDateForReport,
+} from '../telegram-format';
+
 export interface HourlyApprovalRateData {
   date: string;
   time_range: string;
@@ -20,14 +29,6 @@ interface MidWithAR {
   initial_decline: number;
   ar_percent: number | null;
   total: number;
-}
-
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr + 'T00:00:00');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day = date.getDate().toString().padStart(2, '0');
-  const year = date.getFullYear();
-  return `${month}/${day}/${year}`;
 }
 
 function calculateARPercent(sales: number, decline: number): number | null {
@@ -61,13 +62,14 @@ function sortMids(mids: MidWithAR[]): MidWithAR[] {
   });
 }
 
-export function formatHourlyApprovalRate(data: HourlyApprovalRateData): string {
+export function formatHourlyApprovalRate(data: HourlyApprovalRateData, mode: FormatMode = 'telegram'): string {
   const lines: string[] = [];
+  const dateFormatted = formatDateForReport(data.date);
 
-  lines.push('HOURLY MID OPS REPORT');
+  // Title with emoji and bold
+  lines.push(formatTitle(EMOJI.CLOCK, `Hourly MID Ops Report — ${dateFormatted}`, mode));
   lines.push('');
-  lines.push(`Date: ${formatDate(data.date)}`);
-  lines.push(`Time Range: ${data.time_range}`);
+  lines.push(escapeIfNeeded(`Time Range: ${data.time_range}`, mode));
   lines.push('');
 
   // Process and sort VISA mids
@@ -78,13 +80,16 @@ export function formatHourlyApprovalRate(data: HourlyApprovalRateData): string {
   }));
   const sortedVisaMids = sortMids(visaMidsWithAR);
 
-  lines.push('VISA');
+  lines.push(formatSectionHeader(EMOJI.CARD_NETWORK, 'VISA', mode));
   if (sortedVisaMids.length === 0) {
-    lines.push('- —');
+    lines.push(escapeIfNeeded('- —', mode));
   } else {
-    sortedVisaMids.forEach((mid) => {
+    sortedVisaMids.forEach((mid, index) => {
+      const isTop = index === 0 && sortedVisaMids.length > 1;
+      const isBottom = index === sortedVisaMids.length - 1 && sortedVisaMids.length > 1;
+      const prefix = isTop ? EMOJI.TOP_PERFORMER : isBottom ? EMOJI.LOW_PERFORMER : '-';
       lines.push(
-        `- ${mid.mid_name} - ${mid.initial_sales} sales / ${mid.initial_decline} declines - ${formatARPercent(mid.ar_percent)}`
+        escapeIfNeeded(`${prefix} ${mid.mid_name} — ${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`, mode)
       );
     });
   }
@@ -98,20 +103,23 @@ export function formatHourlyApprovalRate(data: HourlyApprovalRateData): string {
   }));
   const sortedMcMids = sortMids(mcMidsWithAR);
 
-  lines.push('MasterCard');
+  lines.push(formatSectionHeader(EMOJI.CARD_NETWORK, 'MasterCard', mode));
   if (sortedMcMids.length === 0) {
-    lines.push('- —');
+    lines.push(escapeIfNeeded('- —', mode));
   } else {
-    sortedMcMids.forEach((mid) => {
+    sortedMcMids.forEach((mid, index) => {
+      const isTop = index === 0 && sortedMcMids.length > 1;
+      const isBottom = index === sortedMcMids.length - 1 && sortedMcMids.length > 1;
+      const prefix = isTop ? EMOJI.TOP_PERFORMER : isBottom ? EMOJI.LOW_PERFORMER : '-';
       lines.push(
-        `- ${mid.mid_name} - ${mid.initial_sales} sales / ${mid.initial_decline} declines - ${formatARPercent(mid.ar_percent)}`
+        escapeIfNeeded(`${prefix} ${mid.mid_name} — ${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`, mode)
       );
     });
   }
   lines.push('');
 
-  lines.push('Insights/Actions:');
-  lines.push(data.insights || '');
+  lines.push(formatSectionHeader(EMOJI.INSIGHTS, 'Insights & Actions', mode));
+  lines.push(escapeIfNeeded(data.insights || '', mode));
 
   return lines.join('\n');
 }

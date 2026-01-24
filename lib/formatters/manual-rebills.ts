@@ -1,4 +1,12 @@
 import { computeApprovalRate, formatShare } from '../calc';
+import {
+  FormatMode,
+  EMOJI,
+  formatTitle,
+  formatSectionHeader,
+  escapeIfNeeded,
+  formatDateForReport,
+} from '../telegram-format';
 
 export interface ManualRebillsData {
   date: string;
@@ -20,20 +28,12 @@ export interface ManualRebillsData {
   insights?: string;
 }
 
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr + 'T00:00:00');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day = date.getDate().toString().padStart(2, '0');
-  const year = date.getFullYear();
-  return `${month}/${day}/${year}`;
-}
-
-function formatDeclineWithShare(reason: string, count: number, share: string): string {
+function formatDeclineWithShare(reason: string, share: string): string {
   if (!reason || reason.trim() === '') return '';
-  return `${reason} (${share})`;
+  return `${reason} — ${share}`;
 }
 
-export function formatManualRebills(data: ManualRebillsData): string {
+export function formatManualRebills(data: ManualRebillsData, mode: FormatMode = 'telegram'): string {
   // Compute approval percentages if needed
   const visaAppr = data.visa_appr || computeApprovalRate(data.visa_approvals, data.visa_txns);
   const mcAppr = data.mc_appr || computeApprovalRate(data.mc_approvals, data.mc_txns);
@@ -49,33 +49,46 @@ export function formatManualRebills(data: ManualRebillsData): string {
   const decline3Share = formatShare(data.decline3_count, data.rebills_reruns);
 
   const lines: string[] = [];
+  const dateFormatted = formatDateForReport(data.date);
 
-  lines.push(`Re-Bills Summary: ${formatDate(data.date)}`);
+  // Title with emoji and bold
+  lines.push(formatTitle(EMOJI.RERUNS, `Manual Rebills Summary — ${dateFormatted}`, mode));
   lines.push('');
+
+  // Summary stats
+  lines.push(escapeIfNeeded(`- Re-runs: ${data.rebills_reruns}`, mode));
+  lines.push(escapeIfNeeded(`- Sales: ${data.rebills_sales}`, mode));
+  lines.push(escapeIfNeeded(`- Approval Rate: ${rebillsApproval}%`, mode));
+  lines.push('');
+
+  // Card network breakdown
   lines.push(
-    `I re-ran ${data.rebills_reruns} rebills declines from yesterday to PayCafe and got ${data.rebills_sales} sales (${rebillsApproval}% approval).`
+    escapeIfNeeded(`${EMOJI.CARD_NETWORK} Visa — ${data.visa_approvals} approvals / ${data.visa_txns} txns (${visaAppr.toFixed(2)}%)`, mode)
   );
   lines.push(
-    `- Visa: ${visaAppr.toFixed(2)}% (${data.visa_approvals} approvals, ${data.visa_txns} txns)`
+    escapeIfNeeded(`${EMOJI.CARD_NETWORK} MC — ${data.mc_approvals} approvals / ${data.mc_txns} txns (${mcAppr.toFixed(2)}%)`, mode)
   );
-  lines.push(`- MC: ${mcAppr.toFixed(2)}% (${data.mc_approvals} approvals, ${data.mc_txns} txns)`);
   
   // Format Common Declines with shares
   const declines = [
-    formatDeclineWithShare(data.decline1_reason, data.decline1_count, decline1Share),
-    formatDeclineWithShare(data.decline2_reason, data.decline2_count, decline2Share),
-    formatDeclineWithShare(data.decline3_reason, data.decline3_count, decline3Share),
+    formatDeclineWithShare(data.decline1_reason, decline1Share),
+    formatDeclineWithShare(data.decline2_reason, decline2Share),
+    formatDeclineWithShare(data.decline3_reason, decline3Share),
   ].filter(d => d !== '');
   
   if (declines.length > 0) {
-    lines.push(`Common Declines: ${declines.join(', ')}`);
+    lines.push('');
+    lines.push(formatSectionHeader(EMOJI.DECLINES, 'Common Declines', mode));
+    declines.forEach(decline => {
+      lines.push(escapeIfNeeded(`- ${decline}`, mode));
+    });
   }
 
   // Add insights if provided
   if (data.insights && data.insights.trim()) {
     lines.push('');
-    lines.push('Insights:');
-    lines.push(data.insights.trim());
+    lines.push(formatSectionHeader(EMOJI.INSIGHTS, 'Insights', mode));
+    lines.push(escapeIfNeeded(data.insights.trim(), mode));
   }
 
   return lines.join('\n');
