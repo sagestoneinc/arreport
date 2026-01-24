@@ -26,6 +26,9 @@ export default function ReportBuilderPage() {
   const [formData, setFormData] = useState<Record<string, FormDataValue>>({});
   const [generatedMessage, setGeneratedMessage] = useState('');
   const [isClient, setIsClient] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [lastSentAt, setLastSentAt] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Initialize form data with defaults
   useEffect(() => {
@@ -45,6 +48,14 @@ export default function ReportBuilderPage() {
       }
     } else {
       initializeDefaults();
+    }
+    
+    // Load lastSentAt for batch-reruns
+    if (slug === 'batch-reruns') {
+      const savedLastSentAt = localStorage.getItem(`lastSentAt:${slug}`);
+      if (savedLastSentAt) {
+        setLastSentAt(savedLastSentAt);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug, template]);
@@ -85,6 +96,39 @@ export default function ReportBuilderPage() {
     if (confirm('Are you sure you want to reset all fields?')) {
       initializeDefaults();
       setGeneratedMessage('');
+    }
+  };
+
+  const handleSendTelegram = async () => {
+    if (!generatedMessage) return;
+
+    setIsSending(true);
+    try {
+      const response = await fetch('/api/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: generatedMessage }),
+      });
+
+      const data = await response.json();
+
+      if (data.ok) {
+        const now = new Date().toLocaleString();
+        setLastSentAt(now);
+        localStorage.setItem(`lastSentAt:${slug}`, now);
+        setToast({ type: 'success', message: 'Sent to Telegram' });
+      } else {
+        setToast({ type: 'error', message: data.error || 'Failed to send message' });
+      }
+    } catch (error) {
+      console.error('Failed to send to Telegram:', error);
+      setToast({ type: 'error', message: 'Network error: Failed to send message' });
+    } finally {
+      setIsSending(false);
+      const timeoutId = setTimeout(() => setToast(null), 5000);
+      return () => clearTimeout(timeoutId);
     }
   };
 
@@ -181,14 +225,31 @@ export default function ReportBuilderPage() {
           </div>
         </div>
 
-        <TelegramButton message={generatedMessage} disabled={!generatedMessage} />
+        {slug !== 'batch-reruns' && (
+          <TelegramButton message={generatedMessage} disabled={!generatedMessage} />
+        )}
       </div>
+
+      {/* Toast notification */}
+      {toast && (
+        <div
+          className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-6 py-4 rounded-xl shadow-xl text-white font-semibold max-w-md ${
+            toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+          }`}
+        >
+          {toast.message}
+        </div>
+      )}
 
       {/* Sticky Toolbar */}
       <StickyToolbar
         templateName={template.name}
         onGenerate={handleGenerate}
         onReset={handleReset}
+        onSendTelegram={slug === 'batch-reruns' ? handleSendTelegram : undefined}
+        canSend={!!generatedMessage}
+        isSending={isSending}
+        lastSentAt={slug === 'batch-reruns' ? lastSentAt : undefined}
       />
     </main>
   );
