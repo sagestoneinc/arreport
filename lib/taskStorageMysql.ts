@@ -38,7 +38,10 @@ export class MySQLTaskStorage implements ITaskStorage {
 
   private async getPool(): Promise<mysql.Pool> {
     await this.initialize();
-    return this.pool!;
+    if (!this.pool) {
+      throw new Error('Database pool not initialized. This indicates a bug in the initialization logic.');
+    }
+    return this.pool;
   }
 
   private async initSchema(): Promise<void> {

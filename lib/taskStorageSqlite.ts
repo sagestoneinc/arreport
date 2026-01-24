@@ -17,6 +17,7 @@ export class SQLiteTaskStorage implements ITaskStorage {
     if (this.initialized) {
       return;
     }
+    // Trigger database creation and schema initialization
     this.getDb();
     this.initialized = true;
   }
