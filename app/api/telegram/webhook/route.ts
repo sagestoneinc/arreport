@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TelegramUpdate } from '@/lib/taskTypes';
+import { TelegramUpdate, Task } from '@/lib/taskTypes';
 import { parseTaskFromMessage, shouldReply, rateLimiter, isOpenTaskCommand, parseDoneCommand } from '@/lib/taskParser';
 import { getTaskStorage } from '@/lib/taskStorage';
 
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse task from message
-    const taskDescription = parseTaskFromMessage(message, botUsername);
+    const parsedTask = parseTaskFromMessage(message, botUsername);
 
     if (!parsedTask) {
       return NextResponse.json({ ok: true });
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     try {
       if (isEdited && (await storage.taskExists(chatId, messageId))) {
         // Update existing task
-        await storage.updateTask(chatId, messageId, taskDescription, message.text || message.caption || '');
+        await storage.updateTask(chatId, messageId, parsedTask.title, parsedTask.description, message.text || message.caption || '');
         console.log(`Updated task from message ${messageId} in chat ${chatId}`);
       } else if (!(await storage.taskExists(chatId, messageId))) {
         // Check for duplicate open task with same title
@@ -114,7 +114,6 @@ export async function POST(request: NextRequest) {
           name: message.from
             ? [message.from.first_name, message.from.last_name].filter(Boolean).join(' ')
             : undefined,
-          description: taskDescription,
           raw_text: message.text || message.caption || '',
         });
 
@@ -202,7 +201,7 @@ async function handleDoneCommand(
       // Match by partial description (case-insensitive)
       const searchText = command.value.toLowerCase();
       taskToComplete = openTasks.find((task) =>
-        task.description.toLowerCase().includes(searchText)
+        task.description?.toLowerCase().includes(searchText)
       );
       if (!taskToComplete) {
         await sendTelegramMessage(
