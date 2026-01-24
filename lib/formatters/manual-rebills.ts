@@ -28,7 +28,7 @@ export interface ManualRebillsData {
   insights?: string;
 }
 
-function formatDeclineWithShare(reason: string, count: number, share: string): string {
+function formatDeclineWithShare(reason: string, share: string): string {
   if (!reason || reason.trim() === '') return '';
   return `${reason} — ${share}`;
 }
@@ -71,9 +71,9 @@ export function formatManualRebills(data: ManualRebillsData, mode: FormatMode = 
   
   // Format Common Declines with shares
   const declines = [
-    formatDeclineWithShare(data.decline1_reason, data.decline1_count, decline1Share),
-    formatDeclineWithShare(data.decline2_reason, data.decline2_count, decline2Share),
-    formatDeclineWithShare(data.decline3_reason, data.decline3_count, decline3Share),
+    formatDeclineWithShare(data.decline1_reason, decline1Share),
+    formatDeclineWithShare(data.decline2_reason, decline2Share),
+    formatDeclineWithShare(data.decline3_reason, decline3Share),
   ].filter(d => d !== '');
   
   if (declines.length > 0) {

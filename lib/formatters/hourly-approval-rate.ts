@@ -80,7 +80,7 @@ export function formatHourlyApprovalRate(data: HourlyApprovalRateData, mode: For
   }));
   const sortedVisaMids = sortMids(visaMidsWithAR);
 
-  lines.push(formatSectionHeader(EMOJI.VISA, 'VISA', mode));
+  lines.push(formatSectionHeader(EMOJI.CARD_NETWORK, 'VISA', mode));
   if (sortedVisaMids.length === 0) {
     lines.push(escapeIfNeeded('- —', mode));
   } else {
@@ -103,7 +103,7 @@ export function formatHourlyApprovalRate(data: HourlyApprovalRateData, mode: For
   }));
   const sortedMcMids = sortMids(mcMidsWithAR);
 
-  lines.push(formatSectionHeader(EMOJI.MASTERCARD, 'MasterCard', mode));
+  lines.push(formatSectionHeader(EMOJI.CARD_NETWORK, 'MasterCard', mode));
   if (sortedMcMids.length === 0) {
     lines.push(escapeIfNeeded('- —', mode));
   } else {

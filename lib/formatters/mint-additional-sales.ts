@@ -16,7 +16,7 @@ export function formatMintAdditionalSales(data: MintAdditionalSalesData, mode: F
   const lines: string[] = [];
 
   // Title with emoji and bold
-  lines.push(formatTitle(EMOJI.SALES, `MInt Additional Sales Update`, mode));
+  lines.push(formatTitle(EMOJI.SALES, `Mint Additional Sales Update`, mode));
   lines.push('');
   lines.push(
     escapeIfNeeded(`We re-ran yesterday's declines and got an additional ${data.additional_sales} sales for you:`, mode)

@@ -52,7 +52,7 @@ function computeShare(count: number, total: number): string {
   return `${percentage.toFixed(2)}%`;
 }
 
-function formatDeclineWithShare(reason: string, count: number, share: string): string {
+function formatDeclineWithShare(reason: string, share: string): string {
   if (!reason || reason.trim() === '') return '';
   return `${reason} — ${share}`;
 }
@@ -118,9 +118,9 @@ export function formatBatchReruns(data: BatchRerunsData, mode: FormatMode = 'tel
   
   // Format Common Declines with shares for US/CA
   const uscaDeclines = [
-    formatDeclineWithShare(data.usca_decline1_reason, data.usca_decline1_count, uscaDecline1Share),
-    formatDeclineWithShare(data.usca_decline2_reason, data.usca_decline2_count, uscaDecline2Share),
-    formatDeclineWithShare(data.usca_decline3_reason, data.usca_decline3_count, uscaDecline3Share),
+    formatDeclineWithShare(data.usca_decline1_reason, uscaDecline1Share),
+    formatDeclineWithShare(data.usca_decline2_reason, uscaDecline2Share),
+    formatDeclineWithShare(data.usca_decline3_reason, uscaDecline3Share),
   ].filter(d => d !== '');
   
   if (uscaDeclines.length > 0) {
@@ -156,9 +156,9 @@ export function formatBatchReruns(data: BatchRerunsData, mode: FormatMode = 'tel
   
   // Format Common Declines with shares for Other Geos
   const otherDeclines = [
-    formatDeclineWithShare(data.other_decline1_reason, data.other_decline1_count, otherDecline1Share),
-    formatDeclineWithShare(data.other_decline2_reason, data.other_decline2_count, otherDecline2Share),
-    formatDeclineWithShare(data.other_decline3_reason, data.other_decline3_count, otherDecline3Share),
+    formatDeclineWithShare(data.other_decline1_reason, otherDecline1Share),
+    formatDeclineWithShare(data.other_decline2_reason, otherDecline2Share),
+    formatDeclineWithShare(data.other_decline3_reason, otherDecline3Share),
   ].filter(d => d !== '');
   
   if (otherDeclines.length > 0) {

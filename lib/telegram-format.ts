@@ -32,8 +32,6 @@ export const EMOJI = {
   US_FLAG: '🇺🇸',
   GLOBE: '🌍',
   CLOCK: '⏱',
-  VISA: '💳',
-  MASTERCARD: '💳',
 } as const;
 
 /**
