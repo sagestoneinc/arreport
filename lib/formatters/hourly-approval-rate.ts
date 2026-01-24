@@ -10,6 +10,7 @@ import {
 export interface HourlyApprovalRateData {
   date: string;
   time_range: string;
+  filter_used?: string;
   visa_mids: Array<{
     mid_name: string;
     initial_sales: number;
@@ -70,6 +71,12 @@ export function formatHourlyApprovalRate(data: HourlyApprovalRateData, mode: For
   lines.push(formatTitle(EMOJI.CLOCK, `Hourly MID Ops Report — ${dateFormatted}`, mode));
   lines.push('');
   lines.push(escapeIfNeeded(`Time Range: ${data.time_range}`, mode));
+  
+  // Add Filter Used if provided
+  if (data.filter_used) {
+    lines.push(escapeIfNeeded(`Filter Used: ${data.filter_used}`, mode));
+  }
+  
   lines.push('');
 
   // Process and sort VISA mids
@@ -83,10 +90,17 @@ export function formatHourlyApprovalRate(data: HourlyApprovalRateData, mode: For
   lines.push(formatSectionHeader(EMOJI.CARD_NETWORK, 'VISA', mode));
   if (sortedVisaMids.length === 0) {
     lines.push(escapeIfNeeded('- —', mode));
+  } else if (sortedVisaMids.length === 1) {
+    // Single MID: only show top performer emoji
+    const mid = sortedVisaMids[0];
+    lines.push(
+      escapeIfNeeded(`${EMOJI.TOP_PERFORMER} ${mid.mid_name} — ${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`, mode)
+    );
   } else {
+    // Multiple MIDs: show top, middle (no emoji), and bottom
     sortedVisaMids.forEach((mid, index) => {
-      const isTop = index === 0 && sortedVisaMids.length > 1;
-      const isBottom = index === sortedVisaMids.length - 1 && sortedVisaMids.length > 1;
+      const isTop = index === 0;
+      const isBottom = index === sortedVisaMids.length - 1;
       const prefix = isTop ? EMOJI.TOP_PERFORMER : isBottom ? EMOJI.LOW_PERFORMER : '-';
       lines.push(
         escapeIfNeeded(`${prefix} ${mid.mid_name} — ${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`, mode)
@@ -106,10 +120,17 @@ export function formatHourlyApprovalRate(data: HourlyApprovalRateData, mode: For
   lines.push(formatSectionHeader(EMOJI.CARD_NETWORK, 'MasterCard', mode));
   if (sortedMcMids.length === 0) {
     lines.push(escapeIfNeeded('- —', mode));
+  } else if (sortedMcMids.length === 1) {
+    // Single MID: only show top performer emoji
+    const mid = sortedMcMids[0];
+    lines.push(
+      escapeIfNeeded(`${EMOJI.TOP_PERFORMER} ${mid.mid_name} — ${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`, mode)
+    );
   } else {
+    // Multiple MIDs: show top, middle (no emoji), and bottom
     sortedMcMids.forEach((mid, index) => {
-      const isTop = index === 0 && sortedMcMids.length > 1;
-      const isBottom = index === sortedMcMids.length - 1 && sortedMcMids.length > 1;
+      const isTop = index === 0;
+      const isBottom = index === sortedMcMids.length - 1;
       const prefix = isTop ? EMOJI.TOP_PERFORMER : isBottom ? EMOJI.LOW_PERFORMER : '-';
       lines.push(
         escapeIfNeeded(`${prefix} ${mid.mid_name} — ${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`, mode)
