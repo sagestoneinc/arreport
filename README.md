@@ -45,7 +45,7 @@ A production-ready Next.js web application for generating Telegram-formatted App
 - **Next.js 14+** (App Router) + TypeScript
 - **Tailwind CSS** for styling
 - **Vitest** for testing
-- **SQLite** (better-sqlite3) for task storage
+- **Database**: SQLite (better-sqlite3) or MySQL (mysql2) for task storage
 - Strong typing (no `any` types)
 
 ## Getting Started
@@ -132,8 +132,15 @@ APP_BASE_URL=https://arreport.example.com
 BOT_USERNAME=your_bot_username
 
 # Task storage type (default: sqlite)
-# Options: "file" | "sqlite" | "memory"
+# Options: "sqlite" | "mysql" | "memory"
 TASKS_STORAGE=sqlite
+
+# MySQL Configuration (only if TASKS_STORAGE=mysql)
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=root
+MYSQL_PASSWORD=your_mysql_password
+MYSQL_DATABASE=arreport
 ```
 
 ### How to Get Telegram Credentials
@@ -368,20 +375,35 @@ The bot will:
 
 ### Storage Options
 
-The bot supports three storage backends:
+The bot supports multiple storage backends:
 
-1. **SQLite** (default, recommended):
+1. **SQLite** (default, recommended for single-server deployments):
    - Persistent storage in `/data/tasks.db`
+   - Set `TASKS_STORAGE=sqlite` (or omit for default)
    - Works on most platforms
-   - Note: Vercel requires [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres) for persistent data
+   - Note: Vercel requires [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres) or external DB for persistent data
 
-2. **Memory**:
+2. **MySQL** (recommended for production/multi-server):
+   - Persistent storage in MySQL database
+   - Set `TASKS_STORAGE=mysql`
+   - Requires MySQL 5.7+ or MariaDB 10.2+
+   - Configure connection settings:
+     ```env
+     TASKS_STORAGE=mysql
+     MYSQL_HOST=localhost
+     MYSQL_PORT=3306
+     MYSQL_USER=your_username
+     MYSQL_PASSWORD=your_password
+     MYSQL_DATABASE=arreport
+     ```
+   - Tables are created automatically on first run
+   - Supports connection pooling for better performance
+   - **[See detailed MySQL setup guide →](docs/MYSQL_SETUP.md)**
+
+3. **Memory** (testing only):
    - Set `TASKS_STORAGE=memory`
    - Tasks lost on restart
    - Good for testing
-
-3. **File** (deprecated):
-   - Uses SQLite file storage (same as sqlite option)
 
 ### Rate Limiting
 
@@ -402,9 +424,11 @@ The bot includes built-in rate limiting (5 requests per chat per minute) to prev
 - Verify the secret is set when configuring the webhook
 
 **Tasks not persisting:**
-- Check `/data` directory exists and is writable
-- Verify `TASKS_STORAGE=sqlite` in environment variables
-- On Vercel, use a proper database solution (Vercel Postgres, external DB)
+- **SQLite**: Check `/data` directory exists and is writable
+- **SQLite**: Verify `TASKS_STORAGE=sqlite` in environment variables
+- **MySQL**: Verify database connection settings and credentials
+- **MySQL**: Ensure database exists (create with `CREATE DATABASE arreport;`)
+- On Vercel, use MySQL or [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres)
 
 **"Error fetching tasks" in UI:**
 - Verify the application is running

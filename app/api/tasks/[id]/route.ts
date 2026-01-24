@@ -20,7 +20,7 @@ export async function PATCH(
     }
 
     const storage = getTaskStorage();
-    const success = storage.updateTaskStatus(id, status);
+    const success = await storage.updateTaskStatus(id, status);
 
     if (!success) {
       return NextResponse.json(
@@ -29,7 +29,7 @@ export async function PATCH(
       );
     }
 
-    const task = storage.getTaskById(id);
+    const task = await storage.getTaskById(id);
     return NextResponse.json({ ok: true, task });
   } catch (error) {
     console.error('Error updating task:', error);
@@ -48,7 +48,7 @@ export async function DELETE(
     const { id } = params;
 
     const storage = getTaskStorage();
-    const success = storage.deleteTask(id);
+    const success = await storage.deleteTask(id);
 
     if (!success) {
       return NextResponse.json(

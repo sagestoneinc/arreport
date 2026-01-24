@@ -56,13 +56,13 @@ export async function POST(request: NextRequest) {
     const isEdited = !!update.edited_message;
     const messageId = message.message_id;
 
-    if (isEdited && storage.taskExists(chatId, messageId)) {
+    if (isEdited && await storage.taskExists(chatId, messageId)) {
       // Update existing task
-      storage.updateTask(chatId, messageId, taskDescription, message.text || '');
+      await storage.updateTask(chatId, messageId, taskDescription, message.text || '');
       console.log(`Updated task from message ${messageId} in chat ${chatId}`);
-    } else if (!storage.taskExists(chatId, messageId)) {
+    } else if (!(await storage.taskExists(chatId, messageId))) {
       // Save new task
-      const task = storage.saveTask({
+      const task = await storage.saveTask({
         chat_id: chatId,
         chat_title: message.chat.title,
         message_id: messageId,
