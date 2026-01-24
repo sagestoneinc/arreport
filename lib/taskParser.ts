@@ -60,7 +60,7 @@ export function extractCleanTitle(rawText: string): string {
 export function parseTaskFromMessage(
   message: TelegramMessage,
   botUsername?: string
-): string | null {
+): ParsedTask | null {
   // Handle forwarded messages - use the forwarded text or caption as the task description
   if (message.forward_from || message.forward_from_chat) {
     // Check for text first
@@ -73,11 +73,18 @@ export function parseTaskFromMessage(
     }
     // Check for caption (for forwarded images/media)
     if (message.caption && message.caption.trim()) {
-      return message.caption.trim();
+      const captionText = message.caption.trim();
+      return {
+        title: extractCleanTitle(captionText),
+        description: captionText,
+      };
     }
     // Forwarded photo without caption - create a generic task description
     if (message.photo && message.photo.length > 0) {
-      return '[Forwarded Image]';
+      return {
+        title: '[Forwarded Image]',
+        description: '[Forwarded Image]',
+      };
     }
     return null;
   }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseTaskFromMessage, shouldReply, isOpenTaskCommand, parseDoneCommand } from '../lib/taskParser';
+import { parseTaskFromMessage, shouldReply, isOpenTaskCommand, parseDoneCommand, extractCleanTitle } from '../lib/taskParser';
 import { TelegramMessage } from '../lib/taskTypes';
 
 describe('taskParser', () => {
@@ -246,7 +246,10 @@ describe('taskParser', () => {
       };
 
       const result = parseTaskFromMessage(message);
-      expect(result).toBe('Check this screenshot for the bug');
+      expect(result).toEqual({
+        title: 'Check this screenshot for the bug',
+        description: 'Check this screenshot for the bug',
+      });
     });
 
     it('parses forwarded image without caption as generic task', () => {
@@ -266,7 +269,10 @@ describe('taskParser', () => {
       };
 
       const result = parseTaskFromMessage(message);
-      expect(result).toBe('[Forwarded Image]');
+      expect(result).toEqual({
+        title: '[Forwarded Image]',
+        description: '[Forwarded Image]',
+      });
     });
 
     it('parses forwarded channel image with caption as task', () => {
@@ -288,7 +294,10 @@ describe('taskParser', () => {
       };
 
       const result = parseTaskFromMessage(message);
-      expect(result).toBe('Important announcement screenshot');
+      expect(result).toEqual({
+        title: 'Important announcement screenshot',
+        description: 'Important announcement screenshot',
+      });
     });
   });
 
