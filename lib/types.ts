@@ -10,12 +10,13 @@ export interface Summary {
   declines: number;
 }
 
-export type TemplateType = 'template-a' | 'template-b';
+export type TemplateType = 'template-a' | 'template-b' | 'approval-rate-hourly' | 'daily-batch-reruns' | 'daily-summary-rebills' | 'mint-additional-sales';
 
 export interface AppState {
   templateType: TemplateType;
   dateISO: string; // YYYY-MM-DD
   timeHHMM: string; // HH:mm
+  timeEndHHMM?: string; // HH:mm for time range
   threshold: number;
   dailySummary: Summary;
   visaMids: MidRow[];
