@@ -229,7 +229,7 @@ export default function ReportBuilderPage() {
             action_type: 'SEND_TELEGRAM',
             report_slug: slug,
             report_title: template?.name,
-            telegram_chat_id: process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID || 'configured',
+            // Chat ID is obtained server-side in the audit log route
             telegram_payload: generatedMessage,
             status: success ? 'SUCCESS' : 'FAIL',
             error_message: errorMsg,

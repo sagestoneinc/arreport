@@ -384,9 +384,9 @@ async function handleHelpCommand(chatId: string, messageId: number): Promise<voi
     return;
   }
 
-  const baseUrl = process.env.APP_BASE_URL || 'https://arreport.jesscura.com';
+  const baseUrl = process.env.APP_BASE_URL;
   
-  const helpText = `🤖 *AR Report Bot — Help*
+  let helpText = `🤖 *AR Report Bot — Help*
 
 📝 *Task Commands*
 • /task <text> — Create a new task
@@ -403,11 +403,15 @@ async function handleHelpCommand(chatId: string, messageId: number): Promise<voi
 • /help — Show this help menu
 • /start — Welcome message
 
+💡 Tasks are deduplicated — duplicate open tasks are rejected.`;
+
+  if (baseUrl) {
+    helpText += `
+
 🔗 *Web Dashboard*
 ${baseUrl}/tasks — View & manage all tasks
-${baseUrl}/audit — View activity log
-
-💡 Tasks are deduplicated — duplicate open tasks are rejected.`;
+${baseUrl}/audit — View activity log`;
+  }
 
   await sendTelegramMessage(chatId, messageId, helpText);
 }
@@ -419,19 +423,25 @@ async function handleStartCommand(chatId: string, messageId: number): Promise<vo
     return;
   }
 
-  const baseUrl = process.env.APP_BASE_URL || 'https://arreport.jesscura.com';
+  const baseUrl = process.env.APP_BASE_URL;
   
-  const welcomeText = `👋 *Welcome to AR Report Bot!*
+  let welcomeText = `👋 *Welcome to AR Report Bot!*
 
 I help you manage tasks and track reports.
 
 🚀 *Quick Start:*
 • Type /task Buy groceries to create a task
 • Type /opentask to see all open tasks
-• Type /done 1 to complete task #1
+• Type /done 1 to complete task #1`;
+
+  if (baseUrl) {
+    welcomeText += `
 
 📱 *Web Dashboard:*
-${baseUrl}
+${baseUrl}`;
+  }
+
+  welcomeText += `
 
 Type /help for all commands.`;
 

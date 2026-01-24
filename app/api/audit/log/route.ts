@@ -40,13 +40,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // For SEND_TELEGRAM, get chat ID from server environment if not provided
+    let chatId = telegram_chat_id;
+    if (action_type === 'SEND_TELEGRAM' && !chatId) {
+      chatId = process.env.TELEGRAM_CHAT_ID || 'configured';
+    }
+
     const params: CreateAuditLogParams = {
       user_id: userId,
       user_email: userEmail,
       action_type,
       report_slug,
       report_title,
-      telegram_chat_id,
+      telegram_chat_id: chatId,
       telegram_chat_title,
       telegram_payload,
       status,
