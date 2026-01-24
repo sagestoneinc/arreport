@@ -359,6 +359,7 @@ Send messages in any of these formats:
 The bot will:
 - ✅ Save the task to the database
 - 💬 Reply with "✅ Task saved: {description}" (for `/task`, `/todo`, or mentions with `-`)
+- 🔗 Include a link to view all tasks (if `APP_BASE_URL` is configured)
 
 #### In the Web Interface
 
