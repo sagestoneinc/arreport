@@ -74,7 +74,10 @@ export class MySQLTaskStorage implements ITaskStorage {
       
       // Clean up the pool if initialization failed
       if (this.pool) {
-        await this.pool.end().catch(() => {});
+        await this.pool.end().catch((cleanupError) => {
+          // Log cleanup error but don't throw - original error is more important
+          console.error('[MySQL] Error during cleanup:', cleanupError);
+        });
         this.pool = null;
       }
       

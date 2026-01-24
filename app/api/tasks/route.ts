@@ -36,11 +36,18 @@ export async function GET(request: NextRequest) {
     console.error('[Tasks API] Error code:', err.code);
     console.error('[Tasks API] Error stack:', err.stack);
     
+    // Sanitize error message to avoid leaking sensitive information
+    let errorMessage = 'Failed to fetch tasks';
+    if (process.env.NODE_ENV === 'development') {
+      // Only include basic error info without connection details
+      errorMessage = err.message.replace(/password[^\s]*/gi, 'password=***');
+    }
+    
     return NextResponse.json(
       { 
         ok: false, 
         error: 'Failed to fetch tasks',
-        details: process.env.NODE_ENV === 'development' ? err.message : undefined 
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined 
       },
       { status: 500 }
     );

@@ -4,6 +4,14 @@ import { getTaskStorage } from '@/lib/taskStorage';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  // Restrict debug endpoint to development and test environments
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({
+      ok: false,
+      error: 'Debug endpoint not available in production'
+    }, { status: 403 });
+  }
+
   try {
     const storageType = process.env.TASKS_STORAGE || 'sqlite';
     
