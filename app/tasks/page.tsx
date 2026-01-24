@@ -116,28 +116,28 @@ export default function TasksPage() {
   const openTasksCount = tasks.filter((task) => task.status === 'open').length;
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-6 py-10 sm:px-6 lg:px-8 sm:py-12">
         {/* Header */}
         <div className="mb-10">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">Tasks</h1>
-          <p className="text-lg text-gray-600">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3">Tasks</h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
             Collected from Telegram • {openTasksCount} open{' '}
             {tasks.length > openTasksCount && `• ${tasks.length - openTasksCount} done`}
           </p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-card border border-gray-100 p-6 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 Status
               </label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as 'all' | 'open' | 'done')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-all duration-150"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-150"
               >
                 <option value="all">All Tasks</option>
                 <option value="open">Open</option>
@@ -146,13 +146,13 @@ export default function TasksPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 Chat
               </label>
               <select
                 value={chatFilter}
                 onChange={(e) => setChatFilter(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-all duration-150"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-150"
               >
                 <option value="all">All Chats</option>
                 {chats.map((chat) => (
@@ -164,21 +164,21 @@ export default function TasksPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 Export
               </label>
               <div className="flex gap-3">
                 <button
                   onClick={exportOpenTasks}
                   disabled={openTasksCount === 0}
-                  className="flex-1 px-4 py-3 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-all duration-150 font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-600 to-accent-500 text-white rounded-lg hover:from-primary-700 hover:to-accent-600 transition-all duration-150 font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
                   Copy
                 </button>
                 <button
                   onClick={downloadOpenTasks}
                   disabled={openTasksCount === 0}
-                  className="flex-1 px-4 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-150 font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                  className="flex-1 px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-150 font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
                   Download
                 </button>
@@ -190,14 +190,14 @@ export default function TasksPage() {
         {/* Tasks List */}
         {loading ? (
           <div className="text-center py-20">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-600"></div>
-            <p className="mt-4 text-gray-600 font-medium">Loading tasks...</p>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600 dark:border-primary-400"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">Loading tasks...</p>
           </div>
         ) : tasks.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-card border border-gray-100 p-16 text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-16 text-center">
             <div className="text-6xl mb-4">📋</div>
-            <p className="text-gray-500 text-lg font-medium">No tasks found</p>
-            <p className="text-gray-400 mt-2">
+            <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">No tasks found</p>
+            <p className="text-gray-400 dark:text-gray-500 mt-2">
               Tasks will appear here when you post them in Telegram
             </p>
           </div>
@@ -206,7 +206,7 @@ export default function TasksPage() {
             {tasks.map((task) => (
               <div
                 key={task.id}
-                className={`bg-white rounded-xl shadow-card border border-gray-100 p-6 transition-all hover:shadow-card-hover ${
+                className={`bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-lg border border-gray-100 dark:border-gray-700 p-6 transition-all ${
                   task.status === 'done' ? 'opacity-60' : ''
                 }`}
               >
@@ -240,15 +240,15 @@ export default function TasksPage() {
                       <h3
                         className={`text-lg font-semibold ${
                           task.status === 'done'
-                            ? 'text-gray-500 line-through'
-                            : 'text-gray-900'
+                            ? 'text-gray-500 dark:text-gray-400 line-through'
+                            : 'text-gray-900 dark:text-gray-100'
                         }`}
                       >
                         {task.description}
                       </h3>
                     </div>
 
-                    <div className="ml-9 space-y-1 text-sm text-gray-600">
+                    <div className="ml-9 space-y-1 text-sm text-gray-600 dark:text-gray-400">
                       <p>
                         <span className="font-semibold">From:</span> {task.name || task.username || 'Unknown'}
                         {task.username && ` (@${task.username})`}
@@ -265,7 +265,7 @@ export default function TasksPage() {
 
                   <button
                     onClick={() => deleteTask(task.id)}
-                    className="ml-4 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-150"
+                    className="ml-4 p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-150"
                     title="Delete task"
                   >
                     <svg
