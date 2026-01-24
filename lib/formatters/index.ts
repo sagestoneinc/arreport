@@ -7,7 +7,7 @@ import { FormatMode } from '../telegram-format';
 
 export type FormDataType = Record<string, string | number | MidRowData[]>;
 
-export { FormatMode } from '../telegram-format';
+export type { FormatMode } from '../telegram-format';
 
 export function formatMessage(slug: string, data: FormDataType, mode: FormatMode = 'telegram'): string {
   switch (slug) {
