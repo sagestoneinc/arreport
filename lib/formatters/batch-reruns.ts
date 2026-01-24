@@ -65,7 +65,7 @@ export function formatBatchReruns(data: BatchRerunsData): string {
   
   // Use computed approval rate (sales/reruns) instead of card-network based calculation
   const uscaApproval = data.usca_reruns > 0
-    ? ((data.usca_sales / data.usca_reruns) * 100).toFixed(2)
+    ? (((data.usca_sales || 0) / data.usca_reruns) * 100).toFixed(2)
     : '0.00';
 
   const otherVisaAppr =
@@ -75,7 +75,7 @@ export function formatBatchReruns(data: BatchRerunsData): string {
   
   // Use computed approval rate (sales/reruns) instead of card-network based calculation
   const otherApproval = data.other_reruns > 0
-    ? ((data.other_sales / data.other_reruns) * 100).toFixed(2)
+    ? (((data.other_sales || 0) / data.other_reruns) * 100).toFixed(2)
     : '0.00';
 
   // Compute decline shares
