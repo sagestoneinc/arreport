@@ -79,6 +79,10 @@ export class MySQLTaskStorage implements ITaskStorage {
 
       await this.initSchema();
       console.log('[MySQL] Database initialized successfully');
+      
+      // Reset failure state on successful initialization
+      this.initializationFailed = false;
+      this.lastFailureTime = 0;
     } catch (error: unknown) {
       const err = error as Error & { code?: string; errno?: number; sqlState?: string };
       
