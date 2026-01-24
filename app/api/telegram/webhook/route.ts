@@ -45,7 +45,12 @@ export async function POST(request: NextRequest) {
 
     // Initialize storage and ensure schema is created
     const storage = getTaskStorage();
-    await storage.initialize();
+    try {
+      await storage.initialize();
+    } catch (initError) {
+      console.error('Failed to initialize storage:', initError);
+      return NextResponse.json({ ok: true });
+    }
 
     // Parse task from message
     const botUsername = process.env.BOT_USERNAME;
@@ -59,31 +64,37 @@ export async function POST(request: NextRequest) {
     const isEdited = !!update.edited_message;
     const messageId = message.message_id;
 
-    if (isEdited && await storage.taskExists(chatId, messageId)) {
-      // Update existing task
-      await storage.updateTask(chatId, messageId, taskDescription, message.text || '');
-      console.log(`Updated task from message ${messageId} in chat ${chatId}`);
-    } else if (!(await storage.taskExists(chatId, messageId))) {
-      // Save new task
-      const task = await storage.saveTask({
-        chat_id: chatId,
-        chat_title: message.chat.title,
-        message_id: messageId,
-        user_id: message.from?.id.toString() || 'unknown',
-        username: message.from?.username,
-        name: message.from
-          ? [message.from.first_name, message.from.last_name].filter(Boolean).join(' ')
-          : undefined,
-        description: taskDescription,
-        raw_text: message.text || '',
-      });
+    try {
+      if (isEdited && await storage.taskExists(chatId, messageId)) {
+        // Update existing task
+        await storage.updateTask(chatId, messageId, taskDescription, message.text || '');
+        console.log(`Updated task from message ${messageId} in chat ${chatId}`);
+      } else if (!(await storage.taskExists(chatId, messageId))) {
+        // Save new task
+        const task = await storage.saveTask({
+          chat_id: chatId,
+          chat_title: message.chat.title,
+          message_id: messageId,
+          user_id: message.from?.id.toString() || 'unknown',
+          username: message.from?.username,
+          name: message.from
+            ? [message.from.first_name, message.from.last_name].filter(Boolean).join(' ')
+            : undefined,
+          description: taskDescription,
+          raw_text: message.text || '',
+        });
 
-      console.log(`Saved new task: ${task.id}`);
+        console.log(`Saved new task: ${task.id}`);
 
-      // Send confirmation reply if appropriate
-      if (shouldReply(message, botUsername)) {
-        await sendTelegramReply(chatId, messageId, taskDescription);
+        // Send confirmation reply if appropriate
+        if (shouldReply(message, botUsername)) {
+          await sendTelegramReply(chatId, messageId, taskDescription);
+        }
       }
+    } catch (dbError) {
+      console.error('Database operation failed:', dbError);
+      // Return ok:true to prevent Telegram from retrying
+      return NextResponse.json({ ok: true });
     }
 
     return NextResponse.json({ ok: true });
