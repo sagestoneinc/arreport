@@ -54,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="font-sans bg-gray-50 antialiased">
+      <body className="font-sans bg-gray-50 dark:bg-gray-900 antialiased">
         <Navbar />
         {children}
       </body>
