@@ -398,6 +398,7 @@ The bot supports multiple storage backends:
      ```
    - Tables are created automatically on first run
    - Supports connection pooling for better performance
+   - **[See detailed MySQL setup guide →](docs/MYSQL_SETUP.md)**
 
 3. **Memory** (testing only):
    - Set `TASKS_STORAGE=memory`
