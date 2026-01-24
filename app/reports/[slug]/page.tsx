@@ -77,14 +77,18 @@ export default function ReportBuilderPage() {
 
   if (!template) {
     return (
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <div className="text-6xl mb-6">😞</div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Template Not Found</h1>
-          <p className="text-xl text-gray-600 mb-8">The requested template does not exist.</p>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+            Template Not Found
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
+            The requested template does not exist.
+          </p>
           <Link
             href="/"
-            className="inline-flex items-center px-6 py-3 bg-accent-600 text-white rounded-xl hover:bg-accent-700 transition-all duration-150 font-semibold shadow-lg hover:shadow-xl"
+            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-500 text-white rounded-xl hover:from-primary-700 hover:to-accent-600 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -102,13 +106,13 @@ export default function ReportBuilderPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-6 py-10 sm:px-6 lg:px-8 sm:py-12">
         {/* Header */}
         <div className="mb-10">
           <Link
             href="/"
-            className="inline-flex items-center text-accent-600 hover:text-accent-700 font-semibold text-sm mb-6 transition-colors"
+            className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-semibold text-sm mb-6 transition-colors"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -120,31 +124,31 @@ export default function ReportBuilderPage() {
             </svg>
             Back to Templates
           </Link>
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">{template.name}</h1>
-          <p className="text-lg text-gray-600">{template.description}</p>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+            {template.name}
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400">{template.description}</p>
         </div>
 
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">{template.name}</h1>
-          <p className="text-gray-600">{template.description}</p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            {slug === 'batch-reruns' ? (
-              <BatchRerunsForm
-                formData={formData as unknown as BatchRerunsFormData}
-                onChange={handleFieldChange}
-                onGenerate={handleGenerate}
-              />
-            ) : (
-              <ReportForm
-                fields={template.fields}
-                formData={formData}
-                onChange={handleFieldChange}
-                onGenerate={handleGenerate}
-              />
-            )}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Form Section - Takes 2 columns on large screens */}
+          <div className="lg:col-span-2">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6 sm:p-8">
+              {slug === 'batch-reruns' ? (
+                <BatchRerunsForm
+                  formData={formData as unknown as BatchRerunsFormData}
+                  onChange={handleFieldChange}
+                  onGenerate={handleGenerate}
+                />
+              ) : (
+                <ReportForm
+                  fields={template.fields}
+                  formData={formData}
+                  onChange={handleFieldChange}
+                  onGenerate={handleGenerate}
+                />
+              )}
+            </div>
           </div>
 
           {/* Preview Section - Takes 1 column on large screens */}
