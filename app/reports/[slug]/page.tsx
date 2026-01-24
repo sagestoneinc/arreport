@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { getTemplateBySlug } from '@/lib/templates';
+import { getTemplateBySlug, MidRowData } from '@/lib/templates';
 import { formatMessage } from '@/lib/formatters';
 import ReportForm from '@/components/ReportForm';
 import Preview from '@/components/Preview';
@@ -11,13 +11,15 @@ import TelegramButton from '@/components/TelegramButton';
 
 const STORAGE_KEY_PREFIX = 'ar-report-';
 
+type FormDataValue = string | number | MidRowData[];
+
 export default function ReportBuilderPage() {
   const params = useParams();
   const slug = params.slug as string;
 
   const template = getTemplateBySlug(slug);
 
-  const [formData, setFormData] = useState<Record<string, string | number>>({});
+  const [formData, setFormData] = useState<Record<string, FormDataValue>>({});
   const [generatedMessage, setGeneratedMessage] = useState('');
   const [isClient, setIsClient] = useState(false);
 
@@ -45,9 +47,9 @@ export default function ReportBuilderPage() {
 
   const initializeDefaults = () => {
     if (!template) return;
-    const defaults: Record<string, string | number> = {};
+    const defaults: Record<string, FormDataValue> = {};
     template.fields.forEach((field) => {
-      defaults[field.name] = field.defaultValue ?? (field.type === 'number' ? 0 : '');
+      defaults[field.name] = field.defaultValue ?? (field.type === 'number' ? 0 : field.type === 'table' ? [] : '');
     });
     setFormData(defaults);
   };
@@ -59,7 +61,7 @@ export default function ReportBuilderPage() {
     }
   }, [formData, slug, isClient]);
 
-  const handleFieldChange = (name: string, value: string | number) => {
+  const handleFieldChange = (name: string, value: FormDataValue) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
