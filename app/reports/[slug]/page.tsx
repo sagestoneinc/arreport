@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { getTemplateBySlug, MidRowData } from '@/lib/templates';
 import { formatMessage } from '@/lib/formatters';
 import ReportForm from '@/components/ReportForm';
+import BatchRerunsForm, { BatchRerunsFormData } from '@/components/BatchRerunsForm';
 import Preview from '@/components/Preview';
 import TelegramButton from '@/components/TelegramButton';
 
@@ -118,12 +119,20 @@ export default function ReportBuilderPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
-            <ReportForm
-              fields={template.fields}
-              formData={formData}
-              onChange={handleFieldChange}
-              onGenerate={handleGenerate}
-            />
+            {slug === 'batch-reruns' ? (
+              <BatchRerunsForm
+                formData={formData as unknown as BatchRerunsFormData}
+                onChange={handleFieldChange}
+                onGenerate={handleGenerate}
+              />
+            ) : (
+              <ReportForm
+                fields={template.fields}
+                formData={formData}
+                onChange={handleFieldChange}
+                onGenerate={handleGenerate}
+              />
+            )}
           </div>
           <div>
             <Preview message={generatedMessage} slug={slug} />

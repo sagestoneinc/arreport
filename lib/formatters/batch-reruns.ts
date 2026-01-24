@@ -45,36 +45,54 @@ function formatDate(dateStr: string): string {
   return `${month}/${day}/${year}`;
 }
 
+function computeShare(count: number, total: number): string {
+  if (!total || total === 0) return '—';
+  const percentage = ((count || 0) / total) * 100;
+  return `${percentage.toFixed(2)}%`;
+}
+
+function formatDeclineWithShare(reason: string, count: number, share: string): string {
+  if (!reason || reason.trim() === '') return '';
+  return `${reason} (${share})`;
+}
+
 export function formatBatchReruns(data: BatchRerunsData): string {
   // Compute approval percentages if needed
   const uscaVisaAppr =
     data.usca_visa_appr || computeApprovalRate(data.usca_visa_approvals, data.usca_visa_txns);
   const uscaMcAppr =
     data.usca_mc_appr || computeApprovalRate(data.usca_mc_approvals, data.usca_mc_txns);
-  const uscaApproval =
-    data.usca_approval ||
-    computeApprovalRate(
-      data.usca_visa_approvals + data.usca_mc_approvals,
-      data.usca_visa_txns + data.usca_mc_txns
-    );
+  
+  // Use computed approval rate (sales/reruns) instead of card-network based calculation
+  const uscaApproval = data.usca_reruns > 0
+    ? ((data.usca_sales / data.usca_reruns) * 100).toFixed(2)
+    : '0.00';
 
   const otherVisaAppr =
     data.other_visa_appr || computeApprovalRate(data.other_visa_approvals, data.other_visa_txns);
   const otherMcAppr =
     data.other_mc_appr || computeApprovalRate(data.other_mc_approvals, data.other_mc_txns);
-  const otherApproval =
-    data.other_approval ||
-    computeApprovalRate(
-      data.other_visa_approvals + data.other_mc_approvals,
-      data.other_visa_txns + data.other_mc_txns
-    );
+  
+  // Use computed approval rate (sales/reruns) instead of card-network based calculation
+  const otherApproval = data.other_reruns > 0
+    ? ((data.other_sales / data.other_reruns) * 100).toFixed(2)
+    : '0.00';
+
+  // Compute decline shares
+  const uscaDecline1Share = computeShare(data.usca_decline1_count, data.usca_reruns);
+  const uscaDecline2Share = computeShare(data.usca_decline2_count, data.usca_reruns);
+  const uscaDecline3Share = computeShare(data.usca_decline3_count, data.usca_reruns);
+
+  const otherDecline1Share = computeShare(data.other_decline1_count, data.other_reruns);
+  const otherDecline2Share = computeShare(data.other_decline2_count, data.other_reruns);
+  const otherDecline3Share = computeShare(data.other_decline3_count, data.other_reruns);
 
   const lines: string[] = [];
 
   lines.push(`Daily Batch Re-runs Summary: ${formatDate(data.date)}`);
   lines.push('');
   lines.push(
-    `I re-ran ${data.usca_reruns} US/CA declines from yesterday to Revolv3 and got ${data.usca_sales} sales (${uscaApproval.toFixed(2)}% approval).`
+    `I re-ran ${data.usca_reruns} US/CA declines from yesterday to Revolv3 and got ${data.usca_sales} sales (${uscaApproval}% approval).`
   );
   lines.push(
     `- Visa: ${uscaVisaAppr.toFixed(2)}% (${data.usca_visa_approvals} approvals, ${data.usca_visa_txns} txns)`
@@ -82,12 +100,21 @@ export function formatBatchReruns(data: BatchRerunsData): string {
   lines.push(
     `- MC: ${uscaMcAppr.toFixed(2)}% (${data.usca_mc_approvals} approvals, ${data.usca_mc_txns} txns)`
   );
-  lines.push(
-    `Common Declines: ${data.usca_decline1_reason} (${data.usca_decline1_count}), ${data.usca_decline2_reason} (${data.usca_decline2_count}), ${data.usca_decline3_reason} (${data.usca_decline3_count})`
-  );
+  
+  // Format Common Declines with shares
+  const uscaDeclines = [
+    formatDeclineWithShare(data.usca_decline1_reason, data.usca_decline1_count, uscaDecline1Share),
+    formatDeclineWithShare(data.usca_decline2_reason, data.usca_decline2_count, uscaDecline2Share),
+    formatDeclineWithShare(data.usca_decline3_reason, data.usca_decline3_count, uscaDecline3Share),
+  ].filter(d => d !== '');
+  
+  if (uscaDeclines.length > 0) {
+    lines.push(`Common Declines: ${uscaDeclines.join(', ')}`);
+  }
+  
   lines.push('');
   lines.push(
-    `I re-ran ${data.other_reruns} declines (all other geos) to Quantum and got ${data.other_sales} sales (${otherApproval.toFixed(2)}% approval).`
+    `I re-ran ${data.other_reruns} declines (all other geos) to Quantum and got ${data.other_sales} sales (${otherApproval}% approval).`
   );
   lines.push(
     `- Visa: ${otherVisaAppr.toFixed(2)}% (${data.other_visa_approvals} approvals, ${data.other_visa_txns} txns)`
@@ -95,9 +122,17 @@ export function formatBatchReruns(data: BatchRerunsData): string {
   lines.push(
     `- MC: ${otherMcAppr.toFixed(2)}% (${data.other_mc_approvals} approvals, ${data.other_mc_txns} txns)`
   );
-  lines.push(
-    `Common Declines: ${data.other_decline1_reason} (${data.other_decline1_count}), ${data.other_decline2_reason} (${data.other_decline2_count}), ${data.other_decline3_reason} (${data.other_decline3_count})`
-  );
+  
+  // Format Common Declines with shares
+  const otherDeclines = [
+    formatDeclineWithShare(data.other_decline1_reason, data.other_decline1_count, otherDecline1Share),
+    formatDeclineWithShare(data.other_decline2_reason, data.other_decline2_count, otherDecline2Share),
+    formatDeclineWithShare(data.other_decline3_reason, data.other_decline3_count, otherDecline3Share),
+  ].filter(d => d !== '');
+  
+  if (otherDeclines.length > 0) {
+    lines.push(`Common Declines: ${otherDeclines.join(', ')}`);
+  }
 
   return lines.join('\n');
 }
