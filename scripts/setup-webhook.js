@@ -2,12 +2,12 @@
 
 /**
  * Webhook Setup Script
- * 
+ *
  * This script sets up the Telegram webhook for the Task Collector bot.
- * 
+ *
  * Usage:
  *   node scripts/setup-webhook.js
- * 
+ *
  * Required environment variables:
  *   - TELEGRAM_BOT_TOKEN
  *   - APP_BASE_URL
@@ -69,7 +69,7 @@ const req = https.request(apiUrl, options, (res) => {
   res.on('end', () => {
     try {
       const result = JSON.parse(responseData);
-      
+
       if (result.ok) {
         console.log('✅ Webhook set successfully!');
         console.log(`📝 Description: ${result.description}`);

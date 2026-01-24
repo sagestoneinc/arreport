@@ -7,10 +7,14 @@
   body {
     @apply transition-colors duration-200;
   }
-  
+
   /* Remove transition from elements that shouldn't transition */
-  input, textarea, select, button {
-    transition-property: background-color, border-color, color, fill, stroke, box-shadow, transform, opacity;
+  input,
+  textarea,
+  select,
+  button {
+    transition-property:
+      background-color, border-color, color, fill, stroke, box-shadow, transform, opacity;
     transition-duration: 200ms;
   }
 }
@@ -18,10 +22,18 @@
 @layer utilities {
   /* Custom gradient utilities */
   .gradient-indigo-teal {
-    background: linear-gradient(135deg, theme('colors.primary.600') 0%, theme('colors.accent.500') 100%);
+    background: linear-gradient(
+      135deg,
+      theme('colors.primary.600') 0%,
+      theme('colors.accent.500') 100%
+    );
   }
-  
+
   .gradient-indigo-teal-hover {
-    background: linear-gradient(135deg, theme('colors.primary.700') 0%, theme('colors.accent.600') 100%);
+    background: linear-gradient(
+      135deg,
+      theme('colors.primary.700') 0%,
+      theme('colors.accent.600') 100%
+    );
   }
 }

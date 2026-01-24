@@ -31,9 +31,7 @@ describe('telegram-format utilities', () => {
     });
 
     it('escapes multiple special characters', () => {
-      expect(escapeMarkdownV2('CS_395 - 50.00% (10/20)')).toBe(
-        'CS\\_395 \\- 50\\.00% \\(10/20\\)'
-      );
+      expect(escapeMarkdownV2('CS_395 - 50.00% (10/20)')).toBe('CS\\_395 \\- 50\\.00% \\(10/20\\)');
     });
 
     it('escapes brackets', () => {

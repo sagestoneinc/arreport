@@ -9,7 +9,7 @@ export default function ThemeToggle() {
   // Load theme on mount
   useEffect(() => {
     setMounted(true);
-    
+
     try {
       // Check localStorage first, then system preference
       const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;

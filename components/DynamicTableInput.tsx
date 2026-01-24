@@ -40,7 +40,9 @@ export default function DynamicTableInput({ label, rows, onChange }: DynamicTabl
   return (
     <div className="space-y-3">
       <div className="flex justify-between items-center">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{label}</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          {label}
+        </label>
         <button
           type="button"
           onClick={addRow}

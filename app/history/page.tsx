@@ -92,9 +92,12 @@ export default function HistoryPage() {
         {/* Header */}
         <div className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3">Report History</h1>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+              Report History
+            </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400">
-              View and resend previously generated reports • {history.length} report{history.length !== 1 ? 's' : ''}
+              View and resend previously generated reports • {history.length} report
+              {history.length !== 1 ? 's' : ''}
             </p>
           </div>
           {history.length > 0 && (
@@ -110,7 +113,9 @@ export default function HistoryPage() {
         {history.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-16 text-center">
             <div className="text-6xl mb-4">📜</div>
-            <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">No reports in history</p>
+            <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">
+              No reports in history
+            </p>
             <p className="text-gray-400 dark:text-gray-500 mt-2 mb-6">
               Generated reports will appear here automatically
             </p>
@@ -155,8 +160,18 @@ export default function HistoryPage() {
                       className="ml-2 p-1.5 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded transition-colors"
                       title="Delete"
                     >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </div>

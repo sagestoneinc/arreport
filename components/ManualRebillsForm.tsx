@@ -46,7 +46,11 @@ function computeCardNetworkRate(approvals: number, txns: number): string | null 
   return percentage.toFixed(2);
 }
 
-export default function ManualRebillsForm({ formData, onChange, onGenerate }: ManualRebillsFormProps) {
+export default function ManualRebillsForm({
+  formData,
+  onChange,
+  onGenerate,
+}: ManualRebillsFormProps) {
   // Compute approval rate
   const approvalRate = useMemo(() => {
     return computeApprovalRate(formData.rebills_sales, formData.rebills_reruns);
@@ -114,7 +118,10 @@ export default function ManualRebillsForm({ formData, onChange, onGenerate }: Ma
   ) => {
     return (
       <div className="space-y-1">
-        <label htmlFor={name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          htmlFor={name}
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
@@ -202,9 +209,7 @@ export default function ManualRebillsForm({ formData, onChange, onGenerate }: Ma
 
         {/* Insights Card */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md dark:shadow-lg hover:shadow-lg transition xl:col-span-1">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            Insights
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Insights</h3>
           <textarea
             id="insights"
             name="insights"

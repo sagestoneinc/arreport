@@ -23,7 +23,7 @@ describe('SQLiteTaskStorage', () => {
       await storage.initialize();
       await storage.initialize();
       await storage.initialize();
-      
+
       // All calls should succeed without error
       expect(true).toBe(true);
     });

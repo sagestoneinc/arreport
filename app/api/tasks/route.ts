@@ -19,12 +19,12 @@ export async function GET(request: NextRequest) {
     }
 
     const storage = getTaskStorage();
-    
+
     // Add detailed logging
     console.log('[Tasks API] Initializing storage...');
     await storage.initialize();
     console.log('[Tasks API] Storage initialized successfully');
-    
+
     console.log('[Tasks API] Fetching tasks with filter:', filter);
     const tasks = await storage.getTasks(filter);
     console.log('[Tasks API] Tasks fetched:', tasks.length);
@@ -35,19 +35,19 @@ export async function GET(request: NextRequest) {
     console.error('[Tasks API] Error fetching tasks:', error);
     console.error('[Tasks API] Error code:', err.code);
     console.error('[Tasks API] Error stack:', err.stack);
-    
+
     // Sanitize error message to avoid leaking sensitive information
     let errorMessage = 'Failed to fetch tasks';
     if (process.env.NODE_ENV === 'development') {
       // Only include basic error info without connection details
       errorMessage = err.message.replace(/password[^\s]*/gi, 'password=***');
     }
-    
+
     return NextResponse.json(
-      { 
-        ok: false, 
+      {
+        ok: false,
         error: 'Failed to fetch tasks',
-        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined 
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined,
       },
       { status: 500 }
     );

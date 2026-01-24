@@ -33,15 +33,19 @@ function formatDeclineWithShare(reason: string, share: string): string {
   return `${reason} — ${share}`;
 }
 
-export function formatManualRebills(data: ManualRebillsData, mode: FormatMode = 'telegram'): string {
+export function formatManualRebills(
+  data: ManualRebillsData,
+  mode: FormatMode = 'telegram'
+): string {
   // Compute approval percentages if needed
   const visaAppr = data.visa_appr || computeApprovalRate(data.visa_approvals, data.visa_txns);
   const mcAppr = data.mc_appr || computeApprovalRate(data.mc_approvals, data.mc_txns);
-  
+
   // Use computed approval rate (sales/reruns) instead of card-network based calculation
-  const rebillsApproval = data.rebills_reruns > 0
-    ? (((data.rebills_sales || 0) / data.rebills_reruns) * 100).toFixed(2)
-    : '0.00';
+  const rebillsApproval =
+    data.rebills_reruns > 0
+      ? (((data.rebills_sales || 0) / data.rebills_reruns) * 100).toFixed(2)
+      : '0.00';
 
   // Compute decline shares
   const decline1Share = formatShare(data.decline1_count, data.rebills_reruns);
@@ -63,23 +67,29 @@ export function formatManualRebills(data: ManualRebillsData, mode: FormatMode = 
 
   // Card network breakdown
   lines.push(
-    escapeIfNeeded(`${EMOJI.CARD_NETWORK} Visa — ${data.visa_approvals} approvals / ${data.visa_txns} txns (${visaAppr.toFixed(2)}%)`, mode)
+    escapeIfNeeded(
+      `${EMOJI.CARD_NETWORK} Visa — ${data.visa_approvals} approvals / ${data.visa_txns} txns (${visaAppr.toFixed(2)}%)`,
+      mode
+    )
   );
   lines.push(
-    escapeIfNeeded(`${EMOJI.CARD_NETWORK} MC — ${data.mc_approvals} approvals / ${data.mc_txns} txns (${mcAppr.toFixed(2)}%)`, mode)
+    escapeIfNeeded(
+      `${EMOJI.CARD_NETWORK} MC — ${data.mc_approvals} approvals / ${data.mc_txns} txns (${mcAppr.toFixed(2)}%)`,
+      mode
+    )
   );
-  
+
   // Format Common Declines with shares
   const declines = [
     formatDeclineWithShare(data.decline1_reason, decline1Share),
     formatDeclineWithShare(data.decline2_reason, decline2Share),
     formatDeclineWithShare(data.decline3_reason, decline3Share),
-  ].filter(d => d !== '');
-  
+  ].filter((d) => d !== '');
+
   if (declines.length > 0) {
     lines.push('');
     lines.push(formatSectionHeader(EMOJI.DECLINES, 'Common Declines', mode));
-    declines.forEach(decline => {
+    declines.forEach((decline) => {
       lines.push(escapeIfNeeded(`- ${decline}`, mode));
     });
   }

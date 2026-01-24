@@ -9,7 +9,11 @@ export type FormDataType = Record<string, string | number | MidRowData[]>;
 
 export type { FormatMode } from '../telegram-format';
 
-export function formatMessage(slug: string, data: FormDataType, mode: FormatMode = 'telegram'): string {
+export function formatMessage(
+  slug: string,
+  data: FormDataType,
+  mode: FormatMode = 'telegram'
+): string {
   switch (slug) {
     case 'batch-reruns':
       return formatBatchReruns(data as unknown as BatchRerunsData, mode);

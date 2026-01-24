@@ -90,4 +90,3 @@ export default function ReportForm({ fields, formData, onChange, onGenerate }: R
     </div>
   );
 }
-

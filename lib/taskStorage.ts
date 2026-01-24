@@ -8,7 +8,7 @@ let storage: ITaskStorage | null = null;
 export function getTaskStorage(): ITaskStorage {
   if (!storage) {
     const storageType = process.env.TASKS_STORAGE || 'sqlite';
-    
+
     if (storageType === 'mysql') {
       storage = new MySQLTaskStorage();
     } else if (storageType === 'memory') {
