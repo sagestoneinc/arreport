@@ -47,7 +47,7 @@ describe('formatHourlyApprovalRate - New Template System', () => {
     // Check insights
     expect(output).toContain('Insights');
     expect(output).toContain('All PAY REVs have been performing over the past few hours');
-    
+
     // Check for all three performer indicators
     expect(output).toContain('🟢⬆️'); // Top performer indicator
     expect(output).toContain('🟡➡️'); // Middle performer indicator
@@ -58,9 +58,7 @@ describe('formatHourlyApprovalRate - New Template System', () => {
     const data = {
       date: '2026-01-23',
       time_range: '13:00 - 16:00 EST',
-      visa_mids: [
-        { mid_name: 'CS_395', initial_sales: 6, initial_decline: 9 },
-      ],
+      visa_mids: [{ mid_name: 'CS_395', initial_sales: 6, initial_decline: 9 }],
       mc_mids: [],
       insights: 'Test',
     };
@@ -71,7 +69,7 @@ describe('formatHourlyApprovalRate - New Template System', () => {
     expect(output).not.toContain('\\_');
     expect(output).not.toContain('\\(');
     expect(output).not.toContain('*VISA*'); // Bold markers
-    
+
     // Should contain plain text
     expect(output).toContain('VISA');
     expect(output).toContain('CS_395');
@@ -113,11 +111,11 @@ describe('formatHourlyApprovalRate - New Template System', () => {
     const visaIndex = output.indexOf('VISA');
     const mcIndex = output.indexOf('MasterCard');
     const visaSection = output.substring(visaIndex, mcIndex);
-    
+
     // Use escaped versions for search
     const cs396Index = visaSection.indexOf('CS\\_396');
     const cs395Index = visaSection.indexOf('CS\\_395');
-    
+
     expect(cs396Index).toBeLessThan(cs395Index); // CS_396 (30%) should come first
     expect(output).toContain('30\\.00%');
     expect(output).toContain('—'); // null AR shows as "—"
@@ -142,12 +140,12 @@ describe('formatHourlyApprovalRate - New Template System', () => {
     const visaIndex = output.indexOf('VISA');
     const mcIndex = output.indexOf('MasterCard');
     const visaSection = output.substring(visaIndex, mcIndex);
-    
+
     // Use escaped versions for search
     const cs396Index = visaSection.indexOf('CS\\_396'); // total 10
     const cs395Index = visaSection.indexOf('CS\\_395'); // total 4
     const cs397Index = visaSection.indexOf('CS\\_397'); // total 2
-    
+
     expect(cs396Index).toBeLessThan(cs395Index);
     expect(cs395Index).toBeLessThan(cs397Index);
   });
@@ -176,9 +174,7 @@ describe('formatHourlyApprovalRate - New Template System', () => {
       date: '2026-01-23',
       time_range: '13:00 - 16:00 EST',
       filter_used: 'Affiliate > Card Brand > Merchant Account',
-      visa_mids: [
-        { mid_name: 'CS_395', initial_sales: 6, initial_decline: 9 },
-      ],
+      visa_mids: [{ mid_name: 'CS_395', initial_sales: 6, initial_decline: 9 }],
       mc_mids: [],
       insights: 'Test',
     };
@@ -207,11 +203,11 @@ describe('formatHourlyApprovalRate - New Template System', () => {
     // Should show green up arrow for single MIDs with bold names
     expect(output).toContain('🟢⬆️ *CS\\_395*');
     expect(output).toContain('🟢⬆️ *PAY\\-REV\\_346*');
-    
+
     // Should NOT show red down arrow for single MIDs
     const visaSection = output.substring(output.indexOf('VISA'), output.indexOf('MasterCard'));
     const mcSection = output.substring(output.indexOf('MasterCard'), output.indexOf('Insights'));
-    
+
     // Count red arrows - should be 0
     const redArrowCount = (output.match(/🔴⬇️/g) || []).length;
     expect(redArrowCount).toBe(0);

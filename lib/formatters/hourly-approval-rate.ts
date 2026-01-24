@@ -60,15 +60,15 @@ function getPerformanceEmoji(index: number, total: number): string {
   //   - second → 🔴⬇️ (Bottom)
   // - If only 1 MID:
   //   - show 🟢⬆️ only (Top)
-  
+
   if (total === 1) {
     return EMOJI.TOP_PERFORMER;
   }
-  
+
   if (total === 2) {
     return index === 0 ? EMOJI.TOP_PERFORMER : EMOJI.LOW_PERFORMER;
   }
-  
+
   // total >= 3
   if (index === 0) {
     return EMOJI.TOP_PERFORMER;
@@ -89,19 +89,16 @@ function formatBoldMID(midName: string): string {
   return `*${escapeIfNeeded(midName, 'telegram')}*`;
 }
 
-function formatMidSection(
-  mids: MidWithAR[],
-  mode: FormatMode
-): string[] {
+function formatMidSection(mids: MidWithAR[], mode: FormatMode): string[] {
   const lines: string[] = [];
-  
+
   if (mids.length === 0) {
     lines.push(escapeIfNeeded('- —', mode));
   } else {
     // For all MIDs, use the performance emoji logic and bold MID names
     mids.forEach((mid, index) => {
       const emoji = getPerformanceEmoji(index, mids.length);
-      
+
       if (mode === 'telegram') {
         // Bold the MID name only, keep emoji and stats outside
         const boldMidName = formatBoldMID(mid.mid_name);
@@ -116,7 +113,7 @@ function formatMidSection(
       }
     });
   }
-  
+
   return lines;
 }
 
@@ -129,18 +126,21 @@ function sortMids(mids: MidWithAR[]): MidWithAR[] {
     }
     if (a.ar_percent === null) return 1; // a goes after b
     if (b.ar_percent === null) return -1; // b goes after a
-    
+
     // Both have ar_percent, sort desc
     if (b.ar_percent !== a.ar_percent) {
       return b.ar_percent - a.ar_percent;
     }
-    
+
     // Same ar_percent, tie-breaker by total desc
     return b.total - a.total;
   });
 }
 
-export function formatHourlyApprovalRate(data: HourlyApprovalRateData, mode: FormatMode = 'telegram'): string {
+export function formatHourlyApprovalRate(
+  data: HourlyApprovalRateData,
+  mode: FormatMode = 'telegram'
+): string {
   const lines: string[] = [];
   const dateFormatted = formatDateForReport(data.date);
 
@@ -148,12 +148,12 @@ export function formatHourlyApprovalRate(data: HourlyApprovalRateData, mode: For
   lines.push(formatTitle(EMOJI.CLOCK, `Hourly MID Ops Report — ${dateFormatted}`, mode));
   lines.push('');
   lines.push(escapeIfNeeded(`Time Range: ${data.time_range}`, mode));
-  
+
   // Add Filter Used if provided
   if (data.filter_used) {
     lines.push(escapeIfNeeded(`Filter Used: ${data.filter_used}`, mode));
   }
-  
+
   lines.push('');
 
   // Process and sort VISA mids
