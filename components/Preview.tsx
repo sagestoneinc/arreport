@@ -36,32 +36,39 @@ export default function Preview({ message, slug }: PreviewProps) {
 
   if (!message) {
     return (
-      <div className="bg-gray-50 rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-xl shadow-card border border-gray-100 p-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Preview</h2>
-        <p className="text-gray-500 italic">Generate a report to see the preview here.</p>
+        <div className="text-center py-12">
+          <div className="text-5xl mb-4">📄</div>
+          <p className="text-gray-500 text-base">Generate a report to see the preview here.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">Preview</h2>
-      <pre className="bg-gray-50 p-4 rounded-md text-sm whitespace-pre-wrap font-mono overflow-x-auto border border-gray-200 mb-4">
-        {message}
-      </pre>
-      <div className="flex gap-2">
-        <button
-          onClick={handleCopy}
-          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-semibold"
-        >
-          {copied ? '✓ Copied!' : '📋 Copy'}
-        </button>
-        <button
-          onClick={handleDownload}
-          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-semibold"
-        >
-          💾 Download .txt
-        </button>
+    <div className="bg-white rounded-xl shadow-card border border-gray-100 sticky top-24">
+      <div className="border-b border-gray-100 px-6 py-4">
+        <h2 className="text-xl font-bold text-gray-900">Preview</h2>
+      </div>
+      <div className="p-6">
+        <pre className="bg-gray-50 p-5 rounded-lg text-sm whitespace-pre-wrap font-mono overflow-x-auto border border-gray-200 mb-5 min-h-[300px] max-h-[600px] overflow-y-auto">
+          {message}
+        </pre>
+        <div className="flex gap-3">
+          <button
+            onClick={handleCopy}
+            className="flex-1 px-5 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-150 font-semibold shadow-sm hover:shadow"
+          >
+            {copied ? '✓ Copied!' : '📋 Copy'}
+          </button>
+          <button
+            onClick={handleDownload}
+            className="flex-1 px-5 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-150 font-semibold shadow-sm hover:shadow"
+          >
+            💾 Download
+          </button>
+        </div>
       </div>
     </div>
   );

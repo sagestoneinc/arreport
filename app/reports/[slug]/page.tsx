@@ -76,15 +76,24 @@ export default function ReportBuilderPage() {
 
   if (!template) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
-        <div className="max-w-4xl mx-auto text-center">
+      <main className="min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+          <div className="text-6xl mb-6">😞</div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Template Not Found</h1>
-          <p className="text-gray-600 mb-8">The requested template does not exist.</p>
+          <p className="text-xl text-gray-600 mb-8">The requested template does not exist.</p>
           <Link
             href="/"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+            className="inline-flex items-center px-6 py-3 bg-accent-600 text-white rounded-xl hover:bg-accent-700 transition-all duration-150 font-semibold shadow-lg hover:shadow-xl"
           >
-            ← Back to Home
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Back to Home
           </Link>
         </div>
       </main>
@@ -92,12 +101,13 @@ export default function ReportBuilderPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
+    <main className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* Header */}
+        <div className="mb-10">
           <Link
             href="/"
-            className="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold"
+            className="inline-flex items-center text-accent-600 hover:text-accent-700 font-semibold text-sm mb-6 transition-colors"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -109,23 +119,27 @@ export default function ReportBuilderPage() {
             </svg>
             Back to Templates
           </Link>
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">{template.name}</h1>
+          <p className="text-lg text-gray-600">{template.description}</p>
         </div>
 
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">{template.name}</h1>
-          <p className="text-gray-600">{template.description}</p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <ReportForm
-              fields={template.fields}
-              formData={formData}
-              onChange={handleFieldChange}
-              onGenerate={handleGenerate}
-            />
+        {/* Form and Preview Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Form Section - Takes 2 columns on large screens */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl shadow-card border border-gray-100 p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Report Fields</h2>
+              <ReportForm
+                fields={template.fields}
+                formData={formData}
+                onChange={handleFieldChange}
+                onGenerate={handleGenerate}
+              />
+            </div>
           </div>
-          <div>
+
+          {/* Preview Section - Takes 1 column on large screens */}
+          <div className="lg:col-span-1">
             <Preview message={generatedMessage} slug={slug} />
           </div>
         </div>
