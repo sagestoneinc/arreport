@@ -4,6 +4,9 @@ import { TaskFilter } from '@/lib/taskTypes';
 
 export const dynamic = 'force-dynamic';
 
+// Track last error log to reduce noise
+const lastErrorLog = new Map<string, number>();
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -32,9 +35,19 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: true, tasks });
   } catch (error: unknown) {
     const err = error as Error & { code?: string; stack?: string };
-    console.error('[Tasks API] Error fetching tasks:', error);
-    console.error('[Tasks API] Error code:', err.code);
-    console.error('[Tasks API] Error stack:', err.stack);
+    
+    // Only log detailed error once per minute to reduce noise
+    const errorKey = `${err.message}:${err.code}`;
+    const now = Date.now();
+    const shouldLogDetailed = !lastErrorLog.has(errorKey) || 
+                              now - (lastErrorLog.get(errorKey) || 0) > 60000;
+    
+    if (shouldLogDetailed) {
+      console.error('[Tasks API] Error fetching tasks:', error);
+      console.error('[Tasks API] Error code:', err.code);
+      console.error('[Tasks API] Error stack:', err.stack);
+      lastErrorLog.set(errorKey, now);
+    }
 
     // Sanitize error message to avoid leaking sensitive information
     let errorMessage = 'Failed to fetch tasks';

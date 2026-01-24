@@ -5,6 +5,9 @@ import { getTaskStorage } from '@/lib/taskStorage';
 
 export const dynamic = 'force-dynamic';
 
+// Track last invalid token log to reduce noise
+let lastInvalidTokenLog = 0;
+
 export async function POST(request: NextRequest) {
   try {
     // Verify webhook secret
@@ -17,7 +20,13 @@ export async function POST(request: NextRequest) {
     }
 
     if (secretToken !== expectedSecret) {
-      console.error('Invalid webhook secret token');
+      // Don't log every invalid attempt to reduce noise - these are expected from unauthorized sources
+      // Only log once per minute to avoid spam
+      const now = Date.now();
+      if (now - lastInvalidTokenLog > 60000) {
+        console.warn('[Webhook] Unauthorized webhook attempt detected');
+        lastInvalidTokenLog = now;
+      }
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
