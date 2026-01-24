@@ -104,6 +104,14 @@ async function sendTelegramReply(
 
   try {
     const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    const baseUrl = process.env.APP_BASE_URL;
+    const tasksUrl = baseUrl ? `${baseUrl}/tasks` : null;
+    
+    let replyText = `✅ Task saved: ${description}`;
+    if (tasksUrl) {
+      replyText += `\n\n📋 View all tasks: ${tasksUrl}`;
+    }
+    
     const response = await fetch(telegramUrl, {
       method: 'POST',
       headers: {
@@ -111,7 +119,7 @@ async function sendTelegramReply(
       },
       body: JSON.stringify({
         chat_id: chatId,
-        text: `✅ Task saved: ${description}`,
+        text: replyText,
         reply_to_message_id: messageId,
       }),
     });
