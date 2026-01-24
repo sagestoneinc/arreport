@@ -63,6 +63,11 @@ The application will automatically create the required tables on first run. Chec
 
 ### Connection Errors
 
+The application includes improved error handling with automatic retry logic. When MySQL initialization fails, the application will:
+- Provide a clear error message indicating the specific issue
+- Wait 30 seconds before attempting to reconnect
+- Continue serving other requests while waiting to retry
+
 **Error: "Access denied for user"**
 - Verify username and password are correct
 - Check that the user has privileges on the database
@@ -72,10 +77,16 @@ The application will automatically create the required tables on first run. Chec
 - Verify the database exists: `SHOW DATABASES;`
 - Check the database name in your environment variables
 
-**Error: "Can't connect to MySQL server"**
+**Error: "Can't connect to MySQL server" (ECONNREFUSED)**
 - Verify MySQL is running: `systemctl status mysql` (Linux)
 - Check the host and port are correct
 - Verify firewall rules allow connections
+- The application will automatically retry every 30 seconds
+
+**Error: "MySQL host not found" (ENOTFOUND)**
+- Check the `MYSQL_HOST` environment variable
+- Verify DNS resolution for the hostname
+- For Railway, ensure the MySQL plugin is added and the service is running
 
 ### Performance Tips
 

@@ -424,12 +424,18 @@ The bot includes built-in rate limiting (5 requests per chat per minute) to prev
 **Webhook verification fails:**
 - Ensure `TELEGRAM_WEBHOOK_SECRET` matches in both environment and webhook setup
 - Verify the secret is set when configuring the webhook
+- Note: Unauthorized webhook attempts are expected and logged only once per minute to reduce noise
 
 **Tasks not persisting:**
 - **SQLite**: Check `/data` directory exists and is writable
 - **SQLite**: Verify `TASKS_STORAGE=sqlite` in environment variables
 - **MySQL**: Verify database connection settings and credentials
 - **MySQL**: Ensure database exists (create with `CREATE DATABASE arreport;`)
+- **MySQL**: The application will retry failed MySQL connections every 30 seconds automatically
+- **MySQL**: Check logs for detailed error messages about connection issues:
+  - `ECONNREFUSED`: MySQL server is not running or not accessible at the configured host/port
+  - `ER_ACCESS_DENIED_ERROR`: Invalid username or password
+  - `ENOTFOUND`: Invalid MySQL host configuration
 - On Vercel, use MySQL or [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres)
 
 **"Error fetching tasks" in UI:**

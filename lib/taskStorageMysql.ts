@@ -6,8 +6,24 @@ import { ITaskStorage } from './taskStorageInterface';
 export class MySQLTaskStorage implements ITaskStorage {
   private pool: mysql.Pool | null = null;
   private initializationPromise: Promise<void> | null = null;
+  private initializationFailed: boolean = false;
+  private lastFailureTime: number = 0;
+  private retryDelayMs: number = 30000; // 30 seconds between retries
 
   async initialize(): Promise<void> {
+    // If initialization previously failed, check if enough time has passed before retrying
+    if (this.initializationFailed) {
+      const timeSinceFailure = Date.now() - this.lastFailureTime;
+      if (timeSinceFailure < this.retryDelayMs) {
+        throw new Error(
+          `MySQL initialization failed previously. Will retry in ${Math.ceil((this.retryDelayMs - timeSinceFailure) / 1000)} seconds.`
+        );
+      }
+      // Reset for retry
+      this.initializationFailed = false;
+      this.initializationPromise = null;
+    }
+
     // Use a single initialization promise to prevent race conditions
     if (this.initializationPromise) {
       return this.initializationPromise;
@@ -63,10 +79,29 @@ export class MySQLTaskStorage implements ITaskStorage {
 
       await this.initSchema();
       console.log('[MySQL] Database initialized successfully');
+      
+      // Reset failure state on successful initialization
+      this.initializationFailed = false;
+      this.lastFailureTime = 0;
     } catch (error: unknown) {
       const err = error as Error & { code?: string; errno?: number; sqlState?: string };
+      
+      // Mark initialization as failed and record the time
+      this.initializationFailed = true;
+      this.lastFailureTime = Date.now();
+      
+      // Provide detailed error message based on error code
+      let errorMessage = err.message;
+      if (err.code === 'ECONNREFUSED') {
+        errorMessage = `Cannot connect to MySQL server at ${host}:${port}. Please ensure MySQL is running and accessible.`;
+      } else if (err.code === 'ER_ACCESS_DENIED_ERROR') {
+        errorMessage = `Access denied for MySQL user '${user}'. Please check your credentials.`;
+      } else if (err.code === 'ENOTFOUND') {
+        errorMessage = `MySQL host '${host}' not found. Please check your MYSQL_HOST configuration.`;
+      }
+
       console.error('[MySQL] Failed to initialize database:', {
-        message: err.message,
+        message: errorMessage,
         code: err.code,
         errno: err.errno,
         sqlState: err.sqlState,
@@ -81,7 +116,7 @@ export class MySQLTaskStorage implements ITaskStorage {
         this.pool = null;
       }
 
-      throw new Error(`MySQL initialization failed: ${err.message}`);
+      throw new Error(`MySQL initialization failed: ${errorMessage}`);
     }
   }
 
