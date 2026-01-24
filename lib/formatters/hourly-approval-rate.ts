@@ -5,6 +5,7 @@ import {
   formatSectionHeader,
   escapeIfNeeded,
   formatDateForReport,
+  bold,
 } from '../telegram-format';
 
 export interface HourlyApprovalRateData {
@@ -43,36 +44,67 @@ function formatARPercent(ar: number | null): string {
   return ar.toFixed(2) + '%';
 }
 
-function formatMidSection(
-  mids: MidWithAR[],
-  mode: FormatMode
-): string[] {
+/**
+ * Get performance emoji based on MID ranking
+ * @param index - The index of the MID in the sorted list (0-based)
+ * @param total - Total number of MIDs in the list
+ * @returns Performance emoji string
+ */
+function getPerformanceEmoji(index: number, total: number): string {
+  // Rules based on requirements:
+  // - If total MIDs >= 3:
+  //   - index === 0 → 🟢⬆️ (Top)
+  //   - index === last → 🔴⬇️ (Bottom)
+  //   - else → 🟡➡️ (Middle)
+  // - If only 2 MIDs:
+  //   - first → 🟢⬆️ (Top)
+  //   - second → 🔴⬇️ (Bottom)
+  // - If only 1 MID:
+  //   - show 🟢⬆️ only (Top)
+
+  if (total === 1) {
+    return EMOJI.TOP_PERFORMER;
+  }
+
+  if (total === 2) {
+    return index === 0 ? EMOJI.TOP_PERFORMER : EMOJI.LOW_PERFORMER;
+  }
+
+  // total >= 3
+  if (index === 0) {
+    return EMOJI.TOP_PERFORMER;
+  } else if (index === total - 1) {
+    return EMOJI.LOW_PERFORMER;
+  } else {
+    return EMOJI.MIDDLE_PERFORMER;
+  }
+}
+
+function formatMidSection(mids: MidWithAR[], mode: FormatMode): string[] {
   const lines: string[] = [];
-  
+
   if (mids.length === 0) {
     lines.push(escapeIfNeeded('- —', mode));
-  } else if (mids.length === 1) {
-    // Single MID: only show top performer emoji (green up arrow).
-    // Design decision: A single MID is considered a "top performer" since there's no comparison.
-    // This avoids showing a negative indicator when there's no context for comparison.
-    const mid = mids[0];
-    lines.push(
-      escapeIfNeeded(`${EMOJI.TOP_PERFORMER} ${mid.mid_name} — ${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`, mode)
-    );
   } else {
-    // Multiple MIDs: show top, middle (no emoji), and bottom.
-    // Note: mids are pre-sorted by AR% descending via sortMids(),
-    // so first item is highest AR%, last item is lowest AR%.
+    // For all MIDs, use the performance emoji logic and bold MID names
     mids.forEach((mid, index) => {
-      const isTop = index === 0;
-      const isBottom = index === mids.length - 1;
-      const prefix = isTop ? EMOJI.TOP_PERFORMER : isBottom ? EMOJI.LOW_PERFORMER : '-';
-      lines.push(
-        escapeIfNeeded(`${prefix} ${mid.mid_name} — ${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`, mode)
-      );
+      const emoji = getPerformanceEmoji(index, mids.length);
+
+      if (mode === 'telegram') {
+        // Bold the MID name only, keep emoji and stats outside
+        const boldMidName = bold(mid.mid_name);
+        const stats = `${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`;
+        const escapedStats = escapeIfNeeded(stats, mode);
+        lines.push(`${emoji} ${boldMidName} — ${escapedStats}`);
+      } else {
+        // Plain mode
+        lines.push(
+          `${emoji} ${mid.mid_name} — ${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`
+        );
+      }
     });
   }
-  
+
   return lines;
 }
 
@@ -85,18 +117,21 @@ function sortMids(mids: MidWithAR[]): MidWithAR[] {
     }
     if (a.ar_percent === null) return 1; // a goes after b
     if (b.ar_percent === null) return -1; // b goes after a
-    
+
     // Both have ar_percent, sort desc
     if (b.ar_percent !== a.ar_percent) {
       return b.ar_percent - a.ar_percent;
     }
-    
+
     // Same ar_percent, tie-breaker by total desc
     return b.total - a.total;
   });
 }
 
-export function formatHourlyApprovalRate(data: HourlyApprovalRateData, mode: FormatMode = 'telegram'): string {
+export function formatHourlyApprovalRate(
+  data: HourlyApprovalRateData,
+  mode: FormatMode = 'telegram'
+): string {
   const lines: string[] = [];
   const dateFormatted = formatDateForReport(data.date);
 
@@ -104,12 +139,12 @@ export function formatHourlyApprovalRate(data: HourlyApprovalRateData, mode: For
   lines.push(formatTitle(EMOJI.CLOCK, `Hourly MID Ops Report — ${dateFormatted}`, mode));
   lines.push('');
   lines.push(escapeIfNeeded(`Time Range: ${data.time_range}`, mode));
-  
+
   // Add Filter Used if provided
   if (data.filter_used) {
     lines.push(escapeIfNeeded(`Filter Used: ${data.filter_used}`, mode));
   }
-  
+
   lines.push('');
 
   // Process and sort VISA mids

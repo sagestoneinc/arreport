@@ -28,6 +28,7 @@ export const EMOJI = {
   INSIGHTS: '🧠',
   ACTION_REQUIRED: '🚀',
   TOP_PERFORMER: '🟢⬆️',
+  MIDDLE_PERFORMER: '🟡➡️',
   LOW_PERFORMER: '🔴⬇️',
   US_FLAG: '🇺🇸',
   GLOBE: '🌍',
