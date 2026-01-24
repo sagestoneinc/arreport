@@ -126,7 +126,7 @@ function TaskCard({
           </div>
 
           {task.description && task.description !== task.title && (
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 overflow-hidden" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
               {task.description}
             </p>
           )}
@@ -272,13 +272,14 @@ export default function TasksPage() {
     fetchTasks();
   }, [fetchTasks]);
 
-  // Debounced search
+  // Debounced search - fetchTasks is stable due to useCallback with its deps
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchTasks();
     }, 300);
     return () => clearTimeout(timer);
-  }, [searchQuery, fetchTasks]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
 
   const updateTaskStatus = useCallback(async (task: Task, newStatus: TaskStatus) => {
     // Optimistic update

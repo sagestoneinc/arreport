@@ -151,8 +151,9 @@ export class MySQLTaskStorage implements ITaskStorage {
         if (!existingColumns.includes('title')) {
           console.log('[MySQL] Adding title column...');
           await this.pool.execute(`ALTER TABLE tasks ADD COLUMN title VARCHAR(255) DEFAULT ''`);
+          // Backfill title from description - truncate to 100 chars to match extractCleanTitle
           await this.pool.execute(
-            `UPDATE tasks SET title = SUBSTRING(description, 1, 255) WHERE title = '' OR title IS NULL`
+            `UPDATE tasks SET title = SUBSTRING(description, 1, 100) WHERE title = '' OR title IS NULL`
           );
         }
         if (!existingColumns.includes('source')) {

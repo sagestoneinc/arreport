@@ -62,8 +62,8 @@ export class SQLiteTaskStorage implements ITaskStorage {
       
       if (!hasTitle) {
         db.exec(`ALTER TABLE tasks ADD COLUMN title TEXT DEFAULT ''`);
-        // Backfill title from description
-        db.exec(`UPDATE tasks SET title = description WHERE title = '' OR title IS NULL`);
+        // Backfill title from description - truncate to 100 chars to match extractCleanTitle
+        db.exec(`UPDATE tasks SET title = SUBSTR(description, 1, 100) WHERE title = '' OR title IS NULL`);
       }
       if (!hasSource) {
         db.exec(`ALTER TABLE tasks ADD COLUMN source TEXT DEFAULT 'telegram'`);
