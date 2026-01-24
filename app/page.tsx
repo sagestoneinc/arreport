@@ -1,160 +1,24 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
-import TemplateSelector from '@/components/TemplateSelector';
-import HeaderInputs from '@/components/HeaderInputs';
-import DailySummaryInputs from '@/components/DailySummaryInputs';
-import MidTableEditor from '@/components/MidTableEditor';
-import NotesInput from '@/components/NotesInput';
-import OutputPanel from '@/components/OutputPanel';
-import TelegramPanel from '@/components/TelegramPanel';
-import { AppState, TemplateType } from '@/lib/types';
-import { DEFAULT_STATE_TEMPLATE_A, DEFAULT_STATE_TEMPLATE_B, DEFAULT_STATE_APPROVAL_RATE_HOURLY, DEFAULT_STATE_DAILY_BATCH_RERUNS, DEFAULT_STATE_DAILY_SUMMARY_REBILLS, DEFAULT_STATE_MINT_ADDITIONAL_SALES } from '@/lib/defaults';
-import { formatTelegramMessage } from '@/lib/format';
-
-const STORAGE_KEY_PREFIX = 'ar-generator-state-';
+import React from 'react';
+import TemplateCard from '@/components/TemplateCard';
+import { TEMPLATES } from '@/lib/templates';
 
 export default function Home() {
-  const [state, setState] = useState<AppState>(DEFAULT_STATE_APPROVAL_RATE_HOURLY);
-  const [generatedMessage, setGeneratedMessage] = useState('');
-  const [isClient, setIsClient] = useState(false);
-
-  // Load state from localStorage on mount
-  useEffect(() => {
-    setIsClient(true);
-    const savedState = localStorage.getItem(STORAGE_KEY_PREFIX + 'approval-rate-hourly');
-    if (savedState) {
-      try {
-        const parsed = JSON.parse(savedState);
-        setState(parsed);
-      } catch (e) {
-        console.error('Failed to parse saved state:', e);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Save state to localStorage whenever it changes
-  useEffect(() => {
-    if (isClient) {
-      localStorage.setItem(STORAGE_KEY_PREFIX + state.templateType, JSON.stringify(state));
-    }
-  }, [state, isClient]);
-
-  const handleTemplateChange = (templateType: TemplateType) => {
-    // Load state for the new template from localStorage or use defaults
-    const savedState = localStorage.getItem(STORAGE_KEY_PREFIX + templateType);
-    if (savedState) {
-      try {
-        const parsed = JSON.parse(savedState);
-        setState(parsed);
-      } catch (e) {
-        console.error('Failed to parse saved state:', e);
-        setState(getDefaultStateForTemplate(templateType));
-      }
-    } else {
-      setState(getDefaultStateForTemplate(templateType));
-    }
-    setGeneratedMessage('');
-  };
-
-  const getDefaultStateForTemplate = (templateType: TemplateType): AppState => {
-    switch (templateType) {
-      case 'template-a':
-        return DEFAULT_STATE_TEMPLATE_A;
-      case 'template-b':
-        return DEFAULT_STATE_TEMPLATE_B;
-      case 'approval-rate-hourly':
-        return DEFAULT_STATE_APPROVAL_RATE_HOURLY;
-      case 'daily-batch-reruns':
-        return DEFAULT_STATE_DAILY_BATCH_RERUNS;
-      case 'daily-summary-rebills':
-        return DEFAULT_STATE_DAILY_SUMMARY_REBILLS;
-      case 'mint-additional-sales':
-        return DEFAULT_STATE_MINT_ADDITIONAL_SALES;
-      default:
-        return DEFAULT_STATE_APPROVAL_RATE_HOURLY;
-    }
-  };
-
-  const handleGenerate = () => {
-    const message = formatTelegramMessage(state);
-    setGeneratedMessage(message);
-  };
-
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            📊 AR MID Optimization Generator
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+            📊 AR Report Template Builder
           </h1>
-          <p className="text-gray-600">
-            Generate Telegram-formatted Approval Rate updates for MID optimization
+          <p className="text-xl text-gray-600">
+            Choose a report template to get started
           </p>
         </div>
 
-        <div className="space-y-6">
-          <TemplateSelector
-            selectedTemplate={state.templateType}
-            onTemplateChange={handleTemplateChange}
-          />
-
-          <HeaderInputs
-            dateISO={state.dateISO}
-            timeHHMM={state.timeHHMM}
-            timeEndHHMM={state.timeEndHHMM}
-            threshold={state.threshold}
-            onDateChange={(dateISO) => setState({ ...state, dateISO })}
-            onTimeChange={(timeHHMM) => setState({ ...state, timeHHMM })}
-            onTimeEndChange={(timeEndHHMM) => setState({ ...state, timeEndHHMM })}
-            onThresholdChange={(threshold) => setState({ ...state, threshold })}
-            showTimeRange={state.templateType === 'approval-rate-hourly'}
-          />
-
-          <DailySummaryInputs
-            dailySummary={state.dailySummary}
-            onDailySummaryChange={(dailySummary) => setState({ ...state, dailySummary })}
-          />
-
-          <MidTableEditor
-            title="💳 VISA MIDs (up to 4)"
-            mids={state.visaMids}
-            threshold={state.threshold}
-            maxRows={4}
-            onMidsChange={(visaMids) => setState({ ...state, visaMids })}
-          />
-
-          <MidTableEditor
-            title="💳 MASTERCARD MIDs (up to 5)"
-            mids={state.mcMids}
-            threshold={state.threshold}
-            maxRows={5}
-            onMidsChange={(mcMids) => setState({ ...state, mcMids })}
-          />
-
-          <NotesInput
-            notes={state.notes}
-            onNotesChange={(notes) => setState({ ...state, notes })}
-          />
-
-          <button
-            onClick={handleGenerate}
-            className="w-full px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-lg shadow-lg"
-          >
-            ✨ Generate Message
-          </button>
-
-          <OutputPanel
-            message={generatedMessage}
-            state={state}
-            onImport={(importedState) => {
-              setState(importedState);
-              setGeneratedMessage('');
-            }}
-          />
-
-          <TelegramPanel message={generatedMessage} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {TEMPLATES.map((template) => (
+            <TemplateCard key={template.slug} template={template} />
+          ))}
         </div>
       </div>
     </main>
