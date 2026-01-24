@@ -170,7 +170,7 @@ Railway provides managed MySQL through their plugin system. When you add the MyS
    - The MySQL tables will be created on first run
    - Your Task Collector bot will start using the MySQL database
 
-**Note:** Railway uses template variables in their configuration (e.g., `${{MYSQL_ROOT_PASSWORD}}`). These are automatically resolved by Railway's runtime environment and should not be manually set in your environment variables.
+**Note:** Railway uses internal template variables in their configuration (e.g., `${{MYSQL_ROOT_PASSWORD}}` → `MYSQLPASSWORD`). These template variables are automatically resolved by Railway and stored in environment variables. You should not manually set template variables - Railway handles this when you add the MySQL plugin.
 
 ## Monitoring
 

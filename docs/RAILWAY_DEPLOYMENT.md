@@ -151,13 +151,26 @@ When you add the MySQL plugin, Railway automatically sets:
 
 ## Railway Template Variables
 
-Railway uses template variables in their internal configuration (e.g., `${{MYSQL_ROOT_PASSWORD}}`). These are automatically resolved at runtime by Railway. You should **not** manually set these variables - Railway handles them automatically.
+Railway uses internal template variables in their configuration system (e.g., `${{MYSQL_ROOT_PASSWORD}}`, `${{RAILWAY_PRIVATE_DOMAIN}}`). These template variables are automatically resolved at runtime by Railway and stored in environment variables that your application can access.
 
-Example Railway MySQL configuration (handled automatically):
+**Important distinction:**
+- `${{MYSQL_ROOT_PASSWORD}}` is Railway's **internal template variable** (you never see this)
+- `MYSQLPASSWORD` is the **environment variable** that your application reads (contains the resolved password)
+
+You should **not** manually set these template variables - Railway handles the resolution automatically when you add the MySQL plugin.
+
+Example Railway MySQL configuration (handled automatically by Railway):
 ```
+# Railway resolves these template variables internally:
+MYSQLPASSWORD=${{MYSQL_ROOT_PASSWORD}}
+MYSQLHOST=${{RAILWAY_PRIVATE_DOMAIN}}
+
+# And constructs these connection URLs:
 MYSQL_URL=mysql://${{MYSQLUSER}}:${{MYSQL_ROOT_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:3306/${{MYSQLDATABASE}}
 MYSQL_PUBLIC_URL=mysql://${{MYSQLUSER}}:${{MYSQL_ROOT_PASSWORD}}@${{RAILWAY_TCP_PROXY_DOMAIN}}:${{RAILWAY_TCP_PROXY_PORT}}/${{MYSQLDATABASE}}
 ```
+
+Your application code reads the resolved values from `MYSQLPASSWORD`, `MYSQLHOST`, etc.
 
 ## Monitoring and Logs
 
