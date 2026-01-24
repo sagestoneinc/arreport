@@ -123,6 +123,76 @@ describe('taskParser', () => {
       const result = parseTaskFromMessage(message);
       expect(result).toBe('Deploy the app');
     });
+
+    it('parses forwarded message with text as task', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: 'This is a forwarded message that should become a task',
+        date: Date.now(),
+        forward_from: {
+          id: 999,
+          first_name: 'John',
+          last_name: 'Doe',
+        },
+        forward_date: Date.now() - 3600,
+      };
+
+      const result = parseTaskFromMessage(message);
+      expect(result).toBe('This is a forwarded message that should become a task');
+    });
+
+    it('parses forwarded message from channel as task', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: 'Message forwarded from a channel',
+        date: Date.now(),
+        forward_from_chat: {
+          id: 888,
+          type: 'channel',
+          title: 'Test Channel',
+        },
+        forward_from_message_id: 42,
+        forward_date: Date.now() - 7200,
+      };
+
+      const result = parseTaskFromMessage(message);
+      expect(result).toBe('Message forwarded from a channel');
+    });
+
+    it('returns null for forwarded message without text', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        date: Date.now(),
+        forward_from: {
+          id: 999,
+          first_name: 'John',
+        },
+        forward_date: Date.now() - 3600,
+      };
+
+      const result = parseTaskFromMessage(message);
+      expect(result).toBeNull();
+    });
+
+    it('returns null for forwarded message with empty text', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '   ',
+        date: Date.now(),
+        forward_from: {
+          id: 999,
+          first_name: 'John',
+        },
+        forward_date: Date.now() - 3600,
+      };
+
+      const result = parseTaskFromMessage(message);
+      expect(result).toBeNull();
+    });
   });
 
   describe('shouldReply', () => {
@@ -201,6 +271,40 @@ describe('taskParser', () => {
       };
 
       expect(shouldReply(message)).toBe(true);
+    });
+
+    it('returns false for forwarded messages', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: 'This is a forwarded message',
+        date: Date.now(),
+        forward_from: {
+          id: 999,
+          first_name: 'John',
+        },
+        forward_date: Date.now() - 3600,
+      };
+
+      expect(shouldReply(message)).toBe(false);
+    });
+
+    it('returns false for messages forwarded from channels', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: 'This is forwarded from a channel',
+        date: Date.now(),
+        forward_from_chat: {
+          id: 888,
+          type: 'channel',
+          title: 'Test Channel',
+        },
+        forward_from_message_id: 42,
+        forward_date: Date.now() - 7200,
+      };
+
+      expect(shouldReply(message)).toBe(false);
     });
   });
 });

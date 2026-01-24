@@ -9,11 +9,20 @@ import { TelegramMessage } from './taskTypes';
  * - /task@botname task description (group chat format)
  * - /todo task description
  * - /todo@botname task description (group chat format)
+ * - Forwarded messages (uses the forwarded message text as task)
  */
 export function parseTaskFromMessage(
   message: TelegramMessage,
   botUsername?: string
 ): string | null {
+  // Handle forwarded messages - use the forwarded text as the task description
+  if (message.forward_from || message.forward_from_chat) {
+    if (message.text && message.text.trim()) {
+      return message.text.trim();
+    }
+    return null;
+  }
+
   if (!message.text) {
     return null;
   }
@@ -52,11 +61,17 @@ export function parseTaskFromMessage(
 /**
  * Determines if a bot should reply to the message.
  * Only replies for /task, /todo commands, or mentions with explicit "-"
+ * Does not reply to forwarded messages to avoid spam
  */
 export function shouldReply(
   message: TelegramMessage,
   botUsername?: string
 ): boolean {
+  // Don't reply to forwarded messages
+  if (message.forward_from || message.forward_from_chat) {
+    return false;
+  }
+
   if (!message.text) {
     return false;
   }

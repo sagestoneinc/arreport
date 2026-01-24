@@ -4,6 +4,7 @@ import { Task, TaskFilter } from './taskTypes';
  * Interface for task storage implementations
  */
 export interface ITaskStorage {
+  initialize(): Promise<void>;
   saveTask(task: Omit<Task, 'id' | 'created_at' | 'status'>): Promise<Task>;
   updateTask(chatId: string, messageId: number, description: string, rawText: string): Promise<void>;
   taskExists(chatId: string, messageId: number): Promise<boolean>;
