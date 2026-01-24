@@ -29,7 +29,7 @@ Ensure your code is in a GitHub repository that Railway can access.
 2. Click "New Project"
 3. Select "Deploy from GitHub repo"
 4. Authorize Railway to access your GitHub account (if not already done)
-5. Select the `arreport` repository
+5. Select your repository (e.g., `arreport` or your fork)
 
 ### 3. Add MySQL Database Plugin
 
@@ -155,8 +155,8 @@ Railway uses template variables in their internal configuration (e.g., `${{MYSQL
 
 Example Railway MySQL configuration (handled automatically):
 ```
-MYSQL_URL=mysql://${{MYSQLUSER}}:${{MYSQL_ROOT_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:3306/${{MYSQL_DATABASE}}
-MYSQL_PUBLIC_URL=mysql://${{MYSQLUSER}}:${{MYSQL_ROOT_PASSWORD}}@${{RAILWAY_TCP_PROXY_DOMAIN}}:${{RAILWAY_TCP_PROXY_PORT}}/${{MYSQL_DATABASE}}
+MYSQL_URL=mysql://${{MYSQLUSER}}:${{MYSQL_ROOT_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:3306/${{MYSQLDATABASE}}
+MYSQL_PUBLIC_URL=mysql://${{MYSQLUSER}}:${{MYSQL_ROOT_PASSWORD}}@${{RAILWAY_TCP_PROXY_DOMAIN}}:${{RAILWAY_TCP_PROXY_PORT}}/${{MYSQLDATABASE}}
 ```
 
 ## Monitoring and Logs
