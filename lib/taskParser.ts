@@ -10,15 +10,25 @@ import { TelegramMessage } from './taskTypes';
  * - /todo task description
  * - /todo@botname task description (group chat format)
  * - Forwarded messages (uses the forwarded message text as task)
+ * - Forwarded images (uses the caption as task)
  */
 export function parseTaskFromMessage(
   message: TelegramMessage,
   botUsername?: string
 ): string | null {
-  // Handle forwarded messages - use the forwarded text as the task description
+  // Handle forwarded messages - use the forwarded text or caption as the task description
   if (message.forward_from || message.forward_from_chat) {
+    // Check for text first
     if (message.text && message.text.trim()) {
       return message.text.trim();
+    }
+    // Check for caption (for forwarded images/media)
+    if (message.caption && message.caption.trim()) {
+      return message.caption.trim();
+    }
+    // Forwarded photo without caption - create a generic task description
+    if (message.photo && message.photo.length > 0) {
+      return '[Forwarded Image]';
     }
     return null;
   }
@@ -53,6 +63,46 @@ export function parseTaskFromMessage(
   }
 
   return null;
+}
+
+/**
+ * Checks if the message is an /opentask command
+ */
+export function isOpenTaskCommand(message: TelegramMessage): boolean {
+  if (!message.text) {
+    return false;
+  }
+  const text = message.text.trim();
+  // Match /opentask or /opentask@botname (case insensitive)
+  return /^\/opentask(?:@[\w-]+)?$/i.test(text);
+}
+
+/**
+ * Checks if the message is a /done command and extracts the task reference
+ * Formats:
+ * - /done <task_number> - marks task by number (1-indexed from open task list)
+ * - /done <partial_description> - marks task by matching description
+ */
+export function parseDoneCommand(message: TelegramMessage): { type: 'number'; value: number } | { type: 'text'; value: string } | null {
+  if (!message.text) {
+    return null;
+  }
+  const text = message.text.trim();
+  // Match /done or /done@botname followed by argument
+  const match = text.match(/^\/done(?:@[\w-]+)?\s+(.+)/i);
+  if (!match) {
+    return null;
+  }
+  
+  const arg = match[1].trim();
+  // Check if it's a number
+  const num = parseInt(arg, 10);
+  if (!isNaN(num) && num > 0 && num.toString() === arg) {
+    return { type: 'number', value: num };
+  }
+  
+  // Otherwise treat as text description to match
+  return { type: 'text', value: arg };
 }
 
 /**

@@ -37,6 +37,15 @@ export interface TelegramMessage {
     offset: number;
     length: number;
   }>;
+  // Photo message fields
+  photo?: Array<{
+    file_id: string;
+    file_unique_id: string;
+    width: number;
+    height: number;
+    file_size?: number;
+  }>;
+  caption?: string;
   // Forwarded message fields
   forward_from?: {
     id: number;
