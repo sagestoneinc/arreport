@@ -6,15 +6,18 @@ import { ITaskStorage } from './taskStorageInterface';
 
 export class SQLiteTaskStorage implements ITaskStorage {
   private db: Database.Database | null = null;
+  private useMemory: boolean;
+
+  constructor(useMemory: boolean = false) {
+    this.useMemory = useMemory;
+  }
 
   private getDb(): Database.Database {
     if (this.db) {
       return this.db;
     }
 
-    const storageType = process.env.TASKS_STORAGE || 'sqlite';
-    
-    if (storageType === 'memory') {
+    if (this.useMemory) {
       this.db = new Database(':memory:');
     } else {
       // Create /data directory if it doesn't exist

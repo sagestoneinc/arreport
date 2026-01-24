@@ -11,9 +11,11 @@ export function getTaskStorage(): ITaskStorage {
     
     if (storageType === 'mysql') {
       storage = new MySQLTaskStorage();
+    } else if (storageType === 'memory') {
+      storage = new SQLiteTaskStorage(true);
     } else {
-      // Default to SQLite (includes 'sqlite', 'memory', and 'file')
-      storage = new SQLiteTaskStorage();
+      // Default to SQLite (includes 'sqlite' and 'file')
+      storage = new SQLiteTaskStorage(false);
     }
   }
   return storage;

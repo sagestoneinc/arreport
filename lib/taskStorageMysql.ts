@@ -4,6 +4,7 @@ import { ITaskStorage } from './taskStorageInterface';
 
 export class MySQLTaskStorage implements ITaskStorage {
   private pool: mysql.Pool | null = null;
+  private schemaInitialized: boolean = false;
 
   private async getPool(): Promise<mysql.Pool> {
     if (this.pool) {
@@ -23,19 +24,24 @@ export class MySQLTaskStorage implements ITaskStorage {
 
     this.pool = mysql.createPool(config);
     
-    // Initialize schema
-    await this.initSchema();
+    // Initialize schema only once
+    if (!this.schemaInitialized) {
+      await this.initSchema();
+      this.schemaInitialized = true;
+    }
     
     return this.pool;
   }
 
   private async initSchema(): Promise<void> {
-    const pool = this.pool!;
+    if (!this.pool) {
+      throw new Error('Pool not initialized');
+    }
     
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS tasks (
         id VARCHAR(36) PRIMARY KEY,
-        created_at DATETIME NOT NULL,
+        created_at VARCHAR(50) NOT NULL,
         chat_id VARCHAR(255) NOT NULL,
         chat_title VARCHAR(255),
         message_id INT NOT NULL,
@@ -52,7 +58,7 @@ export class MySQLTaskStorage implements ITaskStorage {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `;
 
-    await pool.execute(createTableQuery);
+    await this.pool.execute(createTableQuery);
   }
 
   async saveTask(task: Omit<Task, 'id' | 'created_at' | 'status'>): Promise<Task> {
@@ -170,6 +176,7 @@ export class MySQLTaskStorage implements ITaskStorage {
     if (this.pool) {
       await this.pool.end();
       this.pool = null;
+      this.schemaInitialized = false;
     }
   }
 }
