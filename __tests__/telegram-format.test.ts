@@ -171,8 +171,8 @@ describe('telegram-format utilities', () => {
       expect(EMOJI.DECLINES).toBe('⚠️');
       expect(EMOJI.INSIGHTS).toBe('🧠');
       expect(EMOJI.ACTION_REQUIRED).toBe('🚀');
-      expect(EMOJI.TOP_PERFORMER).toBe('🔝');
-      expect(EMOJI.LOW_PERFORMER).toBe('⬇️');
+      expect(EMOJI.TOP_PERFORMER).toBe('🟢⬆️');
+      expect(EMOJI.LOW_PERFORMER).toBe('🔴⬇️');
       expect(EMOJI.US_FLAG).toBe('🇺🇸');
       expect(EMOJI.GLOBE).toBe('🌍');
       expect(EMOJI.CLOCK).toBe('⏱');

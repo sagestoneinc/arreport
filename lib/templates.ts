@@ -299,6 +299,13 @@ export const TEMPLATES: TemplateDefinition[] = [
         required: true,
       },
       {
+        name: 'filter_used',
+        label: 'Filter Used',
+        type: 'text',
+        defaultValue: 'Affiliate > Card Brand > Merchant Account',
+        required: false,
+      },
+      {
         name: 'visa_mids',
         label: 'VISA',
         type: 'table',

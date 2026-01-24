@@ -10,6 +10,7 @@ import {
 export interface HourlyApprovalRateData {
   date: string;
   time_range: string;
+  filter_used?: string;
   visa_mids: Array<{
     mid_name: string;
     initial_sales: number;
@@ -42,6 +43,39 @@ function formatARPercent(ar: number | null): string {
   return ar.toFixed(2) + '%';
 }
 
+function formatMidSection(
+  mids: MidWithAR[],
+  mode: FormatMode
+): string[] {
+  const lines: string[] = [];
+  
+  if (mids.length === 0) {
+    lines.push(escapeIfNeeded('- —', mode));
+  } else if (mids.length === 1) {
+    // Single MID: only show top performer emoji (green up arrow).
+    // Design decision: A single MID is considered a "top performer" since there's no comparison.
+    // This avoids showing a negative indicator when there's no context for comparison.
+    const mid = mids[0];
+    lines.push(
+      escapeIfNeeded(`${EMOJI.TOP_PERFORMER} ${mid.mid_name} — ${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`, mode)
+    );
+  } else {
+    // Multiple MIDs: show top, middle (no emoji), and bottom.
+    // Note: mids are pre-sorted by AR% descending via sortMids(),
+    // so first item is highest AR%, last item is lowest AR%.
+    mids.forEach((mid, index) => {
+      const isTop = index === 0;
+      const isBottom = index === mids.length - 1;
+      const prefix = isTop ? EMOJI.TOP_PERFORMER : isBottom ? EMOJI.LOW_PERFORMER : '-';
+      lines.push(
+        escapeIfNeeded(`${prefix} ${mid.mid_name} — ${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`, mode)
+      );
+    });
+  }
+  
+  return lines;
+}
+
 function sortMids(mids: MidWithAR[]): MidWithAR[] {
   return [...mids].sort((a, b) => {
     // Sort by ar_percent desc, nulls last
@@ -70,6 +104,12 @@ export function formatHourlyApprovalRate(data: HourlyApprovalRateData, mode: For
   lines.push(formatTitle(EMOJI.CLOCK, `Hourly MID Ops Report — ${dateFormatted}`, mode));
   lines.push('');
   lines.push(escapeIfNeeded(`Time Range: ${data.time_range}`, mode));
+  
+  // Add Filter Used if provided
+  if (data.filter_used) {
+    lines.push(escapeIfNeeded(`Filter Used: ${data.filter_used}`, mode));
+  }
+  
   lines.push('');
 
   // Process and sort VISA mids
@@ -81,18 +121,7 @@ export function formatHourlyApprovalRate(data: HourlyApprovalRateData, mode: For
   const sortedVisaMids = sortMids(visaMidsWithAR);
 
   lines.push(formatSectionHeader(EMOJI.CARD_NETWORK, 'VISA', mode));
-  if (sortedVisaMids.length === 0) {
-    lines.push(escapeIfNeeded('- —', mode));
-  } else {
-    sortedVisaMids.forEach((mid, index) => {
-      const isTop = index === 0 && sortedVisaMids.length > 1;
-      const isBottom = index === sortedVisaMids.length - 1 && sortedVisaMids.length > 1;
-      const prefix = isTop ? EMOJI.TOP_PERFORMER : isBottom ? EMOJI.LOW_PERFORMER : '-';
-      lines.push(
-        escapeIfNeeded(`${prefix} ${mid.mid_name} — ${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`, mode)
-      );
-    });
-  }
+  lines.push(...formatMidSection(sortedVisaMids, mode));
   lines.push('');
 
   // Process and sort MasterCard mids
@@ -104,18 +133,7 @@ export function formatHourlyApprovalRate(data: HourlyApprovalRateData, mode: For
   const sortedMcMids = sortMids(mcMidsWithAR);
 
   lines.push(formatSectionHeader(EMOJI.CARD_NETWORK, 'MasterCard', mode));
-  if (sortedMcMids.length === 0) {
-    lines.push(escapeIfNeeded('- —', mode));
-  } else {
-    sortedMcMids.forEach((mid, index) => {
-      const isTop = index === 0 && sortedMcMids.length > 1;
-      const isBottom = index === sortedMcMids.length - 1 && sortedMcMids.length > 1;
-      const prefix = isTop ? EMOJI.TOP_PERFORMER : isBottom ? EMOJI.LOW_PERFORMER : '-';
-      lines.push(
-        escapeIfNeeded(`${prefix} ${mid.mid_name} — ${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`, mode)
-      );
-    });
-  }
+  lines.push(...formatMidSection(sortedMcMids, mode));
   lines.push('');
 
   lines.push(formatSectionHeader(EMOJI.INSIGHTS, 'Insights & Actions', mode));

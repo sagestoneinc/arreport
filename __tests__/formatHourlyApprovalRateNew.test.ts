@@ -50,8 +50,8 @@ describe('formatHourlyApprovalRate - New Template System', () => {
     expect(output).toContain('All PAY REVs have been performing over the past few hours');
     
     // Check for performer indicators
-    expect(output).toContain('🔝'); // Top performer indicator
-    expect(output).toContain('⬇️'); // Low performer indicator
+    expect(output).toContain('🟢⬆️'); // Top performer indicator
+    expect(output).toContain('🔴⬇️'); // Low performer indicator
   });
 
   it('generates plain format when mode is plain', () => {
@@ -169,5 +169,51 @@ describe('formatHourlyApprovalRate - New Template System', () => {
     expect(output).toContain('10 sales');
     expect(output).toContain('0 declines');
     expect(output).toContain('100\\.00%'); // Escaped period
+  });
+
+  it('includes Filter Used field when provided', () => {
+    const data = {
+      date: '2026-01-23',
+      time_range: '13:00 - 16:00 EST',
+      filter_used: 'Affiliate > Card Brand > Merchant Account',
+      visa_mids: [
+        { mid_name: 'CS_395', initial_sales: 6, initial_decline: 9 },
+      ],
+      mc_mids: [],
+      insights: 'Test',
+    };
+
+    const output = formatHourlyApprovalRate(data);
+
+    expect(output).toContain('Time Range: 13:00 \\- 16:00 EST');
+    expect(output).toContain('Filter Used: Affiliate \\> Card Brand \\> Merchant Account');
+  });
+
+  it('handles single MID correctly (shows only top performer emoji)', () => {
+    const data = {
+      date: '2026-01-23',
+      time_range: '13:00 - 16:00 EST',
+      visa_mids: [
+        { mid_name: 'CS_395', initial_sales: 6, initial_decline: 9 }, // Only one
+      ],
+      mc_mids: [
+        { mid_name: 'PAY-REV_346', initial_sales: 12, initial_decline: 6 }, // Only one
+      ],
+      insights: 'Test',
+    };
+
+    const output = formatHourlyApprovalRate(data);
+
+    // Should show green up arrow for single MIDs
+    expect(output).toContain('🟢⬆️ CS\\_395');
+    expect(output).toContain('🟢⬆️ PAY\\-REV\\_346');
+    
+    // Should NOT show red down arrow for single MIDs
+    const visaSection = output.substring(output.indexOf('VISA'), output.indexOf('MasterCard'));
+    const mcSection = output.substring(output.indexOf('MasterCard'), output.indexOf('Insights'));
+    
+    // Count red arrows - should be 0
+    const redArrowCount = (output.match(/🔴⬇️/g) || []).length;
+    expect(redArrowCount).toBe(0);
   });
 });
