@@ -27,5 +27,3 @@ export function formatTelegramMessage(state: AppState): string {
   }
   return formatTemplateA(state);
 }
-
-

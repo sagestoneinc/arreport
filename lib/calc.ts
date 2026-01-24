@@ -24,4 +24,3 @@ export function formatAR(ar: number): string {
 export function determineStatus(ar: number, threshold: number): 'PERFORMING' | 'LOW' {
   return ar >= threshold ? 'PERFORMING' : 'LOW';
 }
-

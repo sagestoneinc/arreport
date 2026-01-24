@@ -24,9 +24,7 @@ export default function TemplateSelector({
         >
           <div className="text-left">
             <div className="font-semibold text-gray-900 mb-1">Approval Rate Hourly Report</div>
-            <div className="text-sm text-gray-600">
-              Time range, MIDs performance, and insights
-            </div>
+            <div className="text-sm text-gray-600">Time range, MIDs performance, and insights</div>
           </div>
         </button>
         <button
@@ -39,9 +37,7 @@ export default function TemplateSelector({
         >
           <div className="text-left">
             <div className="font-semibold text-gray-900 mb-1">Daily Batch Reruns</div>
-            <div className="text-sm text-gray-600">
-              Batch processing reruns report
-            </div>
+            <div className="text-sm text-gray-600">Batch processing reruns report</div>
           </div>
         </button>
         <button
@@ -54,9 +50,7 @@ export default function TemplateSelector({
         >
           <div className="text-left">
             <div className="font-semibold text-gray-900 mb-1">Daily Summary Rebills</div>
-            <div className="text-sm text-gray-600">
-              Daily rebills summary report
-            </div>
+            <div className="text-sm text-gray-600">Daily rebills summary report</div>
           </div>
         </button>
         <button
@@ -69,9 +63,7 @@ export default function TemplateSelector({
         >
           <div className="text-left">
             <div className="font-semibold text-gray-900 mb-1">Mint Additional Sales</div>
-            <div className="text-sm text-gray-600">
-              Additional sales tracking report
-            </div>
+            <div className="text-sm text-gray-600">Additional sales tracking report</div>
           </div>
         </button>
         <button
