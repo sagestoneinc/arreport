@@ -1,5 +1,12 @@
+export type TaskStatus = 'open' | 'in_progress' | 'done';
+export type TaskSource = 'telegram' | 'web';
+
 export interface Task {
   id: string;
+  title: string;
+  description?: string;
+  source: TaskSource;
+  created_by: string;
   created_at: string;
   chat_id: string;
   chat_title?: string;
@@ -7,14 +14,15 @@ export interface Task {
   user_id: string;
   username?: string;
   name?: string;
-  description: string;
-  status: 'open' | 'done';
+  status: TaskStatus;
   raw_text: string;
 }
 
 export interface TaskFilter {
-  status?: 'open' | 'done';
+  status?: TaskStatus;
   chat_id?: string;
+  source?: TaskSource;
+  search?: string;
 }
 
 export interface TelegramMessage {

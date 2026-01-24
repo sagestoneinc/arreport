@@ -1,7 +1,52 @@
 import { TelegramMessage } from './taskTypes';
 
 /**
- * Parses a Telegram message to extract task description.
+ * Result of parsing a task from a message
+ */
+export interface ParsedTask {
+  title: string;
+  description?: string;
+}
+
+/**
+ * Extracts a clean title from raw task text.
+ * - Removes bot mentions and punctuation at the start
+ * - Capitalizes the first letter
+ * - Truncates very long text to create a reasonable title
+ */
+export function extractCleanTitle(rawText: string): string {
+  if (!rawText || !rawText.trim()) {
+    return '';
+  }
+
+  let cleaned = rawText.trim();
+
+  // Remove leading punctuation and whitespace (like dashes)
+  cleaned = cleaned.replace(/^[-–—:,;.!?\s]+/, '');
+
+  // Capitalize first letter
+  if (cleaned.length > 0) {
+    cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+  }
+
+  // Truncate to max 100 chars for title, adding ellipsis if needed
+  const maxLength = 100;
+  if (cleaned.length > maxLength) {
+    // Try to cut at word boundary
+    const truncated = cleaned.substring(0, maxLength);
+    const lastSpace = truncated.lastIndexOf(' ');
+    if (lastSpace > maxLength * 0.7) {
+      cleaned = truncated.substring(0, lastSpace) + '...';
+    } else {
+      cleaned = truncated + '...';
+    }
+  }
+
+  return cleaned;
+}
+
+/**
+ * Parses a Telegram message to extract task information.
  * Supports formats:
  * - @botname - task description
  * - @botname task description
@@ -20,7 +65,11 @@ export function parseTaskFromMessage(
   if (message.forward_from || message.forward_from_chat) {
     // Check for text first
     if (message.text && message.text.trim()) {
-      return message.text.trim();
+      const rawText = message.text.trim();
+      return {
+        title: extractCleanTitle(rawText),
+        description: rawText,
+      };
     }
     // Check for caption (for forwarded images/media)
     if (message.caption && message.caption.trim()) {
@@ -45,12 +94,22 @@ export function parseTaskFromMessage(
   // Command format: /task or /todo (also handles /task@botname format in groups)
   const taskCommandMatch = text.match(/^\/task(?:@[\w-]+)?\s+(.+)/i);
   if (taskCommandMatch) {
-    return taskCommandMatch[1].trim() || null;
+    const rawText = taskCommandMatch[1].trim();
+    if (!rawText) return null;
+    return {
+      title: extractCleanTitle(rawText),
+      description: rawText,
+    };
   }
 
   const todoCommandMatch = text.match(/^\/todo(?:@[\w-]+)?\s+(.+)/i);
   if (todoCommandMatch) {
-    return todoCommandMatch[1].trim() || null;
+    const rawText = todoCommandMatch[1].trim();
+    if (!rawText) return null;
+    return {
+      title: extractCleanTitle(rawText),
+      description: rawText,
+    };
   }
 
   // Mention format: @botname - task or @botname task
@@ -58,7 +117,12 @@ export function parseTaskFromMessage(
     const mentionPattern = new RegExp(`^@${botUsername}(?:\\s*-\\s*|\\s+)(.+)`, 'i');
     const match = text.match(mentionPattern);
     if (match && match[1]) {
-      return match[1].trim() || null;
+      const rawText = match[1].trim();
+      if (!rawText) return null;
+      return {
+        title: extractCleanTitle(rawText),
+        description: rawText,
+      };
     }
   }
 

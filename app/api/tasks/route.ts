@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTaskStorage } from '@/lib/taskStorage';
-import { TaskFilter } from '@/lib/taskTypes';
+import { TaskFilter, TaskStatus, TaskSource } from '@/lib/taskTypes';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,8 +10,10 @@ const lastErrorLog = new Map<string, number>();
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const status = searchParams.get('status') as 'open' | 'done' | null;
+    const status = searchParams.get('status') as TaskStatus | null;
     const chat_id = searchParams.get('chat_id');
+    const source = searchParams.get('source') as TaskSource | null;
+    const search = searchParams.get('search');
 
     const filter: TaskFilter = {};
     if (status) {
@@ -19,6 +21,12 @@ export async function GET(request: NextRequest) {
     }
     if (chat_id) {
       filter.chat_id = chat_id;
+    }
+    if (source) {
+      filter.source = source;
+    }
+    if (search) {
+      filter.search = search;
     }
 
     const storage = getTaskStorage();

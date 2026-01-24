@@ -3,6 +3,28 @@ import { parseTaskFromMessage, shouldReply, isOpenTaskCommand, parseDoneCommand 
 import { TelegramMessage } from '../lib/taskTypes';
 
 describe('taskParser', () => {
+  describe('extractCleanTitle', () => {
+    it('capitalizes first letter', () => {
+      expect(extractCleanTitle('review the PR')).toBe('Review the PR');
+    });
+
+    it('removes leading dashes and punctuation', () => {
+      expect(extractCleanTitle('- fix the bug')).toBe('Fix the bug');
+      expect(extractCleanTitle('-- update docs')).toBe('Update docs');
+    });
+
+    it('truncates very long text', () => {
+      const longText = 'a'.repeat(150);
+      const result = extractCleanTitle(longText);
+      expect(result.length).toBeLessThanOrEqual(103); // 100 + '...'
+    });
+
+    it('handles empty string', () => {
+      expect(extractCleanTitle('')).toBe('');
+      expect(extractCleanTitle('   ')).toBe('');
+    });
+  });
+
   describe('parseTaskFromMessage', () => {
     it('parses /task command format', () => {
       const message: TelegramMessage = {
@@ -13,7 +35,9 @@ describe('taskParser', () => {
       };
 
       const result = parseTaskFromMessage(message);
-      expect(result).toBe('Review the PR');
+      expect(result).not.toBeNull();
+      expect(result?.title).toBe('Review the PR');
+      expect(result?.description).toBe('Review the PR');
     });
 
     it('parses /todo command format', () => {
@@ -25,7 +49,8 @@ describe('taskParser', () => {
       };
 
       const result = parseTaskFromMessage(message);
-      expect(result).toBe('Fix the bug');
+      expect(result).not.toBeNull();
+      expect(result?.title).toBe('Fix the bug');
     });
 
     it('parses @botname - task format', () => {
@@ -37,7 +62,8 @@ describe('taskParser', () => {
       };
 
       const result = parseTaskFromMessage(message, 'testbot');
-      expect(result).toBe('Update the documentation');
+      expect(result).not.toBeNull();
+      expect(result?.title).toBe('Update the documentation');
     });
 
     it('parses @botname task format (without dash)', () => {
@@ -49,7 +75,8 @@ describe('taskParser', () => {
       };
 
       const result = parseTaskFromMessage(message, 'testbot');
-      expect(result).toBe('Deploy to production');
+      expect(result).not.toBeNull();
+      expect(result?.title).toBe('Deploy to production');
     });
 
     it('returns null for non-task messages', () => {
@@ -85,7 +112,8 @@ describe('taskParser', () => {
       };
 
       const result = parseTaskFromMessage(message, 'testbot');
-      expect(result).toBe('Case insensitive task');
+      expect(result).not.toBeNull();
+      expect(result?.title).toBe('Case insensitive task');
     });
 
     it('parses /task@botname format (group chat with multiple bots)', () => {
@@ -97,7 +125,8 @@ describe('taskParser', () => {
       };
 
       const result = parseTaskFromMessage(message);
-      expect(result).toBe('Review the pull request');
+      expect(result).not.toBeNull();
+      expect(result?.title).toBe('Review the pull request');
     });
 
     it('parses /todo@botname format (group chat with multiple bots)', () => {
@@ -109,7 +138,8 @@ describe('taskParser', () => {
       };
 
       const result = parseTaskFromMessage(message);
-      expect(result).toBe('Update documentation');
+      expect(result).not.toBeNull();
+      expect(result?.title).toBe('Update documentation');
     });
 
     it('parses /task@bot-name format with hyphen in bot name', () => {
@@ -121,7 +151,8 @@ describe('taskParser', () => {
       };
 
       const result = parseTaskFromMessage(message);
-      expect(result).toBe('Deploy the app');
+      expect(result).not.toBeNull();
+      expect(result?.title).toBe('Deploy the app');
     });
 
     it('parses forwarded message with text as task', () => {
@@ -139,7 +170,9 @@ describe('taskParser', () => {
       };
 
       const result = parseTaskFromMessage(message);
-      expect(result).toBe('This is a forwarded message that should become a task');
+      expect(result).not.toBeNull();
+      expect(result?.title).toBe('This is a forwarded message that should become a task');
+      expect(result?.description).toBe('This is a forwarded message that should become a task');
     });
 
     it('parses forwarded message from channel as task', () => {
@@ -158,7 +191,8 @@ describe('taskParser', () => {
       };
 
       const result = parseTaskFromMessage(message);
-      expect(result).toBe('Message forwarded from a channel');
+      expect(result).not.toBeNull();
+      expect(result?.title).toBe('Message forwarded from a channel');
     });
 
     it('returns null for forwarded message without text', () => {

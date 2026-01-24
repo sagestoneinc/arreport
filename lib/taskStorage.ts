@@ -1,7 +1,7 @@
 import { ITaskStorage } from './taskStorageInterface';
 import { SQLiteTaskStorage } from './taskStorageSqlite';
 import { MySQLTaskStorage } from './taskStorageMysql';
-import { Task, TaskFilter } from './taskTypes';
+import { Task, TaskFilter, TaskStatus } from './taskTypes';
 
 // Singleton instance
 let storage: ITaskStorage | null = null;
@@ -66,14 +66,19 @@ export class FallbackTaskStorage implements ITaskStorage {
     return this.getActiveStorage().saveTask(task);
   }
 
-  async updateTask(chatId: string, messageId: number, description: string, rawText: string): Promise<void> {
+  async updateTask(chatId: string, messageId: number, title: string, description: string | undefined, rawText: string): Promise<void> {
     await this.ensureInitialized();
-    return this.getActiveStorage().updateTask(chatId, messageId, description, rawText);
+    return this.getActiveStorage().updateTask(chatId, messageId, title, description, rawText);
   }
 
   async taskExists(chatId: string, messageId: number): Promise<boolean> {
     await this.ensureInitialized();
     return this.getActiveStorage().taskExists(chatId, messageId);
+  }
+
+  async findDuplicateOpenTask(title: string): Promise<Task | null> {
+    await this.ensureInitialized();
+    return this.getActiveStorage().findDuplicateOpenTask(title);
   }
 
   async getTasks(filter?: TaskFilter): Promise<Task[]> {
@@ -86,7 +91,7 @@ export class FallbackTaskStorage implements ITaskStorage {
     return this.getActiveStorage().getTaskById(id);
   }
 
-  async updateTaskStatus(id: string, status: 'open' | 'done'): Promise<boolean> {
+  async updateTaskStatus(id: string, status: TaskStatus): Promise<boolean> {
     await this.ensureInitialized();
     return this.getActiveStorage().updateTaskStatus(id, status);
   }

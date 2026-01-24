@@ -1,6 +1,6 @@
 import mysql from 'mysql2/promise';
 import { randomUUID } from 'crypto';
-import { Task, TaskFilter } from './taskTypes';
+import { Task, TaskFilter, TaskStatus } from './taskTypes';
 import { ITaskStorage } from './taskStorageInterface';
 
 export class MySQLTaskStorage implements ITaskStorage {
@@ -137,9 +137,52 @@ export class MySQLTaskStorage implements ITaskStorage {
       throw new Error('Pool not initialized');
     }
 
+    // Check if table exists and needs migration
+    try {
+      const [columns] = await this.pool.execute(
+        "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'tasks'"
+      );
+      const existingColumns = (columns as Array<{ COLUMN_NAME: string }>).map(
+        (col) => col.COLUMN_NAME
+      );
+
+      if (existingColumns.length > 0) {
+        // Table exists, check for new columns
+        if (!existingColumns.includes('title')) {
+          console.log('[MySQL] Adding title column...');
+          await this.pool.execute(`ALTER TABLE tasks ADD COLUMN title VARCHAR(255) DEFAULT ''`);
+          // Backfill title from description - truncate to 100 chars to match extractCleanTitle
+          await this.pool.execute(
+            `UPDATE tasks SET title = SUBSTRING(description, 1, 100) WHERE title = '' OR title IS NULL`
+          );
+        }
+        if (!existingColumns.includes('source')) {
+          console.log('[MySQL] Adding source column...');
+          await this.pool.execute(
+            `ALTER TABLE tasks ADD COLUMN source VARCHAR(20) DEFAULT 'telegram'`
+          );
+        }
+        if (!existingColumns.includes('created_by')) {
+          console.log('[MySQL] Adding created_by column...');
+          await this.pool.execute(
+            `ALTER TABLE tasks ADD COLUMN created_by VARCHAR(255) DEFAULT 'unknown'`
+          );
+          await this.pool.execute(
+            `UPDATE tasks SET created_by = COALESCE(username, name, 'unknown') WHERE created_by = 'unknown' OR created_by IS NULL`
+          );
+        }
+      }
+    } catch {
+      // Table doesn't exist, will be created below
+    }
+
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS tasks (
         id VARCHAR(36) PRIMARY KEY,
+        title VARCHAR(255) NOT NULL DEFAULT '',
+        description TEXT,
+        source VARCHAR(20) NOT NULL DEFAULT 'telegram',
+        created_by VARCHAR(255) NOT NULL DEFAULT 'unknown',
         created_at VARCHAR(50) NOT NULL,
         chat_id VARCHAR(255) NOT NULL,
         chat_title VARCHAR(255),
@@ -147,13 +190,14 @@ export class MySQLTaskStorage implements ITaskStorage {
         user_id VARCHAR(255) NOT NULL,
         username VARCHAR(255),
         name VARCHAR(255),
-        description TEXT NOT NULL,
-        status VARCHAR(10) NOT NULL DEFAULT 'open',
+        status VARCHAR(20) NOT NULL DEFAULT 'open',
         raw_text TEXT NOT NULL,
         UNIQUE KEY unique_chat_message (chat_id, message_id),
         INDEX idx_tasks_status (status),
         INDEX idx_tasks_chat_id (chat_id),
-        INDEX idx_tasks_created_at (created_at)
+        INDEX idx_tasks_created_at (created_at),
+        INDEX idx_tasks_source (source),
+        INDEX idx_tasks_title (title)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `;
 
@@ -177,17 +221,22 @@ export class MySQLTaskStorage implements ITaskStorage {
 
     const id = randomUUID();
     const created_at = new Date().toISOString();
-    const status = 'open';
+    const status: TaskStatus = 'open';
 
     const query = `
       INSERT INTO tasks (
-        id, created_at, chat_id, chat_title, message_id,
-        user_id, username, name, description, status, raw_text
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        id, title, description, source, created_by, created_at,
+        chat_id, chat_title, message_id, user_id, username, name, 
+        status, raw_text
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     await pool.execute(query, [
       id,
+      task.title,
+      task.description || null,
+      task.source,
+      task.created_by,
       created_at,
       task.chat_id,
       task.chat_title || null,
@@ -195,7 +244,6 @@ export class MySQLTaskStorage implements ITaskStorage {
       task.user_id,
       task.username || null,
       task.name || null,
-      task.description,
       status,
       task.raw_text,
     ]);
@@ -211,18 +259,19 @@ export class MySQLTaskStorage implements ITaskStorage {
   async updateTask(
     chatId: string,
     messageId: number,
-    description: string,
+    title: string,
+    description: string | undefined,
     rawText: string
   ): Promise<void> {
     const pool = await this.getPool();
 
     const query = `
       UPDATE tasks 
-      SET description = ?, raw_text = ?
+      SET title = ?, description = ?, raw_text = ?
       WHERE chat_id = ? AND message_id = ?
     `;
 
-    await pool.execute(query, [description, rawText, chatId, messageId]);
+    await pool.execute(query, [title, description || null, rawText, chatId, messageId]);
   }
 
   async taskExists(chatId: string, messageId: number): Promise<boolean> {
@@ -237,6 +286,20 @@ export class MySQLTaskStorage implements ITaskStorage {
     const [rows] = await pool.execute(query, [chatId, messageId]);
     const result = (rows as Array<{ count: number }>)[0];
     return result.count > 0;
+  }
+
+  async findDuplicateOpenTask(title: string): Promise<Task | null> {
+    const pool = await this.getPool();
+
+    const query = `
+      SELECT * FROM tasks 
+      WHERE LOWER(title) = LOWER(?) AND status = 'open'
+      LIMIT 1
+    `;
+
+    const [rows] = await pool.execute(query, [title]);
+    const tasks = rows as Task[];
+    return tasks.length > 0 ? tasks[0] : null;
   }
 
   async getTasks(filter?: TaskFilter): Promise<Task[]> {
@@ -255,6 +318,17 @@ export class MySQLTaskStorage implements ITaskStorage {
       params.push(filter.chat_id);
     }
 
+    if (filter?.source) {
+      query += ' AND source = ?';
+      params.push(filter.source);
+    }
+
+    if (filter?.search) {
+      query += ' AND (LOWER(title) LIKE ? OR LOWER(description) LIKE ?)';
+      const searchTerm = `%${filter.search.toLowerCase()}%`;
+      params.push(searchTerm, searchTerm);
+    }
+
     query += ' ORDER BY created_at DESC';
 
     const [rows] = await pool.execute(query, params);
@@ -270,7 +344,7 @@ export class MySQLTaskStorage implements ITaskStorage {
     return tasks.length > 0 ? tasks[0] : null;
   }
 
-  async updateTaskStatus(id: string, status: 'open' | 'done'): Promise<boolean> {
+  async updateTaskStatus(id: string, status: TaskStatus): Promise<boolean> {
     const pool = await this.getPool();
 
     const query = 'UPDATE tasks SET status = ? WHERE id = ?';
