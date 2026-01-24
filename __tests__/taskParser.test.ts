@@ -1,0 +1,148 @@
+import { describe, it, expect } from 'vitest';
+import { parseTaskFromMessage, shouldReply } from '../lib/taskParser';
+import { TelegramMessage } from '../lib/taskTypes';
+
+describe('taskParser', () => {
+  describe('parseTaskFromMessage', () => {
+    it('parses /task command format', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/task Review the PR',
+        date: Date.now(),
+      };
+
+      const result = parseTaskFromMessage(message);
+      expect(result).toBe('Review the PR');
+    });
+
+    it('parses /todo command format', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/todo Fix the bug',
+        date: Date.now(),
+      };
+
+      const result = parseTaskFromMessage(message);
+      expect(result).toBe('Fix the bug');
+    });
+
+    it('parses @botname - task format', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '@testbot - Update the documentation',
+        date: Date.now(),
+      };
+
+      const result = parseTaskFromMessage(message, 'testbot');
+      expect(result).toBe('Update the documentation');
+    });
+
+    it('parses @botname task format (without dash)', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '@testbot Deploy to production',
+        date: Date.now(),
+      };
+
+      const result = parseTaskFromMessage(message, 'testbot');
+      expect(result).toBe('Deploy to production');
+    });
+
+    it('returns null for non-task messages', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: 'Just a regular message',
+        date: Date.now(),
+      };
+
+      const result = parseTaskFromMessage(message);
+      expect(result).toBeNull();
+    });
+
+    it('returns null for empty task description', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/task',
+        date: Date.now(),
+      };
+
+      const result = parseTaskFromMessage(message);
+      expect(result).toBeNull();
+    });
+
+    it('handles case-insensitive bot mention', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '@TestBot - Case insensitive task',
+        date: Date.now(),
+      };
+
+      const result = parseTaskFromMessage(message, 'testbot');
+      expect(result).toBe('Case insensitive task');
+    });
+  });
+
+  describe('shouldReply', () => {
+    it('returns true for /task command', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/task Some task',
+        date: Date.now(),
+      };
+
+      expect(shouldReply(message)).toBe(true);
+    });
+
+    it('returns true for /todo command', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/todo Some task',
+        date: Date.now(),
+      };
+
+      expect(shouldReply(message)).toBe(true);
+    });
+
+    it('returns true for mention with dash', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '@testbot - Task with explicit dash',
+        date: Date.now(),
+      };
+
+      expect(shouldReply(message, 'testbot')).toBe(true);
+    });
+
+    it('returns false for mention without dash', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '@testbot Task without dash',
+        date: Date.now(),
+      };
+
+      expect(shouldReply(message, 'testbot')).toBe(false);
+    });
+
+    it('returns false for regular messages', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: 'Regular message',
+        date: Date.now(),
+      };
+
+      expect(shouldReply(message)).toBe(false);
+    });
+  });
+});
