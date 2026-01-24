@@ -104,6 +104,7 @@ npm run format       # Format code with Prettier
 npm run format:check # Check code formatting
 npm test             # Run tests
 npm run test:watch   # Run tests in watch mode
+npm run setup:db     # Initialize database tables
 ```
 
 ## Environment Variables
