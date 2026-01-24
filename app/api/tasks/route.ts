@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     }
 
     const storage = getTaskStorage();
-    const tasks = storage.getTasks(filter);
+    const tasks = await storage.getTasks(filter);
 
     return NextResponse.json({ ok: true, tasks });
   } catch (error) {
