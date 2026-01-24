@@ -240,3 +240,27 @@ class RateLimiter {
 }
 
 export const rateLimiter = new RateLimiter();
+
+/**
+ * Checks if the message is a /help command
+ */
+export function isHelpCommand(message: TelegramMessage): boolean {
+  if (!message.text) {
+    return false;
+  }
+  const text = message.text.trim();
+  // Match /help or /help@botname (case insensitive)
+  return /^\/help(?:@[\w-]+)?$/i.test(text);
+}
+
+/**
+ * Checks if the message is a /start command
+ */
+export function isStartCommand(message: TelegramMessage): boolean {
+  if (!message.text) {
+    return false;
+  }
+  const text = message.text.trim();
+  // Match /start or /start@botname (case insensitive)
+  return /^\/start(?:@[\w-]+)?$/i.test(text);
+}

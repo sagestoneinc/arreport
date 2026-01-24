@@ -37,3 +37,19 @@
     );
   }
 }
+
+/* Telegram preview styles - WYSIWYG rendering */
+.telegram-preview {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.telegram-preview strong {
+  font-weight: 600;
+}
+
+.telegram-preview em {
+  font-style: italic;
+}

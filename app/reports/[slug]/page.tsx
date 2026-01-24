@@ -131,12 +131,13 @@ export default function ReportBuilderPage() {
     }));
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!template) return;
 
+    let message: string;
     // For batch-reruns, pass processor config
     if (slug === 'batch-reruns') {
-      const message = formatMessage(slug, formData, {
+      message = formatMessage(slug, formData, {
         mode: 'telegram',
         processorConfig: {
           uscaLabel: template.processors?.usca?.label ?? 'US/CA Declines',
@@ -145,12 +146,29 @@ export default function ReportBuilderPage() {
           otherProcessor: processorSelections.other,
         },
       });
-      setGeneratedMessage(message);
-      saveToHistory(slug, message);
     } else {
-      const message = formatMessage(slug, formData);
-      setGeneratedMessage(message);
-      saveToHistory(slug, message);
+      message = formatMessage(slug, formData);
+    }
+    
+    setGeneratedMessage(message);
+    saveToHistory(slug, message);
+    
+    // Log to audit
+    try {
+      await fetch('/api/audit/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action_type: 'GENERATE_REPORT',
+          report_slug: slug,
+          report_title: template.name,
+          telegram_payload: message,
+          status: 'SUCCESS',
+          metadata: { formFieldCount: Object.keys(formData).length }
+        })
+      });
+    } catch (err) {
+      console.error('Failed to log audit:', err);
     }
   };
 
@@ -173,6 +191,9 @@ export default function ReportBuilderPage() {
     if (!generatedMessage) return;
 
     setIsSending(true);
+    let success = false;
+    let errorMsg: string | null = null;
+    
     try {
       const response = await fetch('/api/telegram', {
         method: 'POST',
@@ -189,13 +210,36 @@ export default function ReportBuilderPage() {
         setLastSentAt(now);
         localStorage.setItem(`lastSentAt:${slug}`, now);
         setToast({ type: 'success', message: 'Sent to Telegram' });
+        success = true;
       } else {
-        setToast({ type: 'error', message: data.error || 'Failed to send message' });
+        errorMsg = data.error || 'Failed to send message';
+        setToast({ type: 'error', message: errorMsg || 'Unknown error' });
       }
     } catch (error) {
       console.error('Failed to send to Telegram:', error);
-      setToast({ type: 'error', message: 'Network error: Failed to send message' });
+      errorMsg = 'Network error: Failed to send message';
+      setToast({ type: 'error', message: errorMsg });
     } finally {
+      // Log to audit
+      try {
+        await fetch('/api/audit/log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action_type: 'SEND_TELEGRAM',
+            report_slug: slug,
+            report_title: template?.name,
+            // Chat ID is obtained server-side in the audit log route
+            telegram_payload: generatedMessage,
+            status: success ? 'SUCCESS' : 'FAIL',
+            error_message: errorMsg,
+            metadata: { messageLength: generatedMessage.length }
+          })
+        });
+      } catch (err) {
+        console.error('Failed to log audit:', err);
+      }
+      
       setIsSending(false);
       setTimeout(() => setToast(null), 5000);
     }

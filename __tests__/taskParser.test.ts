@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseTaskFromMessage, shouldReply, isOpenTaskCommand, parseDoneCommand, extractCleanTitle } from '../lib/taskParser';
+import { parseTaskFromMessage, shouldReply, isOpenTaskCommand, parseDoneCommand, extractCleanTitle, isHelpCommand, isStartCommand } from '../lib/taskParser';
 import { TelegramMessage } from '../lib/taskTypes';
 
 describe('taskParser', () => {
@@ -599,6 +599,98 @@ describe('taskParser', () => {
 
       const result = parseDoneCommand(message);
       expect(result).toEqual({ type: 'text', value: '007' });
+    });
+  });
+
+  describe('isHelpCommand', () => {
+    it('returns true for /help command', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/help',
+        date: Date.now(),
+      };
+
+      expect(isHelpCommand(message)).toBe(true);
+    });
+
+    it('returns true for /help@botname command', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/help@mybot',
+        date: Date.now(),
+      };
+
+      expect(isHelpCommand(message)).toBe(true);
+    });
+
+    it('returns false for /help with extra text', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/help extra',
+        date: Date.now(),
+      };
+
+      expect(isHelpCommand(message)).toBe(false);
+    });
+
+    it('returns false for regular text', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: 'help',
+        date: Date.now(),
+      };
+
+      expect(isHelpCommand(message)).toBe(false);
+    });
+  });
+
+  describe('isStartCommand', () => {
+    it('returns true for /start command', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/start',
+        date: Date.now(),
+      };
+
+      expect(isStartCommand(message)).toBe(true);
+    });
+
+    it('returns true for /start@botname command', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/start@mybot',
+        date: Date.now(),
+      };
+
+      expect(isStartCommand(message)).toBe(true);
+    });
+
+    it('returns false for /start with extra text', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/start extra',
+        date: Date.now(),
+      };
+
+      expect(isStartCommand(message)).toBe(false);
+    });
+
+    it('returns false for regular text', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: 'start',
+        date: Date.now(),
+      };
+
+      expect(isStartCommand(message)).toBe(false);
     });
   });
 });
