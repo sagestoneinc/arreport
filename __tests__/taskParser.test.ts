@@ -87,6 +87,42 @@ describe('taskParser', () => {
       const result = parseTaskFromMessage(message, 'testbot');
       expect(result).toBe('Case insensitive task');
     });
+
+    it('parses /task@botname format (group chat with multiple bots)', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/task@mybot Review the pull request',
+        date: Date.now(),
+      };
+
+      const result = parseTaskFromMessage(message);
+      expect(result).toBe('Review the pull request');
+    });
+
+    it('parses /todo@botname format (group chat with multiple bots)', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/todo@mybot Update documentation',
+        date: Date.now(),
+      };
+
+      const result = parseTaskFromMessage(message);
+      expect(result).toBe('Update documentation');
+    });
+
+    it('parses /task@bot-name format with hyphen in bot name', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/task@my-task-bot Deploy the app',
+        date: Date.now(),
+      };
+
+      const result = parseTaskFromMessage(message);
+      expect(result).toBe('Deploy the app');
+    });
   });
 
   describe('shouldReply', () => {
@@ -143,6 +179,28 @@ describe('taskParser', () => {
       };
 
       expect(shouldReply(message)).toBe(false);
+    });
+
+    it('returns true for /task@botname command (group chat)', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/task@mybot Some task',
+        date: Date.now(),
+      };
+
+      expect(shouldReply(message)).toBe(true);
+    });
+
+    it('returns true for /todo@botname command (group chat)', () => {
+      const message: TelegramMessage = {
+        message_id: 1,
+        chat: { id: 123, type: 'group' },
+        text: '/todo@mybot Some task',
+        date: Date.now(),
+      };
+
+      expect(shouldReply(message)).toBe(true);
     });
   });
 });
