@@ -268,3 +268,40 @@ describe('formatHourlyApprovalRate - New Template System', () => {
     console.log('=================================\n');
   });
 });
+import { describe, it, expect } from 'vitest';
+import { formatHourlyApprovalRate } from '../lib/formatters/hourly-approval-rate';
+
+describe('Test 2 MIDs scenario', () => {
+  it('handles 2 MIDs correctly (shows top and bottom performers only)', () => {
+    const data = {
+      date: '2026-01-24',
+      time_range: '10:00 - 14:00 EST',
+      visa_mids: [
+        { mid_name: 'CS_395', initial_sales: 10, initial_decline: 5 }, // 66.67% - Top
+        { mid_name: 'CS_396', initial_sales: 6, initial_decline: 14 }, // 30% - Bottom
+      ],
+      mc_mids: [
+        { mid_name: 'PAY-REV_346', initial_sales: 12, initial_decline: 6 }, // 66.67% - Top
+        { mid_name: 'PAY-REV_330', initial_sales: 13, initial_decline: 22 }, // 37.14% - Bottom
+      ],
+      insights: 'Test with 2 MIDs',
+    };
+
+    const output = formatHourlyApprovalRate(data);
+    console.log('\n=== Output with 2 MIDs ===');
+    console.log(output);
+    console.log('==========================\n');
+
+    // Should show green up arrow for top performers with bold names
+    expect(output).toContain('🟢⬆️ *CS\\_395*');
+    expect(output).toContain('🟢⬆️ *PAY\\-REV\\_346*');
+
+    // Should show red down arrow for bottom performers with bold names
+    expect(output).toContain('🔴⬇️ *CS\\_396*');
+    expect(output).toContain('🔴⬇️ *PAY\\-REV\\_330*');
+
+    // Should NOT show middle emoji
+    const middleEmojiCount = (output.match(/🟡➡️/g) || []).length;
+    expect(middleEmojiCount).toBe(0);
+  });
+});
