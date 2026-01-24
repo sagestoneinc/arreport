@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TelegramUpdate } from '@/lib/taskTypes';
+import { TelegramUpdate, Task } from '@/lib/taskTypes';
 import { parseTaskFromMessage, shouldReply, rateLimiter } from '@/lib/taskParser';
 import { getTaskStorage } from '@/lib/taskStorage';
 
@@ -57,33 +57,47 @@ export async function POST(request: NextRequest) {
 
     // Parse task from message
     const botUsername = process.env.BOT_USERNAME;
-    const taskDescription = parseTaskFromMessage(message, botUsername);
+    const parsedTask = parseTaskFromMessage(message, botUsername);
 
-    if (!taskDescription) {
+    if (!parsedTask) {
       return NextResponse.json({ ok: true });
     }
 
     // Save or update task
     const isEdited = !!update.edited_message;
     const messageId = message.message_id;
+    const userName = message.from
+      ? [message.from.first_name, message.from.last_name].filter(Boolean).join(' ')
+      : undefined;
+    const createdBy = message.from?.username || userName || 'unknown';
 
     try {
       if (isEdited && (await storage.taskExists(chatId, messageId))) {
         // Update existing task
-        await storage.updateTask(chatId, messageId, taskDescription, message.text || '');
+        await storage.updateTask(chatId, messageId, parsedTask.title, parsedTask.description, message.text || '');
         console.log(`Updated task from message ${messageId} in chat ${chatId}`);
       } else if (!(await storage.taskExists(chatId, messageId))) {
+        // Check for duplicate open task with same title
+        const duplicateTask = await storage.findDuplicateOpenTask(parsedTask.title);
+        
+        if (duplicateTask && shouldReply(message, botUsername)) {
+          // Send duplicate warning
+          await sendDuplicateWarning(chatId, messageId, duplicateTask);
+          return NextResponse.json({ ok: true });
+        }
+
         // Save new task
         const task = await storage.saveTask({
+          title: parsedTask.title,
+          description: parsedTask.description,
+          source: 'telegram',
+          created_by: createdBy,
           chat_id: chatId,
           chat_title: message.chat.title,
           message_id: messageId,
           user_id: message.from?.id.toString() || 'unknown',
           username: message.from?.username,
-          name: message.from
-            ? [message.from.first_name, message.from.last_name].filter(Boolean).join(' ')
-            : undefined,
-          description: taskDescription,
+          name: userName,
           raw_text: message.text || '',
         });
 
@@ -91,7 +105,7 @@ export async function POST(request: NextRequest) {
 
         // Send confirmation reply if appropriate
         if (shouldReply(message, botUsername)) {
-          await sendTelegramReply(chatId, messageId, taskDescription);
+          await sendTelegramReply(chatId, messageId, task);
         }
       }
     } catch (dbError) {
@@ -111,7 +125,7 @@ export async function POST(request: NextRequest) {
 async function sendTelegramReply(
   chatId: string,
   messageId: number,
-  description: string
+  task: Task
 ): Promise<void> {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   if (!botToken) {
@@ -124,9 +138,9 @@ async function sendTelegramReply(
     const baseUrl = process.env.APP_BASE_URL;
     const tasksUrl = baseUrl ? `${baseUrl}/tasks` : null;
 
-    let replyText = `✅ Task saved: ${description}`;
+    let replyText = `✅ Task saved: ${task.title}\n🕒 Status: Open`;
     if (tasksUrl) {
-      replyText += `\n\n📋 View all tasks: ${tasksUrl}`;
+      replyText += `\n\n🔗 View tasks: ${tasksUrl}`;
     }
 
     const response = await fetch(telegramUrl, {
@@ -147,5 +161,47 @@ async function sendTelegramReply(
     }
   } catch (error) {
     console.error('Error sending Telegram reply:', error);
+  }
+}
+
+async function sendDuplicateWarning(
+  chatId: string,
+  messageId: number,
+  existingTask: Task
+): Promise<void> {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  if (!botToken) {
+    console.error('TELEGRAM_BOT_TOKEN not configured');
+    return;
+  }
+
+  try {
+    const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    const baseUrl = process.env.APP_BASE_URL;
+    const tasksUrl = baseUrl ? `${baseUrl}/tasks` : null;
+
+    let replyText = `⚠️ Task already exists and is still open:\n"${existingTask.title}"`;
+    if (tasksUrl) {
+      replyText += `\n\n🔗 View tasks: ${tasksUrl}`;
+    }
+
+    const response = await fetch(telegramUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: replyText,
+        reply_to_message_id: messageId,
+      }),
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      console.error('Failed to send Telegram duplicate warning:', data);
+    }
+  } catch (error) {
+    console.error('Error sending Telegram duplicate warning:', error);
   }
 }

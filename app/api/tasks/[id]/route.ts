@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTaskStorage } from '@/lib/taskStorage';
+import { TaskStatus } from '@/lib/taskTypes';
 
 export const dynamic = 'force-dynamic';
+
+const validStatuses: TaskStatus[] = ['open', 'in_progress', 'done'];
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -9,9 +12,9 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     const body = await request.json();
     const { status } = body;
 
-    if (!status || (status !== 'open' && status !== 'done')) {
+    if (!status || !validStatuses.includes(status)) {
       return NextResponse.json(
-        { ok: false, error: 'Invalid status. Must be "open" or "done"' },
+        { ok: false, error: 'Invalid status. Must be "open", "in_progress", or "done"' },
         { status: 400 }
       );
     }

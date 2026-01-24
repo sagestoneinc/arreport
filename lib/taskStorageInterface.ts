@@ -1,4 +1,4 @@
-import { Task, TaskFilter } from './taskTypes';
+import { Task, TaskFilter, TaskStatus } from './taskTypes';
 
 /**
  * Interface for task storage implementations
@@ -9,13 +9,15 @@ export interface ITaskStorage {
   updateTask(
     chatId: string,
     messageId: number,
-    description: string,
+    title: string,
+    description: string | undefined,
     rawText: string
   ): Promise<void>;
   taskExists(chatId: string, messageId: number): Promise<boolean>;
+  findDuplicateOpenTask(title: string): Promise<Task | null>;
   getTasks(filter?: TaskFilter): Promise<Task[]>;
   getTaskById(id: string): Promise<Task | null>;
-  updateTaskStatus(id: string, status: 'open' | 'done'): Promise<boolean>;
+  updateTaskStatus(id: string, status: TaskStatus): Promise<boolean>;
   deleteTask(id: string): Promise<boolean>;
   close(): Promise<void>;
 }
