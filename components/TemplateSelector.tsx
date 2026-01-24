@@ -12,8 +12,68 @@ export default function TemplateSelector({
 }: TemplateSelectorProps) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">📋 Select Template</h2>
+      <h2 className="text-xl font-semibold text-gray-900 mb-4">📋 Select Report Template</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <button
+          onClick={() => onTemplateChange('approval-rate-hourly')}
+          className={`p-4 rounded-lg border-2 transition-all ${
+            selectedTemplate === 'approval-rate-hourly'
+              ? 'border-blue-600 bg-blue-50 shadow-md'
+              : 'border-gray-300 bg-white hover:border-blue-400'
+          }`}
+        >
+          <div className="text-left">
+            <div className="font-semibold text-gray-900 mb-1">Approval Rate Hourly Report</div>
+            <div className="text-sm text-gray-600">
+              Time range, MIDs performance, and insights
+            </div>
+          </div>
+        </button>
+        <button
+          onClick={() => onTemplateChange('daily-batch-reruns')}
+          className={`p-4 rounded-lg border-2 transition-all ${
+            selectedTemplate === 'daily-batch-reruns'
+              ? 'border-blue-600 bg-blue-50 shadow-md'
+              : 'border-gray-300 bg-white hover:border-blue-400'
+          }`}
+        >
+          <div className="text-left">
+            <div className="font-semibold text-gray-900 mb-1">Daily Batch Reruns</div>
+            <div className="text-sm text-gray-600">
+              Batch processing reruns report
+            </div>
+          </div>
+        </button>
+        <button
+          onClick={() => onTemplateChange('daily-summary-rebills')}
+          className={`p-4 rounded-lg border-2 transition-all ${
+            selectedTemplate === 'daily-summary-rebills'
+              ? 'border-blue-600 bg-blue-50 shadow-md'
+              : 'border-gray-300 bg-white hover:border-blue-400'
+          }`}
+        >
+          <div className="text-left">
+            <div className="font-semibold text-gray-900 mb-1">Daily Summary Rebills</div>
+            <div className="text-sm text-gray-600">
+              Daily rebills summary report
+            </div>
+          </div>
+        </button>
+        <button
+          onClick={() => onTemplateChange('mint-additional-sales')}
+          className={`p-4 rounded-lg border-2 transition-all ${
+            selectedTemplate === 'mint-additional-sales'
+              ? 'border-blue-600 bg-blue-50 shadow-md'
+              : 'border-gray-300 bg-white hover:border-blue-400'
+          }`}
+        >
+          <div className="text-left">
+            <div className="font-semibold text-gray-900 mb-1">Mint Additional Sales</div>
+            <div className="text-sm text-gray-600">
+              Additional sales tracking report
+            </div>
+          </div>
+        </button>
         <button
           onClick={() => onTemplateChange('template-a')}
           className={`p-4 rounded-lg border-2 transition-all ${

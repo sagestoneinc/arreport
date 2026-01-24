@@ -9,20 +9,20 @@ import NotesInput from '@/components/NotesInput';
 import OutputPanel from '@/components/OutputPanel';
 import TelegramPanel from '@/components/TelegramPanel';
 import { AppState, TemplateType } from '@/lib/types';
-import { DEFAULT_STATE_TEMPLATE_A, DEFAULT_STATE_TEMPLATE_B } from '@/lib/defaults';
+import { DEFAULT_STATE_TEMPLATE_A, DEFAULT_STATE_TEMPLATE_B, DEFAULT_STATE_APPROVAL_RATE_HOURLY, DEFAULT_STATE_DAILY_BATCH_RERUNS, DEFAULT_STATE_DAILY_SUMMARY_REBILLS, DEFAULT_STATE_MINT_ADDITIONAL_SALES } from '@/lib/defaults';
 import { formatTelegramMessage } from '@/lib/format';
 
 const STORAGE_KEY_PREFIX = 'ar-generator-state-';
 
 export default function Home() {
-  const [state, setState] = useState<AppState>(DEFAULT_STATE_TEMPLATE_A);
+  const [state, setState] = useState<AppState>(DEFAULT_STATE_APPROVAL_RATE_HOURLY);
   const [generatedMessage, setGeneratedMessage] = useState('');
   const [isClient, setIsClient] = useState(false);
 
   // Load state from localStorage on mount
   useEffect(() => {
     setIsClient(true);
-    const savedState = localStorage.getItem(STORAGE_KEY_PREFIX + 'template-a');
+    const savedState = localStorage.getItem(STORAGE_KEY_PREFIX + 'approval-rate-hourly');
     if (savedState) {
       try {
         const parsed = JSON.parse(savedState);
@@ -50,14 +50,31 @@ export default function Home() {
         setState(parsed);
       } catch (e) {
         console.error('Failed to parse saved state:', e);
-        setState(
-          templateType === 'template-b' ? DEFAULT_STATE_TEMPLATE_B : DEFAULT_STATE_TEMPLATE_A
-        );
+        setState(getDefaultStateForTemplate(templateType));
       }
     } else {
-      setState(templateType === 'template-b' ? DEFAULT_STATE_TEMPLATE_B : DEFAULT_STATE_TEMPLATE_A);
+      setState(getDefaultStateForTemplate(templateType));
     }
     setGeneratedMessage('');
+  };
+
+  const getDefaultStateForTemplate = (templateType: TemplateType): AppState => {
+    switch (templateType) {
+      case 'template-a':
+        return DEFAULT_STATE_TEMPLATE_A;
+      case 'template-b':
+        return DEFAULT_STATE_TEMPLATE_B;
+      case 'approval-rate-hourly':
+        return DEFAULT_STATE_APPROVAL_RATE_HOURLY;
+      case 'daily-batch-reruns':
+        return DEFAULT_STATE_DAILY_BATCH_RERUNS;
+      case 'daily-summary-rebills':
+        return DEFAULT_STATE_DAILY_SUMMARY_REBILLS;
+      case 'mint-additional-sales':
+        return DEFAULT_STATE_MINT_ADDITIONAL_SALES;
+      default:
+        return DEFAULT_STATE_APPROVAL_RATE_HOURLY;
+    }
   };
 
   const handleGenerate = () => {
@@ -86,10 +103,13 @@ export default function Home() {
           <HeaderInputs
             dateISO={state.dateISO}
             timeHHMM={state.timeHHMM}
+            timeEndHHMM={state.timeEndHHMM}
             threshold={state.threshold}
             onDateChange={(dateISO) => setState({ ...state, dateISO })}
             onTimeChange={(timeHHMM) => setState({ ...state, timeHHMM })}
+            onTimeEndChange={(timeEndHHMM) => setState({ ...state, timeEndHHMM })}
             onThresholdChange={(threshold) => setState({ ...state, threshold })}
+            showTimeRange={state.templateType === 'approval-rate-hourly'}
           />
 
           <DailySummaryInputs
