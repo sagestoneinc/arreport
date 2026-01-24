@@ -73,7 +73,7 @@ export default function DynamicTableInput({ label, rows, onChange }: DynamicTabl
                   <input
                     type="number"
                     min="0"
-                    value={row.initial_sales || ''}
+                    value={row.initial_sales ?? ''}
                     onChange={(e) => updateRow(index, 'initial_sales', e.target.value)}
                     placeholder="Sales"
                     className="w-full px-2 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -83,7 +83,7 @@ export default function DynamicTableInput({ label, rows, onChange }: DynamicTabl
                   <input
                     type="number"
                     min="0"
-                    value={row.initial_decline || ''}
+                    value={row.initial_decline ?? ''}
                     onChange={(e) => updateRow(index, 'initial_decline', e.target.value)}
                     placeholder="Declines"
                     className="w-full px-2 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
