@@ -1,11 +1,24 @@
+export interface MidRowData {
+  mid_name: string;
+  initial_sales: number;
+  initial_decline: number;
+}
+
 export interface TemplateField {
   name: string;
   label: string;
-  type: 'text' | 'number' | 'date' | 'textarea';
-  defaultValue?: string | number;
+  type: 'text' | 'number' | 'date' | 'textarea' | 'table';
+  defaultValue?: string | number | MidRowData[];
   placeholder?: string;
   required?: boolean;
   helpText?: string;
+  tableConfig?: {
+    columns: {
+      name: string;
+      label: string;
+      type: 'text' | 'number' | 'computed';
+    }[];
+  };
 }
 
 export interface TemplateDefinition {
@@ -279,30 +292,36 @@ export const TEMPLATES: TemplateDefinition[] = [
         required: true,
       },
       {
-        name: 'filter_used',
-        label: 'Filter Used',
-        type: 'text',
-        defaultValue: 'Affiliate > Card Brand > Merchant Account',
+        name: 'visa_mids',
+        label: 'VISA',
+        type: 'table',
+        defaultValue: [],
+        tableConfig: {
+          columns: [
+            { name: 'mid_name', label: 'MID Name', type: 'text' },
+            { name: 'initial_sales', label: 'Initial Sales', type: 'number' },
+            { name: 'initial_decline', label: 'Initial Decline', type: 'number' },
+            { name: 'ar_percent', label: 'AR%', type: 'computed' },
+          ],
+        },
       },
       {
-        name: 'mc_mid_lines',
-        label: 'MasterCard MID Lines',
-        type: 'textarea',
-        defaultValue: '',
-        placeholder: 'PAY-REV_346 - 12/6 trxns - 66.67%',
-        helpText: 'Enter MasterCard MID data, one per line',
-      },
-      {
-        name: 'visa_mid_lines',
-        label: 'VISA MID Lines',
-        type: 'textarea',
-        defaultValue: '',
-        placeholder: 'CS_395 - 6/9 trxns - 40.00%',
-        helpText: 'Enter VISA MID data, one per line',
+        name: 'mc_mids',
+        label: 'MasterCard',
+        type: 'table',
+        defaultValue: [],
+        tableConfig: {
+          columns: [
+            { name: 'mid_name', label: 'MID Name', type: 'text' },
+            { name: 'initial_sales', label: 'Initial Sales', type: 'number' },
+            { name: 'initial_decline', label: 'Initial Decline', type: 'number' },
+            { name: 'ar_percent', label: 'AR%', type: 'computed' },
+          ],
+        },
       },
       {
         name: 'insights',
-        label: 'Insights & Actions',
+        label: 'Insights/Actions',
         type: 'textarea',
         defaultValue: '',
         placeholder: 'Enter insights and actions taken',

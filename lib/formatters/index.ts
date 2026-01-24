@@ -2,8 +2,9 @@ import { formatBatchReruns, BatchRerunsData } from './batch-reruns';
 import { formatManualRebills, ManualRebillsData } from './manual-rebills';
 import { formatMintAdditionalSales, MintAdditionalSalesData } from './mint-additional-sales';
 import { formatHourlyApprovalRate, HourlyApprovalRateData } from './hourly-approval-rate';
+import { MidRowData } from '../templates';
 
-export type FormDataType = Record<string, string | number>;
+export type FormDataType = Record<string, string | number | MidRowData[]>;
 
 export function formatMessage(slug: string, data: FormDataType): string {
   switch (slug) {
