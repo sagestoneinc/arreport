@@ -13,8 +13,22 @@ interface ReportFormProps {
 export default function ReportForm({ fields, formData, onChange, onGenerate }: ReportFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    const finalValue = type === 'number' ? parseFloat(value) || 0 : value;
-    onChange(name, finalValue);
+    if (type === 'number') {
+      // For number inputs, keep as string while typing, convert on blur
+      onChange(name, value === '' ? 0 : parseFloat(value) || 0);
+    } else {
+      onChange(name, value);
+    }
+  };
+
+  const getInputValue = (field: TemplateField) => {
+    const value = formData[field.name];
+    if (field.type === 'number') {
+      // Show empty string for default 0 values from field definition
+      // But show actual 0 if user explicitly set it
+      return value === field.defaultValue && value === 0 ? '' : String(value || '');
+    }
+    return value ?? '';
   };
 
   return (
@@ -42,7 +56,7 @@ export default function ReportForm({ fields, formData, onChange, onGenerate }: R
               id={field.name}
               name={field.name}
               type={field.type}
-              value={formData[field.name] || ''}
+              value={getInputValue(field)}
               onChange={handleChange}
               placeholder={field.placeholder}
               required={field.required}
