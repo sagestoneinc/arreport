@@ -240,6 +240,13 @@ export const TEMPLATES: TemplateDefinition[] = [
       { name: 'decline2_count', label: 'Decline 2 Count', type: 'number', defaultValue: 0 },
       { name: 'decline3_reason', label: 'Decline 3 Reason', type: 'text', defaultValue: '' },
       { name: 'decline3_count', label: 'Decline 3 Count', type: 'number', defaultValue: 0 },
+      {
+        name: 'insights',
+        label: 'Insights',
+        type: 'textarea',
+        defaultValue: '',
+        placeholder: 'Enter any additional insights or observations...',
+      },
     ],
   },
   {
