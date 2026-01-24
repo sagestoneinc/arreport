@@ -127,6 +127,40 @@ async function setupMysql() {
   console.log('📝 Tables created: tasks');
 }
 
+/**
+ * Format an error for display.
+ * MySQL errors from mysql2 may have an empty message but contain useful info in error.code.
+ * @param {Error} error - The error object
+ * @returns {string} A formatted error message
+ */
+function formatError(error) {
+  // If we have a non-empty message, use it
+  if (error.message && error.message.trim()) {
+    return error.message;
+  }
+
+  // mysql2 errors often have a code but empty message (e.g., ECONNREFUSED)
+  if (error.code) {
+    switch (error.code) {
+      case 'ECONNREFUSED':
+        return `Connection refused (${error.code}). MySQL server may not be running or is not accessible.`;
+      case 'ENOTFOUND':
+        return `Host not found (${error.code}). Check your MySQL host configuration.`;
+      case 'ETIMEDOUT':
+        return `Connection timed out (${error.code}). MySQL server may be slow or unreachable.`;
+      case 'ER_ACCESS_DENIED_ERROR':
+        return `Access denied (${error.code}). Check your MySQL credentials.`;
+      case 'ER_BAD_DB_ERROR':
+        return `Database does not exist (${error.code}). Create the database first.`;
+      default:
+        return `Database error: ${error.code}`;
+    }
+  }
+
+  // Fallback to string representation
+  return String(error) || 'Unknown error';
+}
+
 async function main() {
   try {
     if (storageType === 'mysql') {
@@ -142,7 +176,7 @@ async function main() {
     console.log('🎉 Database setup complete!');
   } catch (error) {
     console.error('');
-    console.error('❌ Database setup failed:', error.message);
+    console.error('❌ Database setup failed:', formatError(error));
     console.error('');
     console.error('💡 Troubleshooting tips:');
     if (storageType === 'mysql') {
