@@ -33,10 +33,9 @@ export default function ReportForm({ fields, formData, onChange, onGenerate }: R
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">Report Fields</h2>
+    <div className="space-y-6">
       {fields.map((field) => (
-        <div key={field.name} className="space-y-1">
+        <div key={field.name} className="space-y-2">
           {field.type === 'table' ? (
             <DynamicTableInput
               label={field.label}
@@ -45,7 +44,7 @@ export default function ReportForm({ fields, formData, onChange, onGenerate }: R
             />
           ) : (
             <>
-              <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+              <label htmlFor={field.name} className="block text-sm font-semibold text-gray-900">
                 {field.label}
                 {field.required && <span className="text-red-500 ml-1">*</span>}
               </label>
@@ -57,8 +56,8 @@ export default function ReportForm({ fields, formData, onChange, onGenerate }: R
                   onChange={handleChange}
                   placeholder={field.placeholder}
                   required={field.required}
-                  rows={6}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                  rows={8}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 font-mono text-sm transition-all duration-150 resize-y"
                 />
               ) : (
                 <input
@@ -69,17 +68,17 @@ export default function ReportForm({ fields, formData, onChange, onGenerate }: R
                   onChange={handleChange}
                   placeholder={field.placeholder}
                   required={field.required}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-all duration-150"
                 />
               )}
-              {field.helpText && <p className="text-xs text-gray-500">{field.helpText}</p>}
+              {field.helpText && <p className="text-xs text-gray-500 mt-1">{field.helpText}</p>}
             </>
           )}
         </div>
       ))}
       <button
         onClick={onGenerate}
-        className="w-full mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-lg shadow-md"
+        className="w-full mt-8 px-8 py-4 bg-gradient-to-r from-accent-600 to-accent-700 text-white rounded-xl hover:from-accent-700 hover:to-accent-800 transition-all duration-150 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
       >
         ✨ Generate Report
       </button>

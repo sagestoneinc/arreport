@@ -8,19 +8,44 @@ interface TemplateCardProps {
   template: TemplateDefinition;
 }
 
+const iconMap: Record<string, string> = {
+  'batch-reruns': '🔄',
+  'manual-rebills': '💳',
+  'mint-additional-sales': '💰',
+  'hourly-approval-rate': '📈',
+};
+
 export default function TemplateCard({ template }: TemplateCardProps) {
+  const icon = iconMap[template.slug] || '📄';
+
   return (
     <Link
       href={`/reports/${template.slug}`}
-      className="block p-6 bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow border-2 border-transparent hover:border-blue-500"
+      className="group block bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-150 ease-in-out p-8 border border-gray-100"
     >
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">{template.name}</h2>
-      <p className="text-gray-600">{template.description}</p>
-      <div className="mt-4 text-blue-600 font-semibold flex items-center">
-        Open Builder
-        <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <div className="text-4xl mb-4">{icon}</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-accent-600 transition-colors">
+            {template.name}
+          </h2>
+          <p className="text-base text-gray-600 leading-relaxed">{template.description}</p>
+        </div>
+        <div className="ml-4 text-gray-400 group-hover:text-accent-500 transition-all duration-150 group-hover:translate-x-1">
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </div>
       </div>
     </Link>
   );

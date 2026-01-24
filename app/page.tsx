@@ -1,27 +1,23 @@
 import React from 'react';
-import Link from 'next/link';
 import TemplateCard from '@/components/TemplateCard';
 import { TEMPLATES } from '@/lib/templates';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">📊 AR Report Template Builder</h1>
-          <p className="text-xl text-gray-600">Choose a report template to get started</p>
-          
-          <div className="mt-6">
-            <Link
-              href="/tasks"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow text-gray-700 font-medium"
-            >
-              📋 View Tasks
-            </Link>
-          </div>
+    <main className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl sm:text-5xl lg:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
+            Report Templates
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Choose a template to start building your report
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Templates Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
           {TEMPLATES.map((template) => (
             <TemplateCard key={template.slug} template={template} />
           ))}

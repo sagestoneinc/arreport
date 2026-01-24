@@ -40,13 +40,24 @@ export const viewport: Viewport = {
   themeColor: '#3B82F6',
 };
 
+import Navbar from '@/components/Navbar';
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
         <link rel="icon" href="/favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
       </head>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans bg-gray-50 antialiased">
+        <Navbar />
+        {children}
+      </body>
     </html>
   );
 }
