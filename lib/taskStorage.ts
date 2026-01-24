@@ -96,7 +96,7 @@ class TaskStorage {
     };
   }
 
-  updateTask(chatId: string, messageId: number, description: string): void {
+  updateTask(chatId: string, messageId: number, description: string, rawText: string): void {
     const db = this.getDb();
     
     const stmt = db.prepare(`
@@ -105,7 +105,7 @@ class TaskStorage {
       WHERE chat_id = ? AND message_id = ?
     `);
 
-    stmt.run(description, description, chatId, messageId);
+    stmt.run(description, rawText, chatId, messageId);
   }
 
   taskExists(chatId: string, messageId: number): boolean {

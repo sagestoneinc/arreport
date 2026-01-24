@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     if (isEdited && storage.taskExists(chatId, messageId)) {
       // Update existing task
-      storage.updateTask(chatId, messageId, taskDescription);
+      storage.updateTask(chatId, messageId, taskDescription, message.text || '');
       console.log(`Updated task from message ${messageId} in chat ${chatId}`);
     } else if (!storage.taskExists(chatId, messageId)) {
       // Save new task
