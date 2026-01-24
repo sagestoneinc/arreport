@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { getTemplateBySlug, MidRowData } from '@/lib/templates';
@@ -12,7 +12,6 @@ import BatchRerunsForm, {
 } from '@/components/BatchRerunsForm';
 import ManualRebillsForm, { ManualRebillsFormData } from '@/components/ManualRebillsForm';
 import Preview from '@/components/Preview';
-import TelegramButton from '@/components/TelegramButton';
 import StickyToolbar from '@/components/StickyToolbar';
 import { saveToHistory } from '@/lib/historyStorage';
 
@@ -60,14 +59,14 @@ export default function ReportBuilderPage() {
       initializeDefaults();
     }
 
-    // Load lastSentAt for batch-reruns
-    if (slug === 'batch-reruns') {
-      const savedLastSentAt = localStorage.getItem(`lastSentAt:${slug}`);
-      if (savedLastSentAt) {
-        setLastSentAt(savedLastSentAt);
-      }
+    // Load lastSentAt for all templates
+    const savedLastSentAt = localStorage.getItem(`lastSentAt:${slug}`);
+    if (savedLastSentAt) {
+      setLastSentAt(savedLastSentAt);
+    }
 
-      // Load processor selections from localStorage
+    // Load processor selections from localStorage (for batch-reruns)
+    if (slug === 'batch-reruns') {
       const savedUscaProcessor = localStorage.getItem(
         `${PROCESSOR_STORAGE_KEY_PREFIX}${slug}:processor_usca`
       );
@@ -198,10 +197,39 @@ export default function ReportBuilderPage() {
       setToast({ type: 'error', message: 'Network error: Failed to send message' });
     } finally {
       setIsSending(false);
-      const timeoutId = setTimeout(() => setToast(null), 5000);
-      return () => clearTimeout(timeoutId);
+      setTimeout(() => setToast(null), 5000);
     }
   };
+
+  const handleCopy = useCallback(async () => {
+    if (!generatedMessage) return;
+    try {
+      await navigator.clipboard.writeText(generatedMessage);
+      setToast({ type: 'success', message: 'Copied to clipboard' });
+      setTimeout(() => setToast(null), 3000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      setToast({ type: 'error', message: 'Failed to copy to clipboard' });
+      setTimeout(() => setToast(null), 3000);
+    }
+  }, [generatedMessage]);
+
+  const handleDownload = useCallback(() => {
+    if (!generatedMessage) return;
+    const date = new Date().toISOString().split('T')[0];
+    const filename = `${slug}-${date}.txt`;
+    const blob = new Blob([generatedMessage], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setToast({ type: 'success', message: `Downloaded ${filename}` });
+    setTimeout(() => setToast(null), 3000);
+  }, [generatedMessage, slug]);
 
   if (!template) {
     return (
@@ -298,16 +326,12 @@ export default function ReportBuilderPage() {
             <Preview message={generatedMessage} slug={slug} />
           </div>
         </div>
-
-        {slug !== 'batch-reruns' && (
-          <TelegramButton message={generatedMessage} disabled={!generatedMessage} />
-        )}
       </div>
 
       {/* Toast notification */}
       {toast && (
         <div
-          className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-6 py-4 rounded-xl shadow-xl text-white font-semibold max-w-md ${
+          className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-6 py-4 rounded-xl shadow-xl text-white font-semibold max-w-md ${
             toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
           }`}
         >
@@ -315,15 +339,17 @@ export default function ReportBuilderPage() {
         </div>
       )}
 
-      {/* Sticky Toolbar */}
+      {/* Unified Sticky Toolbar for all templates */}
       <StickyToolbar
         templateName={template.name}
-        onGenerate={handleGenerate}
+        generatedMessage={generatedMessage}
+        lastSentAt={lastSentAt}
         onReset={handleReset}
-        onSendTelegram={slug === 'batch-reruns' ? handleSendTelegram : undefined}
-        canSend={!!generatedMessage}
-        isSending={isSending}
-        lastSentAt={slug === 'batch-reruns' ? lastSentAt : undefined}
+        onGenerate={handleGenerate}
+        onSendTelegram={handleSendTelegram}
+        onCopy={handleCopy}
+        onDownload={handleDownload}
+        isSendingTelegram={isSending}
       />
     </main>
   );
