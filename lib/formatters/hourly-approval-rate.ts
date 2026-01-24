@@ -52,13 +52,17 @@ function formatMidSection(
   if (mids.length === 0) {
     lines.push(escapeIfNeeded('- —', mode));
   } else if (mids.length === 1) {
-    // Single MID: only show top performer emoji
+    // Single MID: only show top performer emoji (green up arrow).
+    // Design decision: A single MID is considered a "top performer" since there's no comparison.
+    // This avoids showing a negative indicator when there's no context for comparison.
     const mid = mids[0];
     lines.push(
       escapeIfNeeded(`${EMOJI.TOP_PERFORMER} ${mid.mid_name} — ${mid.initial_sales} sales / ${mid.initial_decline} declines (${formatARPercent(mid.ar_percent)})`, mode)
     );
   } else {
-    // Multiple MIDs: show top, middle (no emoji), and bottom
+    // Multiple MIDs: show top, middle (no emoji), and bottom.
+    // Note: mids are pre-sorted by AR% descending via sortMids(),
+    // so first item is highest AR%, last item is lowest AR%.
     mids.forEach((mid, index) => {
       const isTop = index === 0;
       const isBottom = index === mids.length - 1;
