@@ -242,11 +242,16 @@ The Task Collector Bot is a Telegram webhook-based bot that captures tasks from 
 ### Features
 
 - 📋 **Multiple trigger formats**: `@botname - task`, `/task`, `/todo`
+- 🖼️ **Image support**: Captures forwarded images with captions as tasks
+- 📝 **Forwarded messages**: Automatically captures forwarded messages as tasks
 - 💾 **Persistent storage**: SQLite database for reliable task tracking
 - 🌐 **Web UI**: View, filter, and manage tasks from any browser
 - ✅ **Task management**: Mark as done/open, delete, or export
+- 📊 **List open tasks**: Use `/opentask` to see all open tasks in chat
+- ✔️ **Mark done via chat**: Use `/done <number>` to complete tasks directly from Telegram
 - 🔄 **Edit support**: Updates tasks when Telegram messages are edited
 - 🛡️ **Security**: Webhook secret verification, rate limiting
+- 🔗 **No link previews**: Autoresponses don't generate link previews
 - 🚀 **Serverless-friendly**: Works on Vercel, Netlify, and other platforms
 
 ### Task Trigger Formats
@@ -269,6 +274,25 @@ The bot recognizes the following message formats:
    @yourbotname Check the logs
    ```
 
+4. **Forwarded messages**:
+   - Forward any message to capture it as a task
+   - Forward images with captions to capture the caption as the task description
+   - Forwarded images without captions are saved as `[Forwarded Image]`
+
+### Task Management Commands
+
+1. **List open tasks** (`/opentask`):
+   ```
+   /opentask
+   ```
+   Shows all open tasks in the current chat with numbered list.
+
+2. **Mark task as done** (`/done`):
+   ```
+   /done 3                 # Mark task #3 as done (from the /opentask list)
+   /done Review PR         # Mark task containing "Review PR" as done
+   ```
+
 ### Setup Instructions
 
 #### 1. Create or Configure Your Bot
@@ -282,6 +306,8 @@ If you already have a bot token from setting up the AR report feature, you can r
    ```
    task - Add a new task
    todo - Add a new task
+   opentask - Show all open tasks
+   done - Mark a task as done
    ```
 
 #### 2. Add Bot to Your Group

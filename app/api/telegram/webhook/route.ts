@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { TelegramUpdate } from '@/lib/taskTypes';
-import { parseTaskFromMessage, shouldReply, rateLimiter } from '@/lib/taskParser';
+import { parseTaskFromMessage, shouldReply, rateLimiter, isOpenTaskCommand, parseDoneCommand } from '@/lib/taskParser';
 import { getTaskStorage } from '@/lib/taskStorage';
 
 export const dynamic = 'force-dynamic';
@@ -55,8 +55,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    // Parse task from message
     const botUsername = process.env.BOT_USERNAME;
+
+    // Handle /opentask command
+    if (isOpenTaskCommand(message)) {
+      await handleOpenTaskCommand(chatId, message.message_id);
+      return NextResponse.json({ ok: true });
+    }
+
+    // Handle /done command
+    const doneCommand = parseDoneCommand(message);
+    if (doneCommand) {
+      await handleDoneCommand(chatId, message.message_id, doneCommand);
+      return NextResponse.json({ ok: true });
+    }
+
+    // Parse task from message
     const taskDescription = parseTaskFromMessage(message, botUsername);
 
     if (!taskDescription) {
@@ -70,7 +84,7 @@ export async function POST(request: NextRequest) {
     try {
       if (isEdited && (await storage.taskExists(chatId, messageId))) {
         // Update existing task
-        await storage.updateTask(chatId, messageId, taskDescription, message.text || '');
+        await storage.updateTask(chatId, messageId, taskDescription, message.text || message.caption || '');
         console.log(`Updated task from message ${messageId} in chat ${chatId}`);
       } else if (!(await storage.taskExists(chatId, messageId))) {
         // Save new task
@@ -84,7 +98,7 @@ export async function POST(request: NextRequest) {
             ? [message.from.first_name, message.from.last_name].filter(Boolean).join(' ')
             : undefined,
           description: taskDescription,
-          raw_text: message.text || '',
+          raw_text: message.text || message.caption || '',
         });
 
         console.log(`Saved new task: ${task.id}`);
@@ -105,6 +119,133 @@ export async function POST(request: NextRequest) {
     console.error('Webhook error:', error);
     // Return 200 to prevent Telegram from retrying
     return NextResponse.json({ ok: true });
+  }
+}
+
+async function handleOpenTaskCommand(chatId: string, messageId: number): Promise<void> {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  if (!botToken) {
+    console.error('TELEGRAM_BOT_TOKEN not configured');
+    return;
+  }
+
+  try {
+    const storage = getTaskStorage();
+    const tasks = await storage.getTasks({ status: 'open', chat_id: chatId });
+
+    let replyText: string;
+    if (tasks.length === 0) {
+      replyText = '📋 No open tasks found in this chat.';
+    } else {
+      const taskLines = tasks.map((task, index) => `${index + 1}. ${task.description}`);
+      replyText = `📋 Open Tasks (${tasks.length}):\n\n${taskLines.join('\n')}\n\n💡 Use /done <number> to mark a task as completed.`;
+    }
+
+    await sendTelegramMessage(chatId, messageId, replyText);
+  } catch (error) {
+    console.error('Error handling /opentask command:', error);
+    await sendTelegramMessage(chatId, messageId, '❌ Failed to fetch open tasks.');
+  }
+}
+
+async function handleDoneCommand(
+  chatId: string,
+  messageId: number,
+  command: { type: 'number'; value: number } | { type: 'text'; value: string }
+): Promise<void> {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  if (!botToken) {
+    console.error('TELEGRAM_BOT_TOKEN not configured');
+    return;
+  }
+
+  try {
+    const storage = getTaskStorage();
+    const openTasks = await storage.getTasks({ status: 'open', chat_id: chatId });
+
+    if (openTasks.length === 0) {
+      await sendTelegramMessage(chatId, messageId, '📋 No open tasks to mark as done.');
+      return;
+    }
+
+    let taskToComplete;
+    if (command.type === 'number') {
+      // Mark by task number (1-indexed)
+      const taskIndex = command.value - 1;
+      if (taskIndex < 0 || taskIndex >= openTasks.length) {
+        await sendTelegramMessage(
+          chatId,
+          messageId,
+          `❌ Invalid task number. Please use a number between 1 and ${openTasks.length}.`
+        );
+        return;
+      }
+      taskToComplete = openTasks[taskIndex];
+    } else {
+      // Match by partial description (case-insensitive)
+      const searchText = command.value.toLowerCase();
+      taskToComplete = openTasks.find((task) =>
+        task.description.toLowerCase().includes(searchText)
+      );
+      if (!taskToComplete) {
+        await sendTelegramMessage(
+          chatId,
+          messageId,
+          `❌ No open task found matching "${command.value}".`
+        );
+        return;
+      }
+    }
+
+    const success = await storage.updateTaskStatus(taskToComplete.id, 'done');
+    if (success) {
+      await sendTelegramMessage(
+        chatId,
+        messageId,
+        `✅ Task completed: ${taskToComplete.description}`
+      );
+    } else {
+      await sendTelegramMessage(chatId, messageId, '❌ Failed to update task status.');
+    }
+  } catch (error) {
+    console.error('Error handling /done command:', error);
+    await sendTelegramMessage(chatId, messageId, '❌ Failed to mark task as done.');
+  }
+}
+
+async function sendTelegramMessage(
+  chatId: string,
+  replyToMessageId: number,
+  text: string
+): Promise<void> {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  if (!botToken) {
+    console.error('TELEGRAM_BOT_TOKEN not configured');
+    return;
+  }
+
+  try {
+    const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+    const response = await fetch(telegramUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: text,
+        reply_to_message_id: replyToMessageId,
+        disable_web_page_preview: true,
+      }),
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      console.error('Failed to send Telegram message:', data);
+    }
+  } catch (error) {
+    console.error('Error sending Telegram message:', error);
   }
 }
 
@@ -138,6 +279,7 @@ async function sendTelegramReply(
         chat_id: chatId,
         text: replyText,
         reply_to_message_id: messageId,
+        disable_web_page_preview: true,
       }),
     });
 
