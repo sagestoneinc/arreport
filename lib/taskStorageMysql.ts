@@ -22,19 +22,67 @@ export class MySQLTaskStorage implements ITaskStorage {
       return;
     }
 
-    const config = {
-      host: process.env.MYSQL_HOST || 'localhost',
-      port: parseInt(process.env.MYSQL_PORT || '3306'),
-      user: process.env.MYSQL_USER || 'root',
-      password: process.env.MYSQL_PASSWORD || '',
-      database: process.env.MYSQL_DATABASE || 'arreport',
+    // Railway provides MySQL environment variables with different naming conventions
+    // Support both MYSQL_* and MYSQLHOST patterns
+    const host = process.env.MYSQL_HOST || process.env.MYSQLHOST || 'localhost';
+    const port = parseInt(process.env.MYSQL_PORT || process.env.MYSQLPORT || '3306');
+    const user = process.env.MYSQL_USER || process.env.MYSQLUSER || 'root';
+    const password = process.env.MYSQL_PASSWORD || process.env.MYSQLPASSWORD || '';
+    const database = process.env.MYSQL_DATABASE || process.env.MYSQLDATABASE || 'arreport';
+
+    console.log('[MySQL] Initializing connection to:', {
+      host: host ? 'configured' : 'not set',
+      port,
+      user: user ? 'configured' : 'not set',
+      database,
+    });
+
+    const config: mysql.PoolOptions = {
+      host,
+      port,
+      user,
+      password,
+      database,
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
+      connectTimeout: 10000, // 10 seconds timeout for Railway
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0,
     };
 
-    this.pool = mysql.createPool(config);
-    await this.initSchema();
+    try {
+      this.pool = mysql.createPool(config);
+      
+      // Test the connection by executing a simple query
+      console.log('[MySQL] Testing database connection...');
+      const connection = await this.pool.getConnection();
+      await connection.ping();
+      connection.release();
+      console.log('[MySQL] Connection test successful');
+      
+      await this.initSchema();
+      console.log('[MySQL] Database initialized successfully');
+    } catch (error: unknown) {
+      const err = error as Error & { code?: string; errno?: number; sqlState?: string };
+      console.error('[MySQL] Failed to initialize database:', {
+        message: err.message,
+        code: err.code,
+        errno: err.errno,
+        sqlState: err.sqlState,
+      });
+      
+      // Clean up the pool if initialization failed
+      if (this.pool) {
+        await this.pool.end().catch((cleanupError) => {
+          // Log cleanup error but don't throw - original error is more important
+          console.error('[MySQL] Error during cleanup:', cleanupError);
+        });
+        this.pool = null;
+      }
+      
+      throw new Error(`MySQL initialization failed: ${err.message}`);
+    }
   }
 
   private async getPool(): Promise<mysql.Pool> {
@@ -70,7 +118,19 @@ export class MySQLTaskStorage implements ITaskStorage {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `;
 
-    await this.pool.execute(createTableQuery);
+    try {
+      console.log('[MySQL] Creating tasks table if not exists...');
+      await this.pool.execute(createTableQuery);
+      console.log('[MySQL] Tasks table ready');
+    } catch (error: unknown) {
+      const err = error as Error & { code?: string; sqlState?: string };
+      console.error('[MySQL] Failed to create schema:', {
+        message: err.message,
+        code: err.code,
+        sqlState: err.sqlState,
+      });
+      throw error;
+    }
   }
 
   async saveTask(task: Omit<Task, 'id' | 'created_at' | 'status'>): Promise<Task> {
