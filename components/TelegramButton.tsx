@@ -46,9 +46,9 @@ export default function TelegramButton({ message, disabled }: TelegramButtonProp
         <div className="relative">
           {/* Tooltip */}
           {showTooltip && !disabled && (
-            <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-sm font-medium px-3 py-2 rounded-lg whitespace-nowrap">
+            <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium px-3 py-2 rounded-lg whitespace-nowrap shadow-lg">
               Send to Telegram
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-l-4 border-l-gray-900"></div>
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-l-4 border-l-gray-900 dark:border-l-gray-700"></div>
             </div>
           )}
 
@@ -57,10 +57,10 @@ export default function TelegramButton({ message, disabled }: TelegramButtonProp
             disabled={disabled || sending}
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
-            className={`w-16 h-16 rounded-full shadow-lg font-semibold transition-all duration-150 flex items-center justify-center ${
+            className={`w-16 h-16 rounded-full shadow-lg font-semibold transition-all duration-200 flex items-center justify-center ${
               disabled || sending
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-gradient-to-br from-accent-600 to-accent-700 text-white hover:shadow-xl hover:scale-110'
+                ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-500 cursor-not-allowed'
+                : 'bg-gradient-to-br from-accent-600 to-accent-700 text-white hover:shadow-xl hover:scale-110 hover:animate-pulse'
             }`}
             title={disabled ? 'Generate a report first' : 'Send to Telegram'}
           >

@@ -139,8 +139,10 @@ export default function BatchRerunsForm({ formData, onChange, onGenerate }: Batc
   const renderComputedField = (label: string, value: string | null) => {
     return (
       <div className="space-y-1">
-        <label className="block text-sm font-medium text-gray-700">{label}</label>
-        <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          {label}
+        </label>
+        <div className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-accent-50 dark:bg-accent-900/20 text-accent-700 dark:text-accent-400 font-semibold">
           {value ? `${value}%` : '—'}
         </div>
       </div>
@@ -155,7 +157,7 @@ export default function BatchRerunsForm({ formData, onChange, onGenerate }: Batc
   ) => {
     return (
       <div className="space-y-1">
-        <label htmlFor={name} className="block text-sm font-medium text-gray-700">
+        <label htmlFor={name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
@@ -166,7 +168,7 @@ export default function BatchRerunsForm({ formData, onChange, onGenerate }: Batc
           value={getInputValue(name)}
           onChange={handleChange}
           required={required}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
         />
       </div>
     );
@@ -175,14 +177,16 @@ export default function BatchRerunsForm({ formData, onChange, onGenerate }: Batc
   return (
     <div className="space-y-6">
       {/* Report Date Card */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Report Date</h3>
+      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Report Date</h3>
         {renderInputField('date', 'Date', 'date', true)}
       </div>
 
       {/* US/CA Declines → Revolv3 Card */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">US/CA Declines → Revolv3</h3>
+      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
+          US/CA Declines → Revolv3
+        </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {/* Summary Section */}
@@ -228,8 +232,10 @@ export default function BatchRerunsForm({ formData, onChange, onGenerate }: Batc
       </div>
 
       {/* Other Geos → Quantum Card */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">All Other Geos → Quantum</h3>
+      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
+          All Other Geos → Quantum
+        </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {/* Summary Section */}
@@ -250,7 +256,7 @@ export default function BatchRerunsForm({ formData, onChange, onGenerate }: Batc
 
         {/* Common Declines Section */}
         <div className="mt-6">
-          <h4 className="text-md font-semibold text-gray-900 mb-3">Common Declines</h4>
+          <h4 className="text-md font-semibold text-gray-900 dark:text-gray-100 mb-3">Common Declines</h4>
           <div className="space-y-3">
             {/* Decline 1 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -277,7 +283,7 @@ export default function BatchRerunsForm({ formData, onChange, onGenerate }: Batc
       {/* Generate Button */}
       <button
         onClick={onGenerate}
-        className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-lg shadow-md"
+        className="w-full px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-500 text-white rounded-lg hover:from-primary-700 hover:to-accent-600 transition-all duration-200 font-semibold text-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
       >
         ✨ Generate Report
       </button>

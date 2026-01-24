@@ -44,7 +44,10 @@ export default function ReportForm({ fields, formData, onChange, onGenerate }: R
             />
           ) : (
             <>
-              <label htmlFor={field.name} className="block text-sm font-semibold text-gray-900">
+              <label
+                htmlFor={field.name}
+                className="block text-sm font-semibold text-gray-900 dark:text-gray-100"
+              >
                 {field.label}
                 {field.required && <span className="text-red-500 ml-1">*</span>}
               </label>
@@ -52,12 +55,12 @@ export default function ReportForm({ fields, formData, onChange, onGenerate }: R
                 <textarea
                   id={field.name}
                   name={field.name}
-                  value={formData[field.name] as string || ''}
+                  value={(formData[field.name] as string) || ''}
                   onChange={handleChange}
                   placeholder={field.placeholder}
                   required={field.required}
                   rows={8}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 font-mono text-sm transition-all duration-150 resize-y"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm transition-all duration-150 resize-y"
                 />
               ) : (
                 <input
@@ -68,20 +71,23 @@ export default function ReportForm({ fields, formData, onChange, onGenerate }: R
                   onChange={handleChange}
                   placeholder={field.placeholder}
                   required={field.required}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-all duration-150"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-150"
                 />
               )}
-              {field.helpText && <p className="text-xs text-gray-500 mt-1">{field.helpText}</p>}
+              {field.helpText && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{field.helpText}</p>
+              )}
             </>
           )}
         </div>
       ))}
       <button
         onClick={onGenerate}
-        className="w-full mt-8 px-8 py-4 bg-gradient-to-r from-accent-600 to-accent-700 text-white rounded-xl hover:from-accent-700 hover:to-accent-800 transition-all duration-150 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+        className="w-full mt-8 px-8 py-4 bg-gradient-to-r from-primary-600 to-accent-500 text-white rounded-xl hover:from-primary-700 hover:to-accent-600 transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
       >
         ✨ Generate Report
       </button>
     </div>
   );
 }
+
