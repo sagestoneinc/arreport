@@ -27,21 +27,20 @@ describe('formatHourlyApprovalRate - New Template System', () => {
     expect(output).toContain('13:00');
     expect(output).toContain('16:00 EST');
 
-    // Check VISA section - should be sorted by AR% desc
-    // With Telegram formatting, underscores and special chars are escaped
+    // Check VISA section - should be sorted by AR% desc with bold names
     expect(output).toContain('VISA');
-    expect(output).toContain('CS\\_397'); // 66.67% - top performer (escaped underscore)
-    expect(output).toContain('CS\\_395'); // 40%
-    expect(output).toContain('CS\\_396'); // 30% - low performer
+    expect(output).toContain('🟢⬆️ *CS\\_397*'); // 66.67% - top performer (bold, escaped)
+    expect(output).toContain('🟡➡️ *CS\\_395*'); // 40% - middle performer (bold, escaped)
+    expect(output).toContain('🔴⬇️ *CS\\_396*'); // 30% - low performer (bold, escaped)
     expect(output).toContain('10 sales');
     expect(output).toContain('5 declines');
     expect(output).toContain('66\\.67%'); // Escaped period
 
-    // Check MasterCard section - should be sorted by AR% desc
+    // Check MasterCard section - should be sorted by AR% desc with bold names
     expect(output).toContain('MasterCard');
-    expect(output).toContain('PAY\\-REV\\_331'); // 80% - top performer (escaped dash and underscore)
-    expect(output).toContain('PAY\\-REV\\_346'); // 66.67%
-    expect(output).toContain('PAY\\-REV\\_330'); // 59.09% - low performer
+    expect(output).toContain('🟢⬆️ *PAY\\-REV\\_331*'); // 80% - top performer (bold, escaped)
+    expect(output).toContain('🟡➡️ *PAY\\-REV\\_346*'); // 66.67% - middle performer (bold, escaped)
+    expect(output).toContain('🔴⬇️ *PAY\\-REV\\_330*'); // 59.09% - low performer (bold, escaped)
     expect(output).toContain('80\\.00%');
     expect(output).toContain('59\\.09%');
 
@@ -49,8 +48,9 @@ describe('formatHourlyApprovalRate - New Template System', () => {
     expect(output).toContain('Insights');
     expect(output).toContain('All PAY REVs have been performing over the past few hours');
     
-    // Check for performer indicators
+    // Check for all three performer indicators
     expect(output).toContain('🟢⬆️'); // Top performer indicator
+    expect(output).toContain('🟡➡️'); // Middle performer indicator
     expect(output).toContain('🔴⬇️'); // Low performer indicator
   });
 
@@ -204,9 +204,9 @@ describe('formatHourlyApprovalRate - New Template System', () => {
 
     const output = formatHourlyApprovalRate(data);
 
-    // Should show green up arrow for single MIDs
-    expect(output).toContain('🟢⬆️ CS\\_395');
-    expect(output).toContain('🟢⬆️ PAY\\-REV\\_346');
+    // Should show green up arrow for single MIDs with bold names
+    expect(output).toContain('🟢⬆️ *CS\\_395*');
+    expect(output).toContain('🟢⬆️ *PAY\\-REV\\_346*');
     
     // Should NOT show red down arrow for single MIDs
     const visaSection = output.substring(output.indexOf('VISA'), output.indexOf('MasterCard'));
@@ -215,5 +215,60 @@ describe('formatHourlyApprovalRate - New Template System', () => {
     // Count red arrows - should be 0
     const redArrowCount = (output.match(/🔴⬇️/g) || []).length;
     expect(redArrowCount).toBe(0);
+  });
+
+  it('demonstrates complete output format matching requirements', () => {
+    const data = {
+      date: '2026-01-24',
+      time_range: '10:00 - 14:00 EST',
+      filter_used: 'Affiliate > Card Brand > Merchant Account',
+      visa_mids: [
+        { mid_name: 'PAY-REV_348_BloodBoostPro_1090', initial_sales: 15, initial_decline: 9 }, // 62.50%
+        { mid_name: 'PAY-REV-371', initial_sales: 25, initial_decline: 45 }, // 35.71%
+        { mid_name: 'PAY-REV-372', initial_sales: 25, initial_decline: 60 }, // 29.41%
+        { mid_name: 'PAY-REV_346_RapidHealthScreen_0147', initial_sales: 1, initial_decline: 3 }, // 25.00%
+      ],
+      mc_mids: [
+        { mid_name: 'NS_515_DiscountBuyersHub_2351', initial_sales: 8, initial_decline: 6 }, // 57.14%
+        { mid_name: 'NS_512_SportZoneSupply_2377', initial_sales: 10, initial_decline: 8 }, // 55.56%
+        { mid_name: 'NS_513_DiscountBuyersHub_2351', initial_sales: 17, initial_decline: 19 }, // 47.22%
+        { mid_name: 'NS_514_DiscountBuyersHub_2351', initial_sales: 10, initial_decline: 25 }, // 28.57%
+      ],
+      insights: 'All MIDs performing within expected range. Monitor low performers closely.',
+    };
+
+    const output = formatHourlyApprovalRate(data);
+
+    // Verify VISA section with all 3 emoji tiers
+    expect(output).toContain('🟢⬆️ *PAY\\-REV\\_348\\_BloodBoostPro\\_1090*'); // Top: 62.50%
+    expect(output).toContain('🟡➡️ *PAY\\-REV\\-371*'); // Middle: 35.71%
+    expect(output).toContain('🟡➡️ *PAY\\-REV\\-372*'); // Middle: 29.41%
+    expect(output).toContain('🔴⬇️ *PAY\\-REV\\_346\\_RapidHealthScreen\\_0147*'); // Bottom: 25.00%
+
+    // Verify MasterCard section with all 3 emoji tiers
+    expect(output).toContain('🟢⬆️ *NS\\_515\\_DiscountBuyersHub\\_2351*'); // Top: 57.14%
+    expect(output).toContain('🟡➡️ *NS\\_512\\_SportZoneSupply\\_2377*'); // Middle: 55.56%
+    expect(output).toContain('🟡➡️ *NS\\_513\\_DiscountBuyersHub\\_2351*'); // Middle: 47.22%
+    expect(output).toContain('🔴⬇️ *NS\\_514\\_DiscountBuyersHub\\_2351*'); // Bottom: 28.57%
+
+    // Verify percentages
+    expect(output).toContain('62\\.50%');
+    expect(output).toContain('35\\.71%');
+    expect(output).toContain('29\\.41%');
+    expect(output).toContain('25\\.00%');
+    expect(output).toContain('57\\.14%');
+    expect(output).toContain('55\\.56%');
+    expect(output).toContain('47\\.22%');
+    expect(output).toContain('28\\.57%');
+
+    // Verify all emoji types are present
+    expect(output).toContain('🟢⬆️'); // Top
+    expect(output).toContain('🟡➡️'); // Middle
+    expect(output).toContain('🔴⬇️'); // Bottom
+
+    // Print the complete output for verification
+    console.log('\n=== Complete Formatted Output ===');
+    console.log(output);
+    console.log('=================================\n');
   });
 });
