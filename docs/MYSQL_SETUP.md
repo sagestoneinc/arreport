@@ -140,6 +140,38 @@ MYSQL_PASSWORD=your_password
 MYSQL_DATABASE=arreport
 ```
 
+**Railway:**
+
+Railway provides managed MySQL through their plugin system. When you add the MySQL plugin to your Railway project, it automatically provisions a MySQL database and sets the following environment variables:
+
+1. Add the MySQL plugin to your Railway project:
+   - Go to your Railway project dashboard
+   - Click "New" → "Database" → "Add MySQL"
+   - Railway will provision a MySQL instance and automatically set environment variables
+
+2. Configure your application to use MySQL:
+   ```env
+   TASKS_STORAGE=mysql
+   ```
+
+3. Railway automatically sets these environment variables (no manual configuration needed):
+   - `MYSQLHOST` - The private domain of the MySQL service (e.g., `mysql.railway.internal`)
+   - `MYSQLPORT` - MySQL port (default: `3306`)
+   - `MYSQLUSER` - MySQL username (default: `root`)
+   - `MYSQLPASSWORD` - Auto-generated MySQL root password
+   - `MYSQLDATABASE` - Database name (default: `railway`)
+   - `MYSQL_URL` - Full private connection string
+   - `MYSQL_PUBLIC_URL` - Full public connection string (for external access)
+
+4. The application automatically detects and uses these Railway environment variables. No additional configuration is required.
+
+5. Deploy your application:
+   - Railway will automatically build and deploy your app
+   - The MySQL tables will be created on first run
+   - Your Task Collector bot will start using the MySQL database
+
+**Note:** Railway uses internal template variables in their configuration (e.g., `${{MYSQL_ROOT_PASSWORD}}` → `MYSQLPASSWORD`). These template variables are automatically resolved by Railway and stored in environment variables. You should not manually set template variables - Railway handles this when you add the MySQL plugin.
+
 ## Monitoring
 
 Monitor your MySQL database performance:

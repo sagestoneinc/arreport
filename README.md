@@ -316,7 +316,8 @@ Deploy to a platform with HTTPS support (required for Telegram webhooks):
 
 - **Vercel** (recommended): Add all environment variables in project settings
 - **Netlify**: Add environment variables in site settings
-- **Railway/Render**: Add environment variables in dashboard
+- **Railway**: Add environment variables in dashboard (MySQL automatically configured via plugin)
+- **Render**: Add environment variables in dashboard
 
 #### 5. Set Up the Webhook
 
@@ -481,11 +482,32 @@ The bot includes built-in rate limiting (5 requests per chat per minute) to prev
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
+### Deploy to Railway
+
+Railway provides a simple deployment experience with built-in MySQL support:
+
+1. Create a new project on [Railway](https://railway.app)
+2. Connect your GitHub repository
+3. Add the MySQL plugin to your project:
+   - Click "New" → "Database" → "Add MySQL"
+   - Railway will automatically provision MySQL and set environment variables
+4. Add these environment variables to your Railway service:
+   - `TELEGRAM_BOT_TOKEN` - Your Telegram bot token
+   - `TELEGRAM_WEBHOOK_SECRET` - Random secret for webhook verification
+   - `APP_BASE_URL` - Your Railway app URL (e.g., `https://your-app.up.railway.app`)
+   - `BOT_USERNAME` - Your bot username (without @)
+   - `TASKS_STORAGE=mysql` - Enable MySQL storage
+5. Railway automatically sets MySQL environment variables:
+   - `MYSQLHOST`, `MYSQLPORT`, `MYSQLUSER`, `MYSQLPASSWORD`, `MYSQLDATABASE`
+   - `MYSQL_URL`, `MYSQL_PUBLIC_URL`
+6. Deploy and run `node scripts/setup-webhook.js` to configure Telegram webhook
+
+**Note:** Railway uses template variables like `${{MYSQL_ROOT_PASSWORD}}` which are automatically resolved at runtime. See the **[Railway Deployment Guide](docs/RAILWAY_DEPLOYMENT.md)** for complete step-by-step instructions.
+
 ### Other Platforms
 
 The app can be deployed to any platform that supports Next.js:
 - Netlify
-- Railway
 - Render
 - AWS Amplify
 - Docker (Dockerfile included)
