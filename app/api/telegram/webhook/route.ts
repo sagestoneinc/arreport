@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { TelegramUpdate, Task } from '@/lib/taskTypes';
-import { parseTaskFromMessage, shouldReply, rateLimiter, isOpenTaskCommand, parseDoneCommand } from '@/lib/taskParser';
+import { parseTaskFromMessage, shouldReply, rateLimiter, isOpenTaskCommand, parseDoneCommand, isHelpCommand, isStartCommand } from '@/lib/taskParser';
 import { getTaskStorage } from '@/lib/taskStorage';
+import { createAuditLog } from '@/lib/auditStorage';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,6 +57,18 @@ export async function POST(request: NextRequest) {
     }
 
     const botUsername = process.env.BOT_USERNAME;
+
+    // Handle /help command
+    if (isHelpCommand(message)) {
+      await handleHelpCommand(chatId, message.message_id);
+      return NextResponse.json({ ok: true });
+    }
+
+    // Handle /start command
+    if (isStartCommand(message)) {
+      await handleStartCommand(chatId, message.message_id);
+      return NextResponse.json({ ok: true });
+    }
 
     // Handle /opentask command
     if (isOpenTaskCommand(message)) {
@@ -118,6 +131,20 @@ export async function POST(request: NextRequest) {
         });
 
         console.log(`Saved new task: ${task.id}`);
+        
+        // Log to audit
+        try {
+          await createAuditLog({
+            user_email: createdBy,
+            action_type: 'TASK_CREATE',
+            telegram_chat_id: chatId,
+            telegram_chat_title: message.chat.title || undefined,
+            status: 'SUCCESS',
+            metadata: { taskId: task.id, taskTitle: task.title }
+          });
+        } catch (auditError) {
+          console.error('Failed to write audit log:', auditError);
+        }
 
         // Send confirmation reply if appropriate
         if (shouldReply(message, botUsername)) {
@@ -348,4 +375,65 @@ async function sendDuplicateWarning(
   } catch (error) {
     console.error('Error sending Telegram duplicate warning:', error);
   }
+}
+
+async function handleHelpCommand(chatId: string, messageId: number): Promise<void> {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  if (!botToken) {
+    console.error('TELEGRAM_BOT_TOKEN not configured');
+    return;
+  }
+
+  const baseUrl = process.env.APP_BASE_URL || 'https://arreport.jesscura.com';
+  
+  const helpText = `🤖 *AR Report Bot — Help*
+
+📝 *Task Commands*
+• /task <text> — Create a new task
+• /todo <text> — Same as /task
+• /opentask — List all open tasks
+• /done <number> — Mark task as done by number
+• /done <text> — Mark task as done by description
+
+💬 *Quick Actions*
+• @botname - <text> — Create task with dash separator
+• Forward a message — Auto-creates a task
+
+📊 *Other Commands*
+• /help — Show this help menu
+• /start — Welcome message
+
+🔗 *Web Dashboard*
+${baseUrl}/tasks — View & manage all tasks
+${baseUrl}/audit — View activity log
+
+💡 Tasks are deduplicated — duplicate open tasks are rejected.`;
+
+  await sendTelegramMessage(chatId, messageId, helpText);
+}
+
+async function handleStartCommand(chatId: string, messageId: number): Promise<void> {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  if (!botToken) {
+    console.error('TELEGRAM_BOT_TOKEN not configured');
+    return;
+  }
+
+  const baseUrl = process.env.APP_BASE_URL || 'https://arreport.jesscura.com';
+  
+  const welcomeText = `👋 *Welcome to AR Report Bot!*
+
+I help you manage tasks and track reports.
+
+🚀 *Quick Start:*
+• Type /task Buy groceries to create a task
+• Type /opentask to see all open tasks
+• Type /done 1 to complete task #1
+
+📱 *Web Dashboard:*
+${baseUrl}
+
+Type /help for all commands.`;
+
+  await sendTelegramMessage(chatId, messageId, welcomeText);
 }

@@ -7,7 +7,7 @@ const SESSION_COOKIE_NAME = 'ar_session';
 const PUBLIC_ROUTES = ['/login', '/api/auth'];
 
 // Routes that require authentication
-const PROTECTED_ROUTES = ['/reports', '/tasks', '/history'];
+const PROTECTED_ROUTES = ['/reports', '/tasks', '/history', '/audit'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
