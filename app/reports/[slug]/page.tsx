@@ -7,6 +7,7 @@ import { getTemplateBySlug, MidRowData } from '@/lib/templates';
 import { formatMessage } from '@/lib/formatters';
 import ReportForm from '@/components/ReportForm';
 import BatchRerunsForm, { BatchRerunsFormData } from '@/components/BatchRerunsForm';
+import ManualRebillsForm, { ManualRebillsFormData } from '@/components/ManualRebillsForm';
 import Preview from '@/components/Preview';
 import TelegramButton from '@/components/TelegramButton';
 
@@ -137,6 +138,12 @@ export default function ReportBuilderPage() {
               {slug === 'batch-reruns' ? (
                 <BatchRerunsForm
                   formData={formData as unknown as BatchRerunsFormData}
+                  onChange={handleFieldChange}
+                  onGenerate={handleGenerate}
+                />
+              ) : slug === 'manual-rebills' ? (
+                <ManualRebillsForm
+                  formData={formData as unknown as ManualRebillsFormData}
                   onChange={handleFieldChange}
                   onGenerate={handleGenerate}
                 />
