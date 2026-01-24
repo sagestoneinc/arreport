@@ -10,17 +10,24 @@ export default function ThemeToggle() {
   useEffect(() => {
     setMounted(true);
     
-    // Check localStorage first, then system preference
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
-    } else {
-      // Check system preference
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const systemTheme = prefersDark ? 'dark' : 'light';
-      setTheme(systemTheme);
-      document.documentElement.classList.toggle('dark', systemTheme === 'dark');
+    try {
+      // Check localStorage first, then system preference
+      const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+      if (savedTheme) {
+        setTheme(savedTheme);
+        document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+      } else {
+        // Check system preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const systemTheme = prefersDark ? 'dark' : 'light';
+        setTheme(systemTheme);
+        document.documentElement.classList.toggle('dark', systemTheme === 'dark');
+      }
+    } catch (error) {
+      console.error('Error loading theme preference:', error);
+      // Fallback to light theme if there's an error
+      setTheme('light');
+      document.documentElement.classList.remove('dark');
     }
   }, []);
 

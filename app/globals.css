@@ -3,14 +3,15 @@
 @tailwind utilities;
 
 @layer base {
-  /* Smooth transitions for theme changes */
-  * {
+  /* Smooth transitions for theme changes on specific elements */
+  body {
     @apply transition-colors duration-200;
   }
   
   /* Remove transition from elements that shouldn't transition */
   input, textarea, select, button {
     transition-property: background-color, border-color, color, fill, stroke, box-shadow, transform, opacity;
+    transition-duration: 200ms;
   }
 }
 
