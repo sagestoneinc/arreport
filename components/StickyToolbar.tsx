@@ -61,7 +61,7 @@ export default function StickyToolbar({
           <div className="flex flex-col sm:flex-row items-center gap-3">
             {/* Last sent timestamp */}
             {lastSentAt && (
-              <span className="text-xs text-gray-500 dark:text-gray-400">
+              <span className="text-xs text-gray-500 dark:text-gray-400" aria-label={`Last sent to Telegram at ${lastSentAt}`}>
                 Last sent: {lastSentAt}
               </span>
             )}
@@ -87,9 +87,10 @@ export default function StickyToolbar({
                   onClick={onSendTelegram}
                   disabled={!canSend || isSending}
                   className="px-6 py-2 text-sm font-semibold text-white bg-gradient-to-r from-accent-600 to-accent-700 rounded-lg hover:from-accent-700 hover:to-accent-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-accent-500"
+                  aria-label="Send report to Telegram"
                 >
                   {isSending ? (
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center gap-2" aria-live="polite" aria-label="Sending to Telegram">
                       <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
                       Sending...
                     </span>

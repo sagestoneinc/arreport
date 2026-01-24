@@ -122,11 +122,13 @@ export default function ReportBuilderPage() {
       } else {
         setToast({ type: 'error', message: data.error || 'Failed to send message' });
       }
-    } catch {
+    } catch (error) {
+      console.error('Failed to send to Telegram:', error);
       setToast({ type: 'error', message: 'Network error: Failed to send message' });
     } finally {
       setIsSending(false);
-      setTimeout(() => setToast(null), 5000);
+      const timeoutId = setTimeout(() => setToast(null), 5000);
+      return () => clearTimeout(timeoutId);
     }
   };
 
