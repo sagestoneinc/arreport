@@ -1,4 +1,5 @@
 import mysql from 'mysql2/promise';
+import { randomUUID } from 'crypto';
 import { Task, TaskFilter } from './taskTypes';
 import { ITaskStorage } from './taskStorageInterface';
 
@@ -75,7 +76,7 @@ export class MySQLTaskStorage implements ITaskStorage {
   async saveTask(task: Omit<Task, 'id' | 'created_at' | 'status'>): Promise<Task> {
     const pool = await this.getPool();
     
-    const id = crypto.randomUUID();
+    const id = randomUUID();
     const created_at = new Date().toISOString();
     const status = 'open';
 

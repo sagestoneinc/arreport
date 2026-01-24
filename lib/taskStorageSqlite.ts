@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
+import { randomUUID } from 'crypto';
 import { Task, TaskFilter } from './taskTypes';
 import { ITaskStorage } from './taskStorageInterface';
 
@@ -76,7 +77,7 @@ export class SQLiteTaskStorage implements ITaskStorage {
   async saveTask(task: Omit<Task, 'id' | 'created_at' | 'status'>): Promise<Task> {
     const db = this.getDb();
     
-    const id = crypto.randomUUID();
+    const id = randomUUID();
     const created_at = new Date().toISOString();
     const status = 'open';
 
