@@ -10,6 +10,8 @@ import BatchRerunsForm, { BatchRerunsFormData } from '@/components/BatchRerunsFo
 import ManualRebillsForm, { ManualRebillsFormData } from '@/components/ManualRebillsForm';
 import Preview from '@/components/Preview';
 import TelegramButton from '@/components/TelegramButton';
+import StickyToolbar from '@/components/StickyToolbar';
+import { saveToHistory } from '@/lib/historyStorage';
 
 const STORAGE_KEY_PREFIX = 'ar-report-';
 
@@ -74,6 +76,15 @@ export default function ReportBuilderPage() {
     if (!template) return;
     const message = formatMessage(slug, formData);
     setGeneratedMessage(message);
+    // Save to history
+    saveToHistory(slug, message);
+  };
+
+  const handleReset = () => {
+    if (confirm('Are you sure you want to reset all fields?')) {
+      initializeDefaults();
+      setGeneratedMessage('');
+    }
   };
 
   if (!template) {
@@ -107,24 +118,24 @@ export default function ReportBuilderPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24">
       <div className="max-w-7xl mx-auto px-6 py-10 sm:px-6 lg:px-8 sm:py-12">
-        {/* Header */}
-        <div className="mb-10">
+        {/* Breadcrumbs */}
+        <nav className="flex items-center gap-2 text-sm mb-6">
           <Link
             href="/"
-            className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-semibold text-sm mb-6 transition-colors"
+            className="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back to Templates
+            Templates
           </Link>
+          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+          <span className="text-gray-900 dark:text-gray-100 font-medium">{template.name}</span>
+        </nav>
+
+        {/* Header */}
+        <div className="mb-10">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3">
             {template.name}
           </h1>
@@ -166,6 +177,13 @@ export default function ReportBuilderPage() {
 
         <TelegramButton message={generatedMessage} disabled={!generatedMessage} />
       </div>
+
+      {/* Sticky Toolbar */}
+      <StickyToolbar
+        templateName={template.name}
+        onGenerate={handleGenerate}
+        onReset={handleReset}
+      />
     </main>
   );
 }
