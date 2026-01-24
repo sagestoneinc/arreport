@@ -1,7 +1,29 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import Link from 'next/link';
 import { Task, TaskStatus, TaskSource } from '@/lib/taskTypes';
+import { TEMPLATES } from '@/lib/templates';
+
+// Utility to find matching report for a task title
+function findMatchingReport(taskTitle: string): { slug: string; name: string } | null {
+  const titleLower = taskTitle.toLowerCase();
+  
+  // Check each template for a match
+  for (const template of TEMPLATES) {
+    const nameLower = template.name.toLowerCase();
+    const slugNormalized = template.slug.replace(/-/g, ' ');
+    
+    // Check for partial match
+    if (titleLower.includes(nameLower) || 
+        titleLower.includes(slugNormalized) ||
+        nameLower.includes(titleLower.substring(0, Math.min(20, titleLower.length)))) {
+      return { slug: template.slug, name: template.name };
+    }
+  }
+  
+  return null;
+}
 
 // Toast notification component
 function Toast({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) {
@@ -75,6 +97,9 @@ function TaskCard({
     hour: 'numeric',
     minute: '2-digit',
   });
+  
+  // Check if task title matches a report
+  const matchingReport = useMemo(() => findMatchingReport(task.title), [task.title]);
 
   return (
     <div
@@ -136,6 +161,21 @@ function TaskCard({
             <span>by {task.created_by || task.username || task.name || 'Unknown'}</span>
             {task.chat_title && <span className="hidden sm:inline">• {task.chat_title}</span>}
           </div>
+          
+          {/* Report link if matching */}
+          {matchingReport && (
+            <div className="mt-3">
+              <Link
+                href={`/reports/${matchingReport.slug}`}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-900/30 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-all"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Open {matchingReport.name}
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Actions */}
