@@ -6,7 +6,9 @@ import { TelegramMessage } from './taskTypes';
  * - @botname - task description
  * - @botname task description
  * - /task task description
+ * - /task@botname task description (group chat format)
  * - /todo task description
+ * - /todo@botname task description (group chat format)
  */
 export function parseTaskFromMessage(
   message: TelegramMessage,
@@ -21,11 +23,15 @@ export function parseTaskFromMessage(
     return null;
   }
 
-  // Command format: /task or /todo
-  if (text.startsWith('/task ') || text.startsWith('/todo ')) {
-    const parts = text.split(' ');
-    const description = parts.slice(1).join(' ').trim();
-    return description || null;
+  // Command format: /task or /todo (also handles /task@botname format in groups)
+  const taskCommandMatch = text.match(/^\/task(?:@[\w-]+)?\s+(.+)/i);
+  if (taskCommandMatch) {
+    return taskCommandMatch[1].trim() || null;
+  }
+  
+  const todoCommandMatch = text.match(/^\/todo(?:@[\w-]+)?\s+(.+)/i);
+  if (todoCommandMatch) {
+    return todoCommandMatch[1].trim() || null;
   }
 
   // Mention format: @botname - task or @botname task
@@ -57,8 +63,9 @@ export function shouldReply(
 
   const text = message.text.trim();
 
-  // Always reply to commands
-  if (text.startsWith('/task ') || text.startsWith('/todo ')) {
+  // Always reply to commands (handles /task and /task@botname formats)
+  const commandPattern = /^\/(?:task|todo)(?:@[\w-]+)?\s+.+/i;
+  if (commandPattern.test(text)) {
     return true;
   }
 
