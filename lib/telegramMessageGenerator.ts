@@ -20,16 +20,32 @@ export interface TelegramMessageResult {
 }
 
 /**
+ * Escape HTML special characters to prevent XSS
+ */
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/**
  * Convert MarkdownV2 escaped text to human-readable preview HTML
  * - Removes escape backslashes
  * - Converts *bold* to <strong>bold</strong>
  * - Converts _italic_ to <em>italic</em>
  * - Preserves emojis and line breaks
+ * - Sanitizes output to prevent XSS
  */
 export function telegramToPreviewHtml(telegramText: string): string {
-  // First, remove all backslash escapes (for display)
+  // First, escape HTML to prevent XSS
+  let preview = escapeHtml(telegramText);
+  
+  // Remove all backslash escapes (for display)
   // This handles all MarkdownV2 special characters that might be escaped
-  let preview = telegramText.replace(/\\([_*\[\]()~`>#+\-=|{}.!\\/])/g, '$1');
+  preview = preview.replace(/\\([_*\[\]()~`>#+\-=|{}.!\\/])/g, '$1');
   
   // Convert *bold* to <strong>bold</strong>
   // Match *text* but not escaped \*

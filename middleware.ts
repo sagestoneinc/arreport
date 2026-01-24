@@ -56,7 +56,7 @@ export function middleware(request: NextRequest) {
   // For API routes under protected paths, return 401 if not authenticated
   if (pathname.startsWith('/api') && !pathname.startsWith('/api/auth')) {
     const isProtectedApi = PROTECTED_ROUTES.some(route => 
-      pathname.startsWith(`/api${route.replace('/', '/')}`)
+      pathname.startsWith(`/api${route}`)
     );
     
     if (isProtectedApi && !sessionId) {

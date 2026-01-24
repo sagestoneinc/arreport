@@ -1,6 +1,15 @@
 /**
  * Simple session-based authentication
  * Uses environment variables for user credentials (simple, ops-friendly)
+ * 
+ * Dependencies:
+ * - uuid: For generating secure session IDs (already in package.json)
+ * 
+ * Note: This implementation uses in-memory session storage for simplicity.
+ * For production deployments with multiple instances, consider:
+ * - Redis for session storage
+ * - Database-backed sessions
+ * - JWT tokens (stateless)
  */
 
 import { User, Session, AuthResponse } from './types';
@@ -9,7 +18,9 @@ import { v4 as uuidv4 } from 'uuid';
 // Session duration: 24 hours
 const SESSION_DURATION_MS = 24 * 60 * 60 * 1000;
 
-// In-memory session store (for simplicity; in production, use Redis or database)
+// In-memory session store
+// Note: Sessions are lost on server restart and don't scale across instances.
+// For production multi-instance deployments, implement persistent storage.
 const sessions = new Map<string, Session>();
 
 /**
