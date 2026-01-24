@@ -47,33 +47,57 @@ function formatDate(dateStr: string): string {
 
 export function formatBatchReruns(data: BatchRerunsData): string {
   // Compute approval percentages if needed
-  const uscaVisaAppr = data.usca_visa_appr || computeApprovalRate(data.usca_visa_approvals, data.usca_visa_txns);
-  const uscaMcAppr = data.usca_mc_appr || computeApprovalRate(data.usca_mc_approvals, data.usca_mc_txns);
-  const uscaApproval = data.usca_approval || computeApprovalRate(
-    data.usca_visa_approvals + data.usca_mc_approvals,
-    data.usca_visa_txns + data.usca_mc_txns
-  );
+  const uscaVisaAppr =
+    data.usca_visa_appr || computeApprovalRate(data.usca_visa_approvals, data.usca_visa_txns);
+  const uscaMcAppr =
+    data.usca_mc_appr || computeApprovalRate(data.usca_mc_approvals, data.usca_mc_txns);
+  const uscaApproval =
+    data.usca_approval ||
+    computeApprovalRate(
+      data.usca_visa_approvals + data.usca_mc_approvals,
+      data.usca_visa_txns + data.usca_mc_txns
+    );
 
-  const otherVisaAppr = data.other_visa_appr || computeApprovalRate(data.other_visa_approvals, data.other_visa_txns);
-  const otherMcAppr = data.other_mc_appr || computeApprovalRate(data.other_mc_approvals, data.other_mc_txns);
-  const otherApproval = data.other_approval || computeApprovalRate(
-    data.other_visa_approvals + data.other_mc_approvals,
-    data.other_visa_txns + data.other_mc_txns
-  );
+  const otherVisaAppr =
+    data.other_visa_appr || computeApprovalRate(data.other_visa_approvals, data.other_visa_txns);
+  const otherMcAppr =
+    data.other_mc_appr || computeApprovalRate(data.other_mc_approvals, data.other_mc_txns);
+  const otherApproval =
+    data.other_approval ||
+    computeApprovalRate(
+      data.other_visa_approvals + data.other_mc_approvals,
+      data.other_visa_txns + data.other_mc_txns
+    );
 
   const lines: string[] = [];
-  
+
   lines.push(`Daily Batch Re-runs Summary: ${formatDate(data.date)}`);
   lines.push('');
-  lines.push(`I re-ran ${data.usca_reruns} US/CA declines from yesterday to Revolv3 and got ${data.usca_sales} sales (${uscaApproval.toFixed(2)}% approval).`);
-  lines.push(`- Visa: ${uscaVisaAppr.toFixed(2)}% (${data.usca_visa_approvals} approvals, ${data.usca_visa_txns} txns)`);
-  lines.push(`- MC: ${uscaMcAppr.toFixed(2)}% (${data.usca_mc_approvals} approvals, ${data.usca_mc_txns} txns)`);
-  lines.push(`Common Declines: ${data.usca_decline1_reason} (${data.usca_decline1_count}), ${data.usca_decline2_reason} (${data.usca_decline2_count}), ${data.usca_decline3_reason} (${data.usca_decline3_count})`);
+  lines.push(
+    `I re-ran ${data.usca_reruns} US/CA declines from yesterday to Revolv3 and got ${data.usca_sales} sales (${uscaApproval.toFixed(2)}% approval).`
+  );
+  lines.push(
+    `- Visa: ${uscaVisaAppr.toFixed(2)}% (${data.usca_visa_approvals} approvals, ${data.usca_visa_txns} txns)`
+  );
+  lines.push(
+    `- MC: ${uscaMcAppr.toFixed(2)}% (${data.usca_mc_approvals} approvals, ${data.usca_mc_txns} txns)`
+  );
+  lines.push(
+    `Common Declines: ${data.usca_decline1_reason} (${data.usca_decline1_count}), ${data.usca_decline2_reason} (${data.usca_decline2_count}), ${data.usca_decline3_reason} (${data.usca_decline3_count})`
+  );
   lines.push('');
-  lines.push(`I re-ran ${data.other_reruns} declines (all other geos) to Quantum and got ${data.other_sales} sales (${otherApproval.toFixed(2)}% approval).`);
-  lines.push(`- Visa: ${otherVisaAppr.toFixed(2)}% (${data.other_visa_approvals} approvals, ${data.other_visa_txns} txns)`);
-  lines.push(`- MC: ${otherMcAppr.toFixed(2)}% (${data.other_mc_approvals} approvals, ${data.other_mc_txns} txns)`);
-  lines.push(`Common Declines: ${data.other_decline1_reason} (${data.other_decline1_count}), ${data.other_decline2_reason} (${data.other_decline2_count}), ${data.other_decline3_reason} (${data.other_decline3_count})`);
+  lines.push(
+    `I re-ran ${data.other_reruns} declines (all other geos) to Quantum and got ${data.other_sales} sales (${otherApproval.toFixed(2)}% approval).`
+  );
+  lines.push(
+    `- Visa: ${otherVisaAppr.toFixed(2)}% (${data.other_visa_approvals} approvals, ${data.other_visa_txns} txns)`
+  );
+  lines.push(
+    `- MC: ${otherMcAppr.toFixed(2)}% (${data.other_mc_approvals} approvals, ${data.other_mc_txns} txns)`
+  );
+  lines.push(
+    `Common Declines: ${data.other_decline1_reason} (${data.other_decline1_count}), ${data.other_decline2_reason} (${data.other_decline2_count}), ${data.other_decline3_reason} (${data.other_decline3_count})`
+  );
 
   return lines.join('\n');
 }

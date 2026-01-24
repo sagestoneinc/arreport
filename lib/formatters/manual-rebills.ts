@@ -34,19 +34,24 @@ export function formatManualRebills(data: ManualRebillsData): string {
   // Compute approval percentages if needed
   const visaAppr = data.visa_appr || computeApprovalRate(data.visa_approvals, data.visa_txns);
   const mcAppr = data.mc_appr || computeApprovalRate(data.mc_approvals, data.mc_txns);
-  const rebillsApproval = data.rebills_approval || computeApprovalRate(
-    data.visa_approvals + data.mc_approvals,
-    data.visa_txns + data.mc_txns
-  );
+  const rebillsApproval =
+    data.rebills_approval ||
+    computeApprovalRate(data.visa_approvals + data.mc_approvals, data.visa_txns + data.mc_txns);
 
   const lines: string[] = [];
-  
+
   lines.push(`Re-Bills Summary: ${formatDate(data.date)}`);
   lines.push('');
-  lines.push(`I re-ran ${data.rebills_reruns} rebills declines from yesterday to PayCafe and got ${data.rebills_sales} sales (${rebillsApproval.toFixed(2)}% approval).`);
-  lines.push(`- Visa: ${visaAppr.toFixed(2)}% (${data.visa_approvals} approvals, ${data.visa_txns} txns)`);
+  lines.push(
+    `I re-ran ${data.rebills_reruns} rebills declines from yesterday to PayCafe and got ${data.rebills_sales} sales (${rebillsApproval.toFixed(2)}% approval).`
+  );
+  lines.push(
+    `- Visa: ${visaAppr.toFixed(2)}% (${data.visa_approvals} approvals, ${data.visa_txns} txns)`
+  );
   lines.push(`- MC: ${mcAppr.toFixed(2)}% (${data.mc_approvals} approvals, ${data.mc_txns} txns)`);
-  lines.push(`Common Declines: ${data.decline1_reason} (${data.decline1_count}), ${data.decline2_reason} (${data.decline2_count}), ${data.decline3_reason} (${data.decline3_count})`);
+  lines.push(
+    `Common Declines: ${data.decline1_reason} (${data.decline1_count}), ${data.decline2_reason} (${data.decline2_count}), ${data.decline3_reason} (${data.decline3_count})`
+  );
 
   return lines.join('\n');
 }

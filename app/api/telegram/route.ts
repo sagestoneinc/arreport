@@ -19,7 +19,11 @@ export async function POST(request: NextRequest) {
 
     if (!botToken || !chatId) {
       return NextResponse.json(
-        { ok: false, error: 'Telegram configuration missing. Please set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID environment variables.' },
+        {
+          ok: false,
+          error:
+            'Telegram configuration missing. Please set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID environment variables.',
+        },
         { status: 500 }
       );
     }
@@ -50,9 +54,6 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error('Telegram API error:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

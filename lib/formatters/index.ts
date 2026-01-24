@@ -1,19 +1,7 @@
-import { 
-  formatBatchReruns, 
-  BatchRerunsData 
-} from './batch-reruns';
-import { 
-  formatManualRebills, 
-  ManualRebillsData 
-} from './manual-rebills';
-import { 
-  formatMintAdditionalSales, 
-  MintAdditionalSalesData 
-} from './mint-additional-sales';
-import { 
-  formatHourlyApprovalRate, 
-  HourlyApprovalRateData 
-} from './hourly-approval-rate';
+import { formatBatchReruns, BatchRerunsData } from './batch-reruns';
+import { formatManualRebills, ManualRebillsData } from './manual-rebills';
+import { formatMintAdditionalSales, MintAdditionalSalesData } from './mint-additional-sales';
+import { formatHourlyApprovalRate, HourlyApprovalRateData } from './hourly-approval-rate';
 
 export type FormDataType = Record<string, string | number>;
 

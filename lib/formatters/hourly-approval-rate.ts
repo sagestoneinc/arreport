@@ -17,7 +17,7 @@ function formatDate(dateStr: string): string {
 
 export function formatHourlyApprovalRate(data: HourlyApprovalRateData): string {
   const lines: string[] = [];
-  
+
   lines.push('HOURLY MID OPS REPORT');
   lines.push('');
   lines.push(`Date: ${formatDate(data.date)}`);

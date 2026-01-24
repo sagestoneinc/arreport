@@ -63,9 +63,7 @@ export default function ReportForm({ fields, formData, onChange, onGenerate }: R
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           )}
-          {field.helpText && (
-            <p className="text-xs text-gray-500">{field.helpText}</p>
-          )}
+          {field.helpText && <p className="text-xs text-gray-500">{field.helpText}</p>}
         </div>
       ))}
       <button

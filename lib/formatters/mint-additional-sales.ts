@@ -6,8 +6,10 @@ export interface MintAdditionalSalesData {
 
 export function formatMintAdditionalSales(data: MintAdditionalSalesData): string {
   const lines: string[] = [];
-  
-  lines.push(`Hey guys, we re-ran yesterday's declines and got an additional ${data.additional_sales} sales for you:`);
+
+  lines.push(
+    `Hey guys, we re-ran yesterday's declines and got an additional ${data.additional_sales} sales for you:`
+  );
   lines.push(data.affiliate_lines);
   lines.push('');
   lines.push(`c1 & c3's:`);

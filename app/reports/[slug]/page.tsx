@@ -14,9 +14,9 @@ const STORAGE_KEY_PREFIX = 'ar-report-';
 export default function ReportBuilderPage() {
   const params = useParams();
   const slug = params.slug as string;
-  
+
   const template = getTemplateBySlug(slug);
-  
+
   const [formData, setFormData] = useState<Record<string, string | number>>({});
   const [generatedMessage, setGeneratedMessage] = useState('');
   const [isClient, setIsClient] = useState(false);
@@ -24,9 +24,9 @@ export default function ReportBuilderPage() {
   // Initialize form data with defaults
   useEffect(() => {
     if (!template) return;
-    
+
     setIsClient(true);
-    
+
     // Try to load from localStorage
     const savedData = localStorage.getItem(STORAGE_KEY_PREFIX + slug);
     if (savedData) {
@@ -97,12 +97,7 @@ export default function ReportBuilderPage() {
             href="/"
             className="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold"
           >
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

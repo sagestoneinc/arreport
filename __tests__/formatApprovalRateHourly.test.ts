@@ -58,9 +58,7 @@ describe('formatApprovalRateHourly', () => {
         declines: 0,
       },
       visaMids: [],
-      mcMids: [
-        { id: 'mc-1', name: 'PAY-REV_346_RapidHealthScreen_0147', sales: 12, declines: 6 },
-      ],
+      mcMids: [{ id: 'mc-1', name: 'PAY-REV_346_RapidHealthScreen_0147', sales: 12, declines: 6 }],
       notes: 'Test note',
     };
 
@@ -93,7 +91,7 @@ describe('formatApprovalRateHourly', () => {
     expect(output).toContain('Date: 1/23/2026');
     expect(output).toContain('Insights & Actions:');
     expect(output).toContain('No MIDs to report');
-    
+
     // Should not have MID section headers when empty
     expect(output).not.toContain('Master Card - Active PAY REV MIDs');
     expect(output).not.toContain('VISA - Active CS MIDs');

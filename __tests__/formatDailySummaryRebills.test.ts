@@ -15,7 +15,8 @@ describe('formatDailySummaryRebills', () => {
       },
       visaMids: [],
       mcMids: [],
-      notes: 'I re-ran 541 rebills declines from yesterday to PayCafe and got 77 sales (14.2% approval).\n\nVisa: 16.9% (48 approvals, 284 txns)\nMC: 11.3% (29 approvals, 257 txns)\nCommon Declines: Do Not Honor (34.9%)',
+      notes:
+        'I re-ran 541 rebills declines from yesterday to PayCafe and got 77 sales (14.2% approval).\n\nVisa: 16.9% (48 approvals, 284 txns)\nMC: 11.3% (29 approvals, 257 txns)\nCommon Declines: Do Not Honor (34.9%)',
     };
 
     const output = formatDailySummaryRebills(state);
@@ -24,7 +25,9 @@ describe('formatDailySummaryRebills', () => {
     expect(output).toContain('Re-Bills Summary: 2026-01-21');
 
     // Check content
-    expect(output).toContain('I re-ran 541 rebills declines from yesterday to PayCafe and got 77 sales (14.2% approval).');
+    expect(output).toContain(
+      'I re-ran 541 rebills declines from yesterday to PayCafe and got 77 sales (14.2% approval).'
+    );
     expect(output).toContain('Visa: 16.9% (48 approvals, 284 txns)');
     expect(output).toContain('MC: 11.3% (29 approvals, 257 txns)');
     expect(output).toContain('Common Declines: Do Not Honor (34.9%)');

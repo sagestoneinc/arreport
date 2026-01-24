@@ -10,7 +10,13 @@ export interface Summary {
   declines: number;
 }
 
-export type TemplateType = 'template-a' | 'template-b' | 'approval-rate-hourly' | 'daily-batch-reruns' | 'daily-summary-rebills' | 'mint-additional-sales';
+export type TemplateType =
+  | 'template-a'
+  | 'template-b'
+  | 'approval-rate-hourly'
+  | 'daily-batch-reruns'
+  | 'daily-summary-rebills'
+  | 'mint-additional-sales';
 
 export interface AppState {
   templateType: TemplateType;

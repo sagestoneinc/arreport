@@ -7,7 +7,7 @@ import { AppState } from './types';
  * MID: count
  * MID: count
  * ...
- * 
+ *
  * c1 & c3's:
  * MID - transaction_id
  * MID - transaction_id
