@@ -85,7 +85,12 @@ async function setupMysql() {
   console.log('🔌 Connecting to MySQL...');
   console.log(`   Host: ${host}`);
   console.log(`   Port: ${port}`);
+  console.log(`   User: ${user}`);
   console.log(`   Database: ${database}`);
+
+  if (!password) {
+    console.log('⚠️  Warning: No MySQL password set. This may be insecure in production.');
+  }
 
   const connection = await mysql.createConnection({
     host,
