@@ -63,21 +63,21 @@ export function formatBatchReruns(data: BatchRerunsData, mode: FormatMode = 'tel
     data.usca_visa_appr || computeApprovalRate(data.usca_visa_approvals, data.usca_visa_txns);
   const uscaMcAppr =
     data.usca_mc_appr || computeApprovalRate(data.usca_mc_approvals, data.usca_mc_txns);
-  
+
   // Use computed approval rate (sales/reruns) instead of card-network based calculation
-  const uscaApproval = data.usca_reruns > 0
-    ? (((data.usca_sales || 0) / data.usca_reruns) * 100).toFixed(2)
-    : '0.00';
+  const uscaApproval =
+    data.usca_reruns > 0 ? (((data.usca_sales || 0) / data.usca_reruns) * 100).toFixed(2) : '0.00';
 
   const otherVisaAppr =
     data.other_visa_appr || computeApprovalRate(data.other_visa_approvals, data.other_visa_txns);
   const otherMcAppr =
     data.other_mc_appr || computeApprovalRate(data.other_mc_approvals, data.other_mc_txns);
-  
+
   // Use computed approval rate (sales/reruns) instead of card-network based calculation
-  const otherApproval = data.other_reruns > 0
-    ? (((data.other_sales || 0) / data.other_reruns) * 100).toFixed(2)
-    : '0.00';
+  const otherApproval =
+    data.other_reruns > 0
+      ? (((data.other_sales || 0) / data.other_reruns) * 100).toFixed(2)
+      : '0.00';
 
   // Compute decline shares
   const uscaDecline1Share = computeShare(data.usca_decline1_count, data.usca_reruns);
@@ -92,79 +92,81 @@ export function formatBatchReruns(data: BatchRerunsData, mode: FormatMode = 'tel
   const dateFormatted = formatDateForReport(data.date);
 
   // Title with emoji and bold
-  lines.push(formatTitle(EMOJI.REPORT_SUMMARY, `Daily Batch Re-runs Summary — ${dateFormatted}`, mode));
+  lines.push(
+    formatTitle(EMOJI.REPORT_SUMMARY, `Daily Batch Re-runs Summary — ${dateFormatted}`, mode)
+  );
   lines.push('');
 
   // US/CA Section
   lines.push(formatSectionHeader(EMOJI.US_FLAG, 'US/CA Declines → Revolv3', mode));
-  lines.push(
-    escapeIfNeeded(`- Re-runs: ${data.usca_reruns}`, mode)
-  );
-  lines.push(
-    escapeIfNeeded(`- Sales: ${data.usca_sales}`, mode)
-  );
-  lines.push(
-    escapeIfNeeded(`- Approval Rate: ${uscaApproval}%`, mode)
-  );
+  lines.push(escapeIfNeeded(`- Re-runs: ${data.usca_reruns}`, mode));
+  lines.push(escapeIfNeeded(`- Sales: ${data.usca_sales}`, mode));
+  lines.push(escapeIfNeeded(`- Approval Rate: ${uscaApproval}%`, mode));
   lines.push('');
 
   // Card network breakdown for US/CA
   lines.push(
-    escapeIfNeeded(`${EMOJI.CARD_NETWORK} Visa — ${data.usca_visa_approvals} approvals / ${data.usca_visa_txns} txns (${uscaVisaAppr.toFixed(2)}%)`, mode)
+    escapeIfNeeded(
+      `${EMOJI.CARD_NETWORK} Visa — ${data.usca_visa_approvals} approvals / ${data.usca_visa_txns} txns (${uscaVisaAppr.toFixed(2)}%)`,
+      mode
+    )
   );
   lines.push(
-    escapeIfNeeded(`${EMOJI.CARD_NETWORK} MC — ${data.usca_mc_approvals} approvals / ${data.usca_mc_txns} txns (${uscaMcAppr.toFixed(2)}%)`, mode)
+    escapeIfNeeded(
+      `${EMOJI.CARD_NETWORK} MC — ${data.usca_mc_approvals} approvals / ${data.usca_mc_txns} txns (${uscaMcAppr.toFixed(2)}%)`,
+      mode
+    )
   );
-  
+
   // Format Common Declines with shares for US/CA
   const uscaDeclines = [
     formatDeclineWithShare(data.usca_decline1_reason, uscaDecline1Share),
     formatDeclineWithShare(data.usca_decline2_reason, uscaDecline2Share),
     formatDeclineWithShare(data.usca_decline3_reason, uscaDecline3Share),
-  ].filter(d => d !== '');
-  
+  ].filter((d) => d !== '');
+
   if (uscaDeclines.length > 0) {
     lines.push('');
     lines.push(formatSectionHeader(EMOJI.DECLINES, 'Common Declines', mode));
-    uscaDeclines.forEach(decline => {
+    uscaDeclines.forEach((decline) => {
       lines.push(escapeIfNeeded(`- ${decline}`, mode));
     });
   }
-  
+
   lines.push('');
 
   // Other Geos Section
   lines.push(formatSectionHeader(EMOJI.GLOBE, 'All Other Geos → Quantum', mode));
-  lines.push(
-    escapeIfNeeded(`- Re-runs: ${data.other_reruns}`, mode)
-  );
-  lines.push(
-    escapeIfNeeded(`- Sales: ${data.other_sales}`, mode)
-  );
-  lines.push(
-    escapeIfNeeded(`- Approval Rate: ${otherApproval}%`, mode)
-  );
+  lines.push(escapeIfNeeded(`- Re-runs: ${data.other_reruns}`, mode));
+  lines.push(escapeIfNeeded(`- Sales: ${data.other_sales}`, mode));
+  lines.push(escapeIfNeeded(`- Approval Rate: ${otherApproval}%`, mode));
   lines.push('');
 
   // Card network breakdown for Other Geos
   lines.push(
-    escapeIfNeeded(`${EMOJI.CARD_NETWORK} Visa — ${data.other_visa_approvals} approvals / ${data.other_visa_txns} txns (${otherVisaAppr.toFixed(2)}%)`, mode)
+    escapeIfNeeded(
+      `${EMOJI.CARD_NETWORK} Visa — ${data.other_visa_approvals} approvals / ${data.other_visa_txns} txns (${otherVisaAppr.toFixed(2)}%)`,
+      mode
+    )
   );
   lines.push(
-    escapeIfNeeded(`${EMOJI.CARD_NETWORK} MC — ${data.other_mc_approvals} approvals / ${data.other_mc_txns} txns (${otherMcAppr.toFixed(2)}%)`, mode)
+    escapeIfNeeded(
+      `${EMOJI.CARD_NETWORK} MC — ${data.other_mc_approvals} approvals / ${data.other_mc_txns} txns (${otherMcAppr.toFixed(2)}%)`,
+      mode
+    )
   );
-  
+
   // Format Common Declines with shares for Other Geos
   const otherDeclines = [
     formatDeclineWithShare(data.other_decline1_reason, otherDecline1Share),
     formatDeclineWithShare(data.other_decline2_reason, otherDecline2Share),
     formatDeclineWithShare(data.other_decline3_reason, otherDecline3Share),
-  ].filter(d => d !== '');
-  
+  ].filter((d) => d !== '');
+
   if (otherDeclines.length > 0) {
     lines.push('');
     lines.push(formatSectionHeader(EMOJI.DECLINES, 'Common Declines', mode));
-    otherDeclines.forEach(decline => {
+    otherDeclines.forEach((decline) => {
       lines.push(escapeIfNeeded(`- ${decline}`, mode));
     });
   }

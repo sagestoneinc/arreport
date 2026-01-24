@@ -157,7 +157,10 @@ export default function BatchRerunsForm({ formData, onChange, onGenerate }: Batc
   ) => {
     return (
       <div className="space-y-1">
-        <label htmlFor={name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          htmlFor={name}
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
@@ -187,7 +190,7 @@ export default function BatchRerunsForm({ formData, onChange, onGenerate }: Batc
         <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
           US/CA Declines → Revolv3
         </h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {/* Summary Section */}
           {renderInputField('usca_reruns', 'US/CA Re-runs', 'number', true)}
@@ -236,7 +239,7 @@ export default function BatchRerunsForm({ formData, onChange, onGenerate }: Batc
         <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
           All Other Geos → Quantum
         </h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {/* Summary Section */}
           {renderInputField('other_reruns', 'Other Geos Re-runs', 'number', true)}
@@ -256,7 +259,9 @@ export default function BatchRerunsForm({ formData, onChange, onGenerate }: Batc
 
         {/* Common Declines Section */}
         <div className="mt-6">
-          <h4 className="text-md font-semibold text-gray-900 dark:text-gray-100 mb-3">Common Declines</h4>
+          <h4 className="text-md font-semibold text-gray-900 dark:text-gray-100 mb-3">
+            Common Declines
+          </h4>
           <div className="space-y-3">
             {/* Decline 1 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

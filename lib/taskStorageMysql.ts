@@ -53,14 +53,14 @@ export class MySQLTaskStorage implements ITaskStorage {
 
     try {
       this.pool = mysql.createPool(config);
-      
+
       // Test the connection by executing a simple query
       console.log('[MySQL] Testing database connection...');
       const connection = await this.pool.getConnection();
       await connection.ping();
       connection.release();
       console.log('[MySQL] Connection test successful');
-      
+
       await this.initSchema();
       console.log('[MySQL] Database initialized successfully');
     } catch (error: unknown) {
@@ -71,7 +71,7 @@ export class MySQLTaskStorage implements ITaskStorage {
         errno: err.errno,
         sqlState: err.sqlState,
       });
-      
+
       // Clean up the pool if initialization failed
       if (this.pool) {
         await this.pool.end().catch((cleanupError) => {
@@ -80,7 +80,7 @@ export class MySQLTaskStorage implements ITaskStorage {
         });
         this.pool = null;
       }
-      
+
       throw new Error(`MySQL initialization failed: ${err.message}`);
     }
   }
@@ -88,7 +88,9 @@ export class MySQLTaskStorage implements ITaskStorage {
   private async getPool(): Promise<mysql.Pool> {
     await this.initialize();
     if (!this.pool) {
-      throw new Error('Database pool not initialized. This indicates a bug in the initialization logic.');
+      throw new Error(
+        'Database pool not initialized. This indicates a bug in the initialization logic.'
+      );
     }
     return this.pool;
   }
@@ -97,7 +99,7 @@ export class MySQLTaskStorage implements ITaskStorage {
     if (!this.pool) {
       throw new Error('Pool not initialized');
     }
-    
+
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS tasks (
         id VARCHAR(36) PRIMARY KEY,
@@ -135,7 +137,7 @@ export class MySQLTaskStorage implements ITaskStorage {
 
   async saveTask(task: Omit<Task, 'id' | 'created_at' | 'status'>): Promise<Task> {
     const pool = await this.getPool();
-    
+
     const id = randomUUID();
     const created_at = new Date().toISOString();
     const status = 'open';
@@ -158,7 +160,7 @@ export class MySQLTaskStorage implements ITaskStorage {
       task.name || null,
       task.description,
       status,
-      task.raw_text
+      task.raw_text,
     ]);
 
     return {
@@ -169,9 +171,14 @@ export class MySQLTaskStorage implements ITaskStorage {
     };
   }
 
-  async updateTask(chatId: string, messageId: number, description: string, rawText: string): Promise<void> {
+  async updateTask(
+    chatId: string,
+    messageId: number,
+    description: string,
+    rawText: string
+  ): Promise<void> {
     const pool = await this.getPool();
-    
+
     const query = `
       UPDATE tasks 
       SET description = ?, raw_text = ?
@@ -183,7 +190,7 @@ export class MySQLTaskStorage implements ITaskStorage {
 
   async taskExists(chatId: string, messageId: number): Promise<boolean> {
     const pool = await this.getPool();
-    
+
     const query = `
       SELECT COUNT(*) as count 
       FROM tasks 
@@ -197,7 +204,7 @@ export class MySQLTaskStorage implements ITaskStorage {
 
   async getTasks(filter?: TaskFilter): Promise<Task[]> {
     const pool = await this.getPool();
-    
+
     let query = 'SELECT * FROM tasks WHERE 1=1';
     const params: (string | number)[] = [];
 
@@ -219,7 +226,7 @@ export class MySQLTaskStorage implements ITaskStorage {
 
   async getTaskById(id: string): Promise<Task | null> {
     const pool = await this.getPool();
-    
+
     const query = 'SELECT * FROM tasks WHERE id = ?';
     const [rows] = await pool.execute(query, [id]);
     const tasks = rows as Task[];
@@ -228,7 +235,7 @@ export class MySQLTaskStorage implements ITaskStorage {
 
   async updateTaskStatus(id: string, status: 'open' | 'done'): Promise<boolean> {
     const pool = await this.getPool();
-    
+
     const query = 'UPDATE tasks SET status = ? WHERE id = ?';
     const [result] = await pool.execute(query, [status, id]);
     const updateResult = result as mysql.ResultSetHeader;
@@ -237,7 +244,7 @@ export class MySQLTaskStorage implements ITaskStorage {
 
   async deleteTask(id: string): Promise<boolean> {
     const pool = await this.getPool();
-    
+
     const query = 'DELETE FROM tasks WHERE id = ?';
     const [result] = await pool.execute(query, [id]);
     const deleteResult = result as mysql.ResultSetHeader;

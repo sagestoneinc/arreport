@@ -53,7 +53,8 @@ export default function ReportBuilderPage() {
     if (!template) return;
     const defaults: Record<string, FormDataValue> = {};
     template.fields.forEach((field) => {
-      defaults[field.name] = field.defaultValue ?? (field.type === 'number' ? 0 : field.type === 'table' ? [] : '');
+      defaults[field.name] =
+        field.defaultValue ?? (field.type === 'number' ? 0 : field.type === 'table' ? [] : '');
     });
     setFormData(defaults);
   };
@@ -128,7 +129,12 @@ export default function ReportBuilderPage() {
           >
             Templates
           </Link>
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-4 h-4 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
           <span className="text-gray-900 dark:text-gray-100 font-medium">{template.name}</span>

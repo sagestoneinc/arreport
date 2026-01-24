@@ -13,23 +13,17 @@ export async function POST(request: NextRequest) {
 
     if (!expectedSecret) {
       console.error('TELEGRAM_WEBHOOK_SECRET not configured');
-      return NextResponse.json(
-        { ok: false, error: 'Webhook not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ ok: false, error: 'Webhook not configured' }, { status: 500 });
     }
 
     if (secretToken !== expectedSecret) {
       console.error('Invalid webhook secret token');
-      return NextResponse.json(
-        { ok: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     // Parse Telegram update
     const update: TelegramUpdate = await request.json();
-    
+
     // Handle both message and edited_message
     const message = update.message || update.edited_message;
     if (!message) {
@@ -65,7 +59,7 @@ export async function POST(request: NextRequest) {
     const messageId = message.message_id;
 
     try {
-      if (isEdited && await storage.taskExists(chatId, messageId)) {
+      if (isEdited && (await storage.taskExists(chatId, messageId))) {
         // Update existing task
         await storage.updateTask(chatId, messageId, taskDescription, message.text || '');
         console.log(`Updated task from message ${messageId} in chat ${chatId}`);
@@ -120,12 +114,12 @@ async function sendTelegramReply(
     const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
     const baseUrl = process.env.APP_BASE_URL;
     const tasksUrl = baseUrl ? `${baseUrl}/tasks` : null;
-    
+
     let replyText = `✅ Task saved: ${description}`;
     if (tasksUrl) {
       replyText += `\n\n📋 View all tasks: ${tasksUrl}`;
     }
-    
+
     const response = await fetch(telegramUrl, {
       method: 'POST',
       headers: {

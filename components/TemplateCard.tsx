@@ -36,18 +36,8 @@ export default function TemplateCard({ template }: TemplateCardProps) {
           </p>
         </div>
         <div className="ml-4 text-gray-400 dark:text-gray-500 group-hover:text-accent-500 dark:group-hover:text-accent-400 transition-all duration-200 group-hover:translate-x-1">
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </div>
       </div>

@@ -37,7 +37,7 @@ export function parseTaskFromMessage(
   if (taskCommandMatch) {
     return taskCommandMatch[1].trim() || null;
   }
-  
+
   const todoCommandMatch = text.match(/^\/todo(?:@[\w-]+)?\s+(.+)/i);
   if (todoCommandMatch) {
     return todoCommandMatch[1].trim() || null;
@@ -45,10 +45,7 @@ export function parseTaskFromMessage(
 
   // Mention format: @botname - task or @botname task
   if (botUsername) {
-    const mentionPattern = new RegExp(
-      `^@${botUsername}(?:\\s*-\\s*|\\s+)(.+)`,
-      'i'
-    );
+    const mentionPattern = new RegExp(`^@${botUsername}(?:\\s*-\\s*|\\s+)(.+)`, 'i');
     const match = text.match(mentionPattern);
     if (match && match[1]) {
       return match[1].trim() || null;
@@ -63,10 +60,7 @@ export function parseTaskFromMessage(
  * Only replies for /task, /todo commands, or mentions with explicit "-"
  * Does not reply to forwarded messages to avoid spam
  */
-export function shouldReply(
-  message: TelegramMessage,
-  botUsername?: string
-): boolean {
+export function shouldReply(message: TelegramMessage, botUsername?: string): boolean {
   // Don't reply to forwarded messages
   if (message.forward_from || message.forward_from_chat) {
     return false;
@@ -106,11 +100,9 @@ class RateLimiter {
   canProceed(chatId: string): boolean {
     const now = Date.now();
     const chatRecords = this.records.get(chatId) || [];
-    
+
     // Remove old records
-    const recentRecords = chatRecords.filter(
-      (timestamp) => now - timestamp < this.windowMs
-    );
+    const recentRecords = chatRecords.filter((timestamp) => now - timestamp < this.windowMs);
 
     if (recentRecords.length >= this.maxRequests) {
       return false;

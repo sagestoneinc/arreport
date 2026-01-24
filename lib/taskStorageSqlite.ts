@@ -48,7 +48,7 @@ export class SQLiteTaskStorage implements ITaskStorage {
 
   private initSchema(): void {
     const db = this.db!;
-    
+
     db.exec(`
       CREATE TABLE IF NOT EXISTS tasks (
         id TEXT PRIMARY KEY,
@@ -76,7 +76,7 @@ export class SQLiteTaskStorage implements ITaskStorage {
 
   async saveTask(task: Omit<Task, 'id' | 'created_at' | 'status'>): Promise<Task> {
     const db = this.getDb();
-    
+
     const id = randomUUID();
     const created_at = new Date().toISOString();
     const status = 'open';
@@ -110,9 +110,14 @@ export class SQLiteTaskStorage implements ITaskStorage {
     };
   }
 
-  async updateTask(chatId: string, messageId: number, description: string, rawText: string): Promise<void> {
+  async updateTask(
+    chatId: string,
+    messageId: number,
+    description: string,
+    rawText: string
+  ): Promise<void> {
     const db = this.getDb();
-    
+
     const stmt = db.prepare(`
       UPDATE tasks 
       SET description = ?, raw_text = ?
@@ -124,7 +129,7 @@ export class SQLiteTaskStorage implements ITaskStorage {
 
   async taskExists(chatId: string, messageId: number): Promise<boolean> {
     const db = this.getDb();
-    
+
     const stmt = db.prepare(`
       SELECT COUNT(*) as count 
       FROM tasks 
@@ -137,7 +142,7 @@ export class SQLiteTaskStorage implements ITaskStorage {
 
   async getTasks(filter?: TaskFilter): Promise<Task[]> {
     const db = this.getDb();
-    
+
     let query = 'SELECT * FROM tasks WHERE 1=1';
     const params: (string | number)[] = [];
 
@@ -159,7 +164,7 @@ export class SQLiteTaskStorage implements ITaskStorage {
 
   async getTaskById(id: string): Promise<Task | null> {
     const db = this.getDb();
-    
+
     const stmt = db.prepare('SELECT * FROM tasks WHERE id = ?');
     const result = stmt.get(id) as Task | undefined;
     return result || null;
@@ -167,7 +172,7 @@ export class SQLiteTaskStorage implements ITaskStorage {
 
   async updateTaskStatus(id: string, status: 'open' | 'done'): Promise<boolean> {
     const db = this.getDb();
-    
+
     const stmt = db.prepare('UPDATE tasks SET status = ? WHERE id = ?');
     const result = stmt.run(status, id);
     return result.changes > 0;
@@ -175,7 +180,7 @@ export class SQLiteTaskStorage implements ITaskStorage {
 
   async deleteTask(id: string): Promise<boolean> {
     const db = this.getDb();
-    
+
     const stmt = db.prepare('DELETE FROM tasks WHERE id = ?');
     const result = stmt.run(id);
     return result.changes > 0;

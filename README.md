@@ -436,6 +436,15 @@ The bot includes built-in rate limiting (5 requests per chat per minute) to prev
 - Check browser console for errors
 - Ensure API routes are accessible
 
+**Debug endpoint (`/api/debug-storage`):**
+- Use this endpoint to verify storage configuration and connectivity
+- In development: Available without authentication at `http://localhost:3000/api/debug-storage`
+- In production: Requires `DEBUG_API_KEY` environment variable to be set
+- Access with: `curl -H "Authorization: Bearer YOUR_KEY" https://your-app.com/api/debug-storage`
+- Or with query parameter: `https://your-app.com/api/debug-storage?key=YOUR_KEY`
+- Returns storage type, task count, and basic connectivity status
+- In production, sensitive configuration details are not exposed
+
 ### Security Considerations
 
 ✅ **Webhook Secret**: Always set `TELEGRAM_WEBHOOK_SECRET` to prevent unauthorized webhook calls
@@ -447,6 +456,8 @@ The bot includes built-in rate limiting (5 requests per chat per minute) to prev
 ✅ **Rate Limiting**: Built-in protection against spam and loops
 
 ⚠️ **Access Control**: The `/tasks` page is publicly accessible. Add authentication if needed.
+
+⚠️ **Debug Endpoint**: Set `DEBUG_API_KEY` to a strong random value if you need to access the debug endpoint in production. Keep this key secure and never commit it to version control.
 
 ## Deployment
 
@@ -462,6 +473,7 @@ The bot includes built-in rate limiting (5 requests per chat per minute) to prev
    - `APP_BASE_URL` (for Task Collector)
    - `BOT_USERNAME` (for Task Collector)
    - `TASKS_STORAGE` (optional, default: sqlite)
+   - `DEBUG_API_KEY` (optional, for production debug endpoint access)
 5. Deploy
 6. After deployment, run `node scripts/setup-webhook.js` to configure the Telegram webhook
 

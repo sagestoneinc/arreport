@@ -31,7 +31,7 @@ export default function TasksPage() {
 
       if (data.ok) {
         setTasks(data.tasks);
-        
+
         // Extract unique chats
         const uniqueChats = new Map<string, string>();
         data.tasks.forEach((task: Task) => {
@@ -39,10 +39,8 @@ export default function TasksPage() {
             uniqueChats.set(task.chat_id, task.chat_title || `Chat ${task.chat_id}`);
           }
         });
-        
-        setChats(
-          Array.from(uniqueChats.entries()).map(([id, title]) => ({ id, title }))
-        );
+
+        setChats(Array.from(uniqueChats.entries()).map(([id, title]) => ({ id, title })));
       }
     } catch (error) {
       console.error('Error fetching tasks:', error);
@@ -90,20 +88,16 @@ export default function TasksPage() {
 
   const exportOpenTasks = () => {
     const openTasks = tasks.filter((task) => task.status === 'open');
-    const text = openTasks
-      .map((task) => `- ${task.description}`)
-      .join('\n');
-    
+    const text = openTasks.map((task) => `- ${task.description}`).join('\n');
+
     navigator.clipboard.writeText(text);
     alert('Open tasks copied to clipboard!');
   };
 
   const downloadOpenTasks = () => {
     const openTasks = tasks.filter((task) => task.status === 'open');
-    const text = openTasks
-      .map((task) => `- ${task.description}`)
-      .join('\n');
-    
+    const text = openTasks.map((task) => `- ${task.description}`).join('\n');
+
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -250,11 +244,13 @@ export default function TasksPage() {
 
                     <div className="ml-9 space-y-1 text-sm text-gray-600 dark:text-gray-400">
                       <p>
-                        <span className="font-semibold">From:</span> {task.name || task.username || 'Unknown'}
+                        <span className="font-semibold">From:</span>{' '}
+                        {task.name || task.username || 'Unknown'}
                         {task.username && ` (@${task.username})`}
                       </p>
                       <p>
-                        <span className="font-semibold">Chat:</span> {task.chat_title || `Chat ${task.chat_id}`}
+                        <span className="font-semibold">Chat:</span>{' '}
+                        {task.chat_title || `Chat ${task.chat_id}`}
                       </p>
                       <p>
                         <span className="font-semibold">Created:</span>{' '}
@@ -268,12 +264,7 @@ export default function TasksPage() {
                     className="ml-4 p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-150"
                     title="Delete task"
                   >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
