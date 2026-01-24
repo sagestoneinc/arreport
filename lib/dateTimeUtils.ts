@@ -7,7 +7,7 @@ export function formatDate(dateISO: string): string {
 }
 
 /**
- * Format date from YYYY-MM-DD to MM/DD/YYYY (with zero-padding)
+ * Format date from YYYY-MM-DD to MM/DD/YYYY (preserves zero-padding from ISO format)
  */
 export function formatDatePadded(dateISO: string): string {
   const [year, month, day] = dateISO.split('-');
