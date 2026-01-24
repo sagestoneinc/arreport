@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
     }
 
     const storage = getTaskStorage();
+    await storage.initialize();
     const tasks = await storage.getTasks(filter);
 
     return NextResponse.json({ ok: true, tasks });

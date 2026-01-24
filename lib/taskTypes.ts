@@ -37,6 +37,21 @@ export interface TelegramMessage {
     offset: number;
     length: number;
   }>;
+  // Forwarded message fields
+  forward_from?: {
+    id: number;
+    username?: string;
+    first_name?: string;
+    last_name?: string;
+  };
+  forward_from_chat?: {
+    id: number;
+    type: string;
+    title?: string;
+    username?: string;
+  };
+  forward_from_message_id?: number;
+  forward_date?: number;
 }
 
 export interface TelegramUpdate {

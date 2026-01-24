@@ -20,6 +20,7 @@ export async function PATCH(
     }
 
     const storage = getTaskStorage();
+    await storage.initialize();
     const success = await storage.updateTaskStatus(id, status);
 
     if (!success) {
@@ -48,6 +49,7 @@ export async function DELETE(
     const { id } = params;
 
     const storage = getTaskStorage();
+    await storage.initialize();
     const success = await storage.deleteTask(id);
 
     if (!success) {

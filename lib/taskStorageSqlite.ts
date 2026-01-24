@@ -7,9 +7,18 @@ import { ITaskStorage } from './taskStorageInterface';
 export class SQLiteTaskStorage implements ITaskStorage {
   private db: Database.Database | null = null;
   private useMemory: boolean;
+  private initialized: boolean = false;
 
   constructor(useMemory: boolean = false) {
     this.useMemory = useMemory;
+  }
+
+  async initialize(): Promise<void> {
+    if (this.initialized) {
+      return;
+    }
+    this.getDb();
+    this.initialized = true;
   }
 
   private getDb(): Database.Database {

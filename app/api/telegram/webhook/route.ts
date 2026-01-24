@@ -43,6 +43,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
+    // Initialize storage and ensure schema is created
+    const storage = getTaskStorage();
+    await storage.initialize();
+
     // Parse task from message
     const botUsername = process.env.BOT_USERNAME;
     const taskDescription = parseTaskFromMessage(message, botUsername);
@@ -52,7 +56,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Save or update task
-    const storage = getTaskStorage();
     const isEdited = !!update.edited_message;
     const messageId = message.message_id;
 

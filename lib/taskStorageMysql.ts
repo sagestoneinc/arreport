@@ -4,11 +4,21 @@ import { ITaskStorage } from './taskStorageInterface';
 
 export class MySQLTaskStorage implements ITaskStorage {
   private pool: mysql.Pool | null = null;
-  private schemaInitialized: boolean = false;
+  private initializationPromise: Promise<void> | null = null;
 
-  private async getPool(): Promise<mysql.Pool> {
+  async initialize(): Promise<void> {
+    // Use a single initialization promise to prevent race conditions
+    if (this.initializationPromise) {
+      return this.initializationPromise;
+    }
+
+    this.initializationPromise = this.doInitialize();
+    return this.initializationPromise;
+  }
+
+  private async doInitialize(): Promise<void> {
     if (this.pool) {
-      return this.pool;
+      return;
     }
 
     const config = {
@@ -23,14 +33,12 @@ export class MySQLTaskStorage implements ITaskStorage {
     };
 
     this.pool = mysql.createPool(config);
-    
-    // Initialize schema only once
-    if (!this.schemaInitialized) {
-      await this.initSchema();
-      this.schemaInitialized = true;
-    }
-    
-    return this.pool;
+    await this.initSchema();
+  }
+
+  private async getPool(): Promise<mysql.Pool> {
+    await this.initialize();
+    return this.pool!;
   }
 
   private async initSchema(): Promise<void> {
@@ -176,7 +184,7 @@ export class MySQLTaskStorage implements ITaskStorage {
     if (this.pool) {
       await this.pool.end();
       this.pool = null;
-      this.schemaInitialized = false;
+      this.initializationPromise = null;
     }
   }
 }
