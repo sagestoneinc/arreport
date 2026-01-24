@@ -1,3 +1,5 @@
+import { computeApprovalRate, formatShare } from '../calc';
+
 export interface ManualRebillsData {
   date: string;
   rebills_reruns: number;
@@ -18,23 +20,12 @@ export interface ManualRebillsData {
   insights?: string;
 }
 
-function computeApprovalRate(approvals: number, txns: number): number {
-  if (txns === 0) return 0;
-  return Math.round((approvals / txns) * 10000) / 100;
-}
-
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr + 'T00:00:00');
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const day = date.getDate().toString().padStart(2, '0');
   const year = date.getFullYear();
   return `${month}/${day}/${year}`;
-}
-
-function computeShare(count: number, total: number): string {
-  if (!total || total === 0) return '—';
-  const percentage = ((count || 0) / total) * 100;
-  return `${percentage.toFixed(2)}%`;
 }
 
 function formatDeclineWithShare(reason: string, count: number, share: string): string {
@@ -53,9 +44,9 @@ export function formatManualRebills(data: ManualRebillsData): string {
     : '0.00';
 
   // Compute decline shares
-  const decline1Share = computeShare(data.decline1_count, data.rebills_reruns);
-  const decline2Share = computeShare(data.decline2_count, data.rebills_reruns);
-  const decline3Share = computeShare(data.decline3_count, data.rebills_reruns);
+  const decline1Share = formatShare(data.decline1_count, data.rebills_reruns);
+  const decline2Share = formatShare(data.decline2_count, data.rebills_reruns);
+  const decline3Share = formatShare(data.decline3_count, data.rebills_reruns);
 
   const lines: string[] = [];
 

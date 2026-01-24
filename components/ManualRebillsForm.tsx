@@ -99,7 +99,7 @@ export default function ManualRebillsForm({ formData, onChange, onGenerate }: Ma
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
         </label>
-        <div className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-accent-50 dark:bg-accent-900/20 text-accent-700 dark:text-accent-400 font-semibold">
+        <div className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-accent-50 dark:bg-accent-900/20 text-accent-700 dark:text-accent-400 font-semibold">
           {value ? `${value}%` : '—'}
         </div>
       </div>
@@ -174,7 +174,7 @@ export default function ManualRebillsForm({ formData, onChange, onGenerate }: Ma
         </div>
 
         {/* Common Declines Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md dark:shadow-lg hover:shadow-lg transition md:col-span-2 xl:col-span-2">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md dark:shadow-lg hover:shadow-lg transition md:col-span-2">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
             Common Declines
           </h3>
