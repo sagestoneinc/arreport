@@ -50,7 +50,7 @@ export function formatMessage(
     case 'hourly-approval-rate':
       return formatHourlyApprovalRate(data as unknown as HourlyApprovalRateData, mode);
     case 'xshield-hourly-approval':
-      return formatXShieldHourlyApproval(data as unknown as XShieldHourlyApprovalData, mode);
+      return formatXShieldHourlyApproval(data as unknown as XShieldHourlyApprovalData);
     default:
       return '';
   }
