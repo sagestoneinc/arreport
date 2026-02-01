@@ -6,6 +6,10 @@ import {
 import { formatManualRebills, ManualRebillsData } from './manual-rebills';
 import { formatMintAdditionalSales, MintAdditionalSalesData } from './mint-additional-sales';
 import { formatHourlyApprovalRate, HourlyApprovalRateData } from './hourly-approval-rate';
+import {
+  formatXShieldHourlyApproval,
+  XShieldHourlyApprovalData,
+} from './xshield-hourly-approval';
 import { MidRowData } from '../templates';
 import { FormatMode } from '../telegram-format';
 
@@ -45,6 +49,8 @@ export function formatMessage(
       return formatMintAdditionalSales(data as unknown as MintAdditionalSalesData, mode);
     case 'hourly-approval-rate':
       return formatHourlyApprovalRate(data as unknown as HourlyApprovalRateData, mode);
+    case 'xshield-hourly-approval':
+      return formatXShieldHourlyApproval(data as unknown as XShieldHourlyApprovalData, mode);
     default:
       return '';
   }

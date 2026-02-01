@@ -10,6 +10,7 @@ A production-ready Next.js web application for generating Telegram-formatted App
 - ✅ **Dual Template Support**:
   - **Template A**: Top/Worst MIDs format with daily summary and hourly updates
   - **Template B**: Threshold Performing/Low format with sales/declines grouping
+- ✅ **XSHIELD Hourly Approval Report** with yesterday vs. as-of MID performance lists
 - ✅ Template-specific localStorage persistence
 - ✅ Exact Telegram message formatting with emojis
 - ✅ Dynamic MID management (VISA: up to 4, MASTERCARD: up to 5)
@@ -161,7 +162,7 @@ MYSQL_DATABASE=arreport
 
 ## Usage
 
-1. **Select Template**: Choose between Template A (Top/Worst) or Template B (Threshold Performing/Low)
+1. **Select Template**: Choose Template A (Top/Worst), Template B (Threshold Performing/Low), or the XSHIELD Hourly Approval Report
 2. **Report Date/Time**: Set the date and time for the AR update (defaults to sample data)
 3. **Threshold**: Enter the performing AR threshold percentage (default: 38%)
 4. **Daily Summary**: Enter daily sales and declines (auto-calculates AR)
@@ -213,6 +214,25 @@ Same format as Template A but with emphasis on threshold-based grouping:
 - Output MID line format: `- {MID}: {AR}% ({sales} / {declines})`
 - Daily line format: `Overall AR: {AR}% ({sales} sales / {declines} declines)`
 - Shows "(none)" for empty sections
+
+### XSHIELD Hourly Approval Report
+
+Yesterday vs. as-of MID approval report with Telegram-ready formatting:
+
+```
+⏱ XSHIELD MID Ops Report — 01/15/2026
+
+Yesterday
+🟢⬆️ MID Alpha — 120 sales / 30 declines (80.00%)
+🔴⬇️ MID Gamma — 40 sales / 80 declines (33.33%)
+
+01/15/2026 AS OF 1:00 PM EST
+🟢⬆️ MID Alpha — 60 sales / 12 declines (83.33%)
+🔴⬇️ MID Gamma — 18 sales / 35 declines (33.96%)
+
+🧠 Insights & Actions
+Enter routing changes, monitoring notes, or action items.
+```
 
 ### Calculation Rules
 
