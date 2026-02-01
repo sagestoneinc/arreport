@@ -11,6 +11,9 @@ import BatchRerunsForm, {
   ProcessorSelections,
 } from '@/components/BatchRerunsForm';
 import ManualRebillsForm, { ManualRebillsFormData } from '@/components/ManualRebillsForm';
+import XShieldHourlyApprovalForm, {
+  XShieldHourlyApprovalFormData,
+} from '@/components/XShieldHourlyApprovalForm';
 import Preview from '@/components/Preview';
 import StickyToolbar from '@/components/StickyToolbar';
 import { saveToHistory } from '@/lib/historyStorage';
@@ -200,7 +203,10 @@ export default function ReportBuilderPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: generatedMessage }),
+        body: JSON.stringify({
+          message: generatedMessage,
+          parseMode: slug === 'xshield-hourly-approval' ? 'HTML' : 'MarkdownV2',
+        }),
       });
 
       const data = await response.json();
@@ -347,6 +353,12 @@ export default function ReportBuilderPage() {
                   processors={template.processors}
                   processorSelections={processorSelections}
                   onProcessorChange={handleProcessorChange}
+                />
+              ) : slug === 'xshield-hourly-approval' ? (
+                <XShieldHourlyApprovalForm
+                  formData={formData as unknown as XShieldHourlyApprovalFormData}
+                  onChange={handleFieldChange}
+                  onGenerate={handleGenerate}
                 />
               ) : slug === 'manual-rebills' ? (
                 <ManualRebillsForm

@@ -372,6 +372,110 @@ export const TEMPLATES: TemplateDefinition[] = [
       },
     ],
   },
+  {
+    slug: 'xshield-hourly-approval',
+    name: 'XSHIELD Hourly Approval Report',
+    description: 'Generate XSHIELD hourly approval updates with yesterday vs as-of MIDs',
+    fields: [
+      {
+        name: 'report_date',
+        label: 'Report Date',
+        type: 'date',
+        defaultValue: new Date().toISOString().split('T')[0],
+        required: true,
+      },
+      {
+        name: 'yesterday_good',
+        label: 'Yesterday — Good/Improving MIDs',
+        type: 'table',
+        defaultValue: [
+          { mid_name: 'MID Alpha', initial_sales: 120, initial_decline: 30 },
+          { mid_name: 'MID Beta', initial_sales: 95, initial_decline: 20 },
+        ],
+        tableConfig: {
+          columns: [
+            { name: 'mid_name', label: 'MID Name', type: 'text' },
+            { name: 'initial_sales', label: 'Sales', type: 'number' },
+            { name: 'initial_decline', label: 'Declines', type: 'number' },
+            { name: 'ar_percent', label: 'AR%', type: 'computed' },
+          ],
+        },
+      },
+      {
+        name: 'yesterday_bad',
+        label: 'Yesterday — Bad/Declining MIDs',
+        type: 'table',
+        defaultValue: [
+          { mid_name: 'MID Gamma', initial_sales: 40, initial_decline: 80 },
+          { mid_name: 'MID Delta', initial_sales: 30, initial_decline: 70 },
+        ],
+        tableConfig: {
+          columns: [
+            { name: 'mid_name', label: 'MID Name', type: 'text' },
+            { name: 'initial_sales', label: 'Sales', type: 'number' },
+            { name: 'initial_decline', label: 'Declines', type: 'number' },
+            { name: 'ar_percent', label: 'AR%', type: 'computed' },
+          ],
+        },
+      },
+      {
+        name: 'as_of_date',
+        label: 'As Of Date',
+        type: 'date',
+        defaultValue: new Date().toISOString().split('T')[0],
+        required: true,
+      },
+      {
+        name: 'as_of_time',
+        label: 'As Of Time (EST)',
+        type: 'text',
+        defaultValue: '1:00 PM',
+        required: true,
+      },
+      {
+        name: 'as_of_good',
+        label: 'As Of — Good/Improving MIDs',
+        type: 'table',
+        defaultValue: [
+          { mid_name: 'MID Alpha', initial_sales: 60, initial_decline: 12 },
+          { mid_name: 'MID Beta', initial_sales: 48, initial_decline: 10 },
+        ],
+        tableConfig: {
+          columns: [
+            { name: 'mid_name', label: 'MID Name', type: 'text' },
+            { name: 'initial_sales', label: 'Sales', type: 'number' },
+            { name: 'initial_decline', label: 'Declines', type: 'number' },
+            { name: 'ar_percent', label: 'AR%', type: 'computed' },
+          ],
+        },
+      },
+      {
+        name: 'as_of_bad',
+        label: 'As Of — Bad/Declining MIDs',
+        type: 'table',
+        defaultValue: [
+          { mid_name: 'MID Gamma', initial_sales: 18, initial_decline: 35 },
+          { mid_name: 'MID Delta', initial_sales: 12, initial_decline: 28 },
+        ],
+        tableConfig: {
+          columns: [
+            { name: 'mid_name', label: 'MID Name', type: 'text' },
+            { name: 'initial_sales', label: 'Sales', type: 'number' },
+            { name: 'initial_decline', label: 'Declines', type: 'number' },
+            { name: 'ar_percent', label: 'AR%', type: 'computed' },
+          ],
+        },
+      },
+      {
+        name: 'insights',
+        label: 'Insights & Actions',
+        type: 'textarea',
+        defaultValue: 'Enter routing changes, monitoring notes, or action items.',
+        placeholder: 'Enter routing changes, monitoring notes, or action items.',
+        required: true,
+      },
+    ],
+  },
 ];
 
 export function getTemplateBySlug(slug: string): TemplateDefinition | undefined {
