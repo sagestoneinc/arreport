@@ -61,9 +61,8 @@ const formatMidLines = (mids: MidRowData[], emoji: string): string[] => {
 
 export function formatXShieldHourlyApproval(
   data: XShieldHourlyApprovalData,
-  mode: FormatMode = 'telegram'
+  _mode: FormatMode = 'telegram'
 ): string {
-  void mode;
   const lines: string[] = [];
   const reportDate = formatDateForReport(data.report_date);
   const asOfDate = formatDateForReport(data.as_of_date);
