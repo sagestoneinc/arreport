@@ -1,4 +1,4 @@
-import { FormatMode, formatDateForReport } from '../telegram-format';
+import { formatDateForReport } from '../telegram-format';
 import { MidRowData } from '../templates';
 
 export interface XShieldHourlyApprovalData {
@@ -60,8 +60,7 @@ const formatMidLines = (mids: MidRowData[], emoji: string): string[] => {
 };
 
 export function formatXShieldHourlyApproval(
-  data: XShieldHourlyApprovalData,
-  _mode: FormatMode = 'telegram'
+  data: XShieldHourlyApprovalData
 ): string {
   const lines: string[] = [];
   const reportDate = formatDateForReport(data.report_date);
