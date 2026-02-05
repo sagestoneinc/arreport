@@ -49,8 +49,6 @@ export function formatMessage(
       return formatMintAdditionalSales(data as unknown as MintAdditionalSalesData, mode);
     case 'hourly-approval-rate':
       return formatHourlyApprovalRate(data as unknown as HourlyApprovalRateData, mode);
-    case 'xshield-hourly-approval':
-      return formatXShieldHourlyApproval(data as unknown as XShieldHourlyApprovalData);
     default:
       return '';
   }
