@@ -28,8 +28,6 @@ export default function StickyToolbar({
   onReset,
   onGenerate,
   onSendTelegram,
-  onCopy,
-  onDownload,
   isGenerating = false,
   isSendingTelegram = false,
 }: StickyToolbarProps) {
