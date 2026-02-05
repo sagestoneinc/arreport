@@ -103,7 +103,7 @@ export default function ManualRebillsForm({
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
         </label>
-        <div className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-accent-50 dark:bg-accent-900/20 text-accent-700 dark:text-accent-400 font-semibold">
+        <div className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200 font-semibold">
           {value ? `${value}%` : '—'}
         </div>
       </div>
@@ -133,7 +133,7 @@ export default function ManualRebillsForm({
           onChange={handleChange}
           required={required}
           min={type === 'number' ? 0 : undefined}
-          className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none"
         />
       </div>
     );
@@ -144,7 +144,7 @@ export default function ManualRebillsForm({
       {/* Main Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {/* Manual Rebills Summary Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md dark:shadow-lg hover:shadow-lg transition">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-card border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
             Manual Rebills Summary
           </h3>
@@ -157,7 +157,7 @@ export default function ManualRebillsForm({
         </div>
 
         {/* Card Network Section — VISA */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md dark:shadow-lg hover:shadow-lg transition">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-card border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
             Card Network — VISA
           </h3>
@@ -169,7 +169,7 @@ export default function ManualRebillsForm({
         </div>
 
         {/* Card Network Section — MC */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md dark:shadow-lg hover:shadow-lg transition">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-card border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
             Card Network — MC
           </h3>
@@ -181,7 +181,7 @@ export default function ManualRebillsForm({
         </div>
 
         {/* Common Declines Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md dark:shadow-lg hover:shadow-lg transition md:col-span-2">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-card border border-gray-200 dark:border-gray-700 md:col-span-2">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
             Common Declines
           </h3>
@@ -208,7 +208,7 @@ export default function ManualRebillsForm({
         </div>
 
         {/* Insights Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md dark:shadow-lg hover:shadow-lg transition xl:col-span-1">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-card border border-gray-200 dark:border-gray-700 xl:col-span-1">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Insights</h3>
           <textarea
             id="insights"
@@ -217,7 +217,7 @@ export default function ManualRebillsForm({
             onChange={handleChange}
             placeholder="Enter any additional insights or observations..."
             rows={6}
-            className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none font-mono text-sm resize-y"
+            className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none font-mono text-sm resize-y"
           />
         </div>
       </div>

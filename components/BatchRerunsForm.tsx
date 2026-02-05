@@ -193,7 +193,7 @@ export default function BatchRerunsForm({
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
         </label>
-        <div className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-accent-50 dark:bg-accent-900/20 text-accent-700 dark:text-accent-400 font-semibold">
+        <div className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200 font-semibold">
           {value ? `${value}%` : '—'}
         </div>
       </div>
@@ -222,7 +222,7 @@ export default function BatchRerunsForm({
           value={getInputValue(name)}
           onChange={handleChange}
           required={required}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
         />
       </div>
     );

@@ -16,11 +16,13 @@ export default function DailySummaryInputs({
   const ar = calculateAR(dailySummary.sales, dailySummary.declines);
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">📌 Daily Summary</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-200 dark:border-gray-700 p-6">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+        Daily Summary
+      </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
         <div>
-          <label htmlFor="daily-sales" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="daily-sales" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Daily Sales
           </label>
           <input
@@ -34,11 +36,11 @@ export default function DailySummaryInputs({
                 sales: parseInt(e.target.value) || 0,
               })
             }
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
         </div>
         <div>
-          <label htmlFor="daily-declines" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="daily-declines" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Daily Declines
           </label>
           <input
@@ -52,12 +54,14 @@ export default function DailySummaryInputs({
                 declines: parseInt(e.target.value) || 0,
               })
             }
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
         </div>
         <div>
-          <div className="block text-sm font-medium text-gray-700 mb-2">Daily AR</div>
-          <div className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900 font-semibold">
+          <div className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Daily AR
+          </div>
+          <div className="px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-gray-100 font-semibold">
             {formatAR(ar)}%
           </div>
         </div>

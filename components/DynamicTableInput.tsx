@@ -46,14 +46,14 @@ export default function DynamicTableInput({ label, rows, onChange }: DynamicTabl
         <button
           type="button"
           onClick={addRow}
-          className="px-3 py-1 bg-green-600 dark:bg-green-700 text-white text-sm rounded-md hover:bg-green-700 dark:hover:bg-green-800 transition-colors"
+          className="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
           + Add MID
         </button>
       </div>
 
       {rows.length === 0 ? (
-        <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-4 border border-gray-200 dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-800">
+        <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
           No MIDs added yet. Click &quot;Add MID&quot; to start.
         </p>
       ) : (
@@ -68,7 +68,7 @@ export default function DynamicTableInput({ label, rows, onChange }: DynamicTabl
                     value={row.mid_name}
                     onChange={(e) => updateRow(index, 'mid_name', e.target.value)}
                     placeholder="MID name"
-                    className="w-full px-2 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-2 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
                 <div className="col-span-2">
@@ -78,7 +78,7 @@ export default function DynamicTableInput({ label, rows, onChange }: DynamicTabl
                     value={row.initial_sales ?? ''}
                     onChange={(e) => updateRow(index, 'initial_sales', e.target.value)}
                     placeholder="Sales"
-                    className="w-full px-2 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-2 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
                 <div className="col-span-2">
@@ -88,11 +88,11 @@ export default function DynamicTableInput({ label, rows, onChange }: DynamicTabl
                     value={row.initial_decline ?? ''}
                     onChange={(e) => updateRow(index, 'initial_decline', e.target.value)}
                     placeholder="Declines"
-                    className="w-full px-2 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-2 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
                 <div className="col-span-3">
-                  <div className="px-2 py-2 text-sm bg-accent-50 dark:bg-accent-900/20 border border-gray-300 dark:border-gray-600 rounded-md text-center font-semibold text-accent-700 dark:text-accent-400">
+                  <div className="px-2 py-2 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg text-center font-semibold text-gray-700 dark:text-gray-200">
                     {ar}
                   </div>
                 </div>
@@ -100,7 +100,7 @@ export default function DynamicTableInput({ label, rows, onChange }: DynamicTabl
                   <button
                     type="button"
                     onClick={() => removeRow(index)}
-                    className="w-full px-2 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors"
+                    className="w-full px-2 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition-colors"
                     title="Remove MID"
                   >
                     ✕

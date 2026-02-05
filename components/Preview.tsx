@@ -60,7 +60,7 @@ export default function Preview({ message, slug }: PreviewProps) {
 
   if (!message) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-200 dark:border-gray-700 p-8">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Preview</h2>
         <div className="text-center py-12">
           <div className="text-4xl mb-4">📄</div>
@@ -82,7 +82,7 @@ export default function Preview({ message, slug }: PreviewProps) {
           <div className="flex rounded-lg bg-gray-100 dark:bg-gray-700 p-1">
             <button
               onClick={() => setPreviewMode('telegram')}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
                 previewMode === 'telegram'
                   ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
@@ -92,7 +92,7 @@ export default function Preview({ message, slug }: PreviewProps) {
             </button>
             <button
               onClick={() => setPreviewMode('plain')}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
                 previewMode === 'plain'
                   ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'

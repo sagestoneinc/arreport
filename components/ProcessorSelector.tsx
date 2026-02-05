@@ -28,7 +28,7 @@ export default function ProcessorSelector({
         id={`processor-${sectionKey}`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+        className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
       >
         {config.processorOptions.map((option) => (
           <option key={option} value={option}>

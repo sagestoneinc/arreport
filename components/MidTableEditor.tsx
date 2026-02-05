@@ -35,20 +35,20 @@ export default function MidTableEditor({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-200 dark:border-gray-700 p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">{title}</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{title}</h2>
         <button
           onClick={addRow}
           disabled={mids.length >= maxRows}
-          className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           + Add MID
         </button>
       </div>
 
       {mids.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">
+        <p className="text-gray-500 dark:text-gray-400 text-center py-8">
           No MIDs added yet. Click &quot;Add MID&quot; to start.
         </p>
       ) : (
@@ -66,7 +66,7 @@ export default function MidTableEditor({
                     value={mid.name}
                     onChange={(e) => updateRow(mid.id, 'name', e.target.value)}
                     placeholder="MID name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -76,7 +76,7 @@ export default function MidTableEditor({
                     value={mid.sales}
                     onChange={(e) => updateRow(mid.id, 'sales', parseInt(e.target.value) || 0)}
                     placeholder="Sales"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -86,11 +86,11 @@ export default function MidTableEditor({
                     value={mid.declines}
                     onChange={(e) => updateRow(mid.id, 'declines', parseInt(e.target.value) || 0)}
                     placeholder="Declines"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-center">
+                  <div className="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg text-center text-gray-900 dark:text-gray-100">
                     <div className="font-semibold">{formatAR(ar)}%</div>
                     <div className={`text-xs font-medium ${statusColor}`}>{status}</div>
                   </div>
@@ -98,7 +98,7 @@ export default function MidTableEditor({
                 <div className="md:col-span-1">
                   <button
                     onClick={() => removeRow(mid.id)}
-                    className="w-full px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                    className="w-full px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                     title="Remove MID"
                   >
                     ✕

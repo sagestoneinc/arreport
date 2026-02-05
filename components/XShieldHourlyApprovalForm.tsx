@@ -131,7 +131,7 @@ export default function XShieldHourlyApprovalForm({
           <button
             type="button"
             onClick={() => addMerchantRow(section)}
-            className="px-3 py-1.5 bg-green-600 dark:bg-green-700 text-white text-xs rounded-md hover:bg-green-700 dark:hover:bg-green-800 transition-colors"
+            className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             + Add Merchant
           </button>
@@ -212,7 +212,7 @@ export default function XShieldHourlyApprovalForm({
                   <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                     %
                   </label>
-                  <div className="px-3 py-2 text-sm text-center font-semibold rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-accent-700 dark:text-accent-400">
+                  <div className="px-3 py-2 text-sm text-center font-semibold rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200">
                     {visaPercent}
                   </div>
                 </div>
@@ -262,7 +262,7 @@ export default function XShieldHourlyApprovalForm({
                   <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                     %
                   </label>
-                  <div className="px-3 py-2 text-sm text-center font-semibold rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-accent-700 dark:text-accent-400">
+                  <div className="px-3 py-2 text-sm text-center font-semibold rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200">
                     {mcPercent}
                   </div>
                 </div>
@@ -293,7 +293,7 @@ export default function XShieldHourlyApprovalForm({
         </div>
       )}
 
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md border border-gray-100 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-card border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
           Header Time Range
         </h3>
@@ -335,7 +335,7 @@ export default function XShieldHourlyApprovalForm({
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md border border-gray-100 dark:border-gray-700 space-y-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-card border border-gray-200 dark:border-gray-700 space-y-6">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Yesterday</h3>
         </div>
@@ -379,7 +379,7 @@ export default function XShieldHourlyApprovalForm({
         {renderMerchantSection('Merchant Accounts', 'yesterday_merchants')}
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md border border-gray-100 dark:border-gray-700 space-y-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-card border border-gray-200 dark:border-gray-700 space-y-6">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             Today (As Of)
@@ -425,7 +425,7 @@ export default function XShieldHourlyApprovalForm({
         {renderMerchantSection('Merchant Accounts', 'today_merchants')}
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md border border-gray-100 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-card border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
           Insights/Actions
         </h3>
