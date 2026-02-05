@@ -77,7 +77,7 @@ export default function Navbar() {
     { href: '/', label: 'Templates' },
     { href: '/tasks', label: 'Tasks' },
     { href: '/history', label: 'History' },
-    { href: '/audit', label: 'Audit' },
+    { href: '/playbook', label: 'Ecom OPS PlayBook' },
   ];
 
   return (
