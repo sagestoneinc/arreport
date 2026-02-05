@@ -7,11 +7,10 @@ type PreviewMode = 'telegram' | 'plain';
 
 interface PreviewProps {
   message: string;
-  slug: string;
 }
 
-export default function Preview({ message, slug }: PreviewProps) {
-  const [copied, setCopied] = useState<'readable' | 'payload' | null>(null);
+export default function Preview({ message }: PreviewProps) {
+  const [copied, setCopied] = useState(false);
   const [previewMode, setPreviewMode] = useState<PreviewMode>('telegram');
 
   // Generate preview HTML and plain text from the telegram message
@@ -26,36 +25,11 @@ export default function Preview({ message, slug }: PreviewProps) {
   const handleCopyReadable = async () => {
     try {
       await navigator.clipboard.writeText(plainText);
-      setCopied('readable');
-      setTimeout(() => setCopied(null), 2000);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
     }
-  };
-
-  const handleCopyPayload = async () => {
-    try {
-      await navigator.clipboard.writeText(message);
-      setCopied('payload');
-      setTimeout(() => setCopied(null), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-    }
-  };
-
-  const handleDownload = () => {
-    const date = new Date().toISOString().split('T')[0];
-    const filename = `${slug}-${date}.txt`;
-    // Download readable version by default
-    const blob = new Blob([plainText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   if (!message) {
@@ -123,19 +97,7 @@ export default function Preview({ message, slug }: PreviewProps) {
             onClick={handleCopyReadable}
             className="flex-1 min-w-[120px] px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-sm shadow-sm"
           >
-            {copied === 'readable' ? 'Copied' : 'Copy Readable'}
-          </button>
-          <button
-            onClick={handleCopyPayload}
-            className="flex-1 min-w-[120px] px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-sm shadow-sm"
-          >
-            {copied === 'payload' ? 'Copied' : 'Copy Payload'}
-          </button>
-          <button
-            onClick={handleDownload}
-            className="px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-sm shadow-sm"
-          >
-            Download .txt
+            {copied ? 'Copied' : 'Copy Readable'}
           </button>
         </div>
       </div>

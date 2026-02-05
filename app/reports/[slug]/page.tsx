@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { getTemplateBySlug, MidRowData, XShieldMerchantRow } from '@/lib/templates';
@@ -258,35 +258,6 @@ export default function ReportBuilderPage() {
     }
   };
 
-  const handleCopy = useCallback(async () => {
-    if (!generatedMessage) return;
-    try {
-      await navigator.clipboard.writeText(generatedMessage);
-      setToast({ type: 'success', message: 'Copied to clipboard' });
-      setTimeout(() => setToast(null), 3000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      setToast({ type: 'error', message: 'Failed to copy to clipboard' });
-      setTimeout(() => setToast(null), 3000);
-    }
-  }, [generatedMessage]);
-
-  const handleDownload = useCallback(() => {
-    if (!generatedMessage) return;
-    const date = new Date().toISOString().split('T')[0];
-    const filename = `${slug}-${date}.txt`;
-    const blob = new Blob([generatedMessage], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    setToast({ type: 'success', message: `Downloaded ${filename}` });
-    setTimeout(() => setToast(null), 3000);
-  }, [generatedMessage, slug]);
 
   if (!template) {
     return (
@@ -386,7 +357,7 @@ export default function ReportBuilderPage() {
 
           {/* Preview Section - Takes 1 column on large screens */}
           <div className="lg:col-span-1">
-            <Preview message={generatedMessage} slug={slug} />
+            <Preview message={generatedMessage} />
           </div>
         </div>
       </div>
@@ -425,8 +396,6 @@ export default function ReportBuilderPage() {
         onReset={handleReset}
         onGenerate={handleGenerate}
         onSendTelegram={handleSendTelegram}
-        onCopy={handleCopy}
-        onDownload={handleDownload}
         isSendingTelegram={isSending}
       />
     </main>

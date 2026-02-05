@@ -85,10 +85,10 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/" className="flex items-center space-x-2 min-w-0">
             <div className="text-xl">📊</div>
-            <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              AR Report Builder
+            <span className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate max-w-[150px] sm:max-w-none">
+              SwissCRM - Ecom OPS
             </span>
           </Link>
 

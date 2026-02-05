@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 
 interface StickyToolbarProps {
   templateName: string;
@@ -13,8 +13,6 @@ interface StickyToolbarProps {
   onReset: () => void;
   onGenerate: () => void | Promise<void>;
   onSendTelegram: () => Promise<void>;
-  onCopy?: () => void;
-  onDownload?: () => void;
 
   isGenerating?: boolean;
   isSendingTelegram?: boolean;
@@ -35,17 +33,7 @@ export default function StickyToolbar({
   isGenerating = false,
   isSendingTelegram = false,
 }: StickyToolbarProps) {
-  const [copied, setCopied] = useState(false);
-
   const canSendTelegram = !!generatedMessage;
-
-  const handleCopy = () => {
-    if (onCopy) {
-      onCopy();
-    }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 shadow-soft">
@@ -139,27 +127,6 @@ export default function StickyToolbar({
                 )}
               </button>
 
-              {/* Optional Copy button - secondary */}
-              {onCopy && (
-                <button
-                  onClick={handleCopy}
-                  disabled={!generatedMessage}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {copied ? 'Copied' : 'Copy Payload'}
-                </button>
-              )}
-
-              {/* Optional Download button - secondary */}
-              {onDownload && (
-                <button
-                  onClick={onDownload}
-                  disabled={!generatedMessage}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Download .txt
-                </button>
-              )}
             </div>
           </div>
         </div>
