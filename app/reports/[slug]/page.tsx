@@ -369,7 +369,7 @@ export default function ReportBuilderPage() {
               ) : (
                 <ReportForm
                   fields={template.fields}
-                  formData={formData}
+                  formData={formData as Record<string, string | number | MidRowData[]>}
                   onChange={handleFieldChange}
                   onGenerate={handleGenerate}
                 />
