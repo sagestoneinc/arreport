@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { getTemplateBySlug, MidRowData } from '@/lib/templates';
+import { getTemplateBySlug, MidRowData, XShieldMerchantRow } from '@/lib/templates';
 import { formatMessage } from '@/lib/formatters';
 import ReportForm from '@/components/ReportForm';
 import BatchRerunsForm, {
@@ -21,7 +21,7 @@ import { saveToHistory } from '@/lib/historyStorage';
 const STORAGE_KEY_PREFIX = 'ar-report-';
 const PROCESSOR_STORAGE_KEY_PREFIX = 'ar-processor-';
 
-type FormDataValue = string | number | MidRowData[];
+type FormDataValue = string | number | MidRowData[] | XShieldMerchantRow[];
 
 export default function ReportBuilderPage() {
   const params = useParams();

@@ -4,11 +4,19 @@ export interface MidRowData {
   initial_decline: number;
 }
 
+export interface XShieldMerchantRow {
+  merchant_name: string;
+  visa_approved: number;
+  visa_total: number;
+  mc_approved: number;
+  mc_total: number;
+}
+
 export interface TemplateField {
   name: string;
   label: string;
   type: 'text' | 'number' | 'date' | 'textarea' | 'table';
-  defaultValue?: string | number | MidRowData[];
+  defaultValue?: string | number | MidRowData[] | XShieldMerchantRow[];
   placeholder?: string;
   required?: boolean;
   helpText?: string;
@@ -374,104 +382,103 @@ export const TEMPLATES: TemplateDefinition[] = [
   },
   {
     slug: 'xshield-hourly-approval',
-    name: 'XSHIELD Hourly Approval Report',
-    description: 'Generate XSHIELD hourly approval updates with yesterday vs as-of MIDs',
+    name: 'XSHIELD MID Performance Report',
+    description: 'Generate XSHIELD MID performance updates with yesterday vs today merchant account stats',
     fields: [
       {
-        name: 'report_date',
-        label: 'Report Date',
-        type: 'date',
-        defaultValue: new Date().toISOString().split('T')[0],
-        required: true,
-      },
-      {
-        name: 'yesterday_good',
-        label: 'Yesterday — Good/Improving MIDs',
-        type: 'table',
-        defaultValue: [
-          { mid_name: 'MID Alpha', initial_sales: 120, initial_decline: 30 },
-          { mid_name: 'MID Beta', initial_sales: 95, initial_decline: 20 },
-        ],
-        tableConfig: {
-          columns: [
-            { name: 'mid_name', label: 'MID Name', type: 'text' },
-            { name: 'initial_sales', label: 'Sales', type: 'number' },
-            { name: 'initial_decline', label: 'Declines', type: 'number' },
-            { name: 'ar_percent', label: 'AR%', type: 'computed' },
-          ],
-        },
-      },
-      {
-        name: 'yesterday_bad',
-        label: 'Yesterday — Bad/Declining MIDs',
-        type: 'table',
-        defaultValue: [
-          { mid_name: 'MID Gamma', initial_sales: 40, initial_decline: 80 },
-          { mid_name: 'MID Delta', initial_sales: 30, initial_decline: 70 },
-        ],
-        tableConfig: {
-          columns: [
-            { name: 'mid_name', label: 'MID Name', type: 'text' },
-            { name: 'initial_sales', label: 'Sales', type: 'number' },
-            { name: 'initial_decline', label: 'Declines', type: 'number' },
-            { name: 'ar_percent', label: 'AR%', type: 'computed' },
-          ],
-        },
-      },
-      {
-        name: 'as_of_date',
-        label: 'As Of Date',
-        type: 'date',
-        defaultValue: new Date().toISOString().split('T')[0],
-        required: true,
-      },
-      {
-        name: 'as_of_time',
-        label: 'As Of Time (EST)',
+        name: 'header_time_start',
+        label: 'Header Time Start (EST)',
         type: 'text',
-        defaultValue: '1:00 PM',
+        defaultValue: '9:00 AM',
         required: true,
       },
       {
-        name: 'as_of_good',
-        label: 'As Of — Good/Improving MIDs',
+        name: 'header_time_end',
+        label: 'Header Time End (EST)',
+        type: 'text',
+        defaultValue: '10:00 AM',
+        required: true,
+      },
+      {
+        name: 'yesterday_from_time',
+        label: 'Yesterday From (EST)',
+        type: 'text',
+        defaultValue: '9:00 AM',
+        required: true,
+      },
+      {
+        name: 'yesterday_to_time',
+        label: 'Yesterday To (EST)',
+        type: 'text',
+        defaultValue: '10:00 AM',
+        required: true,
+      },
+      {
+        name: 'yesterday_merchants',
+        label: 'Yesterday Merchant Accounts',
         type: 'table',
         defaultValue: [
-          { mid_name: 'MID Alpha', initial_sales: 60, initial_decline: 12 },
-          { mid_name: 'MID Beta', initial_sales: 48, initial_decline: 10 },
+          {
+            merchant_name: '',
+            visa_approved: 0,
+            visa_total: 0,
+            mc_approved: 0,
+            mc_total: 0,
+          },
         ],
         tableConfig: {
           columns: [
-            { name: 'mid_name', label: 'MID Name', type: 'text' },
-            { name: 'initial_sales', label: 'Sales', type: 'number' },
-            { name: 'initial_decline', label: 'Declines', type: 'number' },
-            { name: 'ar_percent', label: 'AR%', type: 'computed' },
+            { name: 'merchant_name', label: 'Merchant Account Name', type: 'text' },
+            { name: 'visa_approved', label: 'VISA Approved', type: 'number' },
+            { name: 'visa_total', label: 'VISA Total', type: 'number' },
+            { name: 'mc_approved', label: 'MC Approved', type: 'number' },
+            { name: 'mc_total', label: 'MC Total', type: 'number' },
           ],
         },
       },
       {
-        name: 'as_of_bad',
-        label: 'As Of — Bad/Declining MIDs',
+        name: 'today_as_of_from_time',
+        label: 'Today As Of From (EST)',
+        type: 'text',
+        defaultValue: '9:00 AM',
+        required: true,
+      },
+      {
+        name: 'today_as_of_to_time',
+        label: 'Today As Of To (EST)',
+        type: 'text',
+        defaultValue: '10:00 AM',
+        required: true,
+      },
+      {
+        name: 'today_merchants',
+        label: 'Today Merchant Accounts',
         type: 'table',
         defaultValue: [
-          { mid_name: 'MID Gamma', initial_sales: 18, initial_decline: 35 },
-          { mid_name: 'MID Delta', initial_sales: 12, initial_decline: 28 },
+          {
+            merchant_name: '',
+            visa_approved: 0,
+            visa_total: 0,
+            mc_approved: 0,
+            mc_total: 0,
+          },
         ],
         tableConfig: {
           columns: [
-            { name: 'mid_name', label: 'MID Name', type: 'text' },
-            { name: 'initial_sales', label: 'Sales', type: 'number' },
-            { name: 'initial_decline', label: 'Declines', type: 'number' },
-            { name: 'ar_percent', label: 'AR%', type: 'computed' },
+            { name: 'merchant_name', label: 'Merchant Account Name', type: 'text' },
+            { name: 'visa_approved', label: 'VISA Approved', type: 'number' },
+            { name: 'visa_total', label: 'VISA Total', type: 'number' },
+            { name: 'mc_approved', label: 'MC Approved', type: 'number' },
+            { name: 'mc_total', label: 'MC Total', type: 'number' },
           ],
         },
       },
       {
         name: 'insights',
-        label: 'Insights & Actions',
+        label: 'Insights/Actions',
         type: 'textarea',
-        defaultValue: 'Enter routing changes, monitoring notes, or action items.',
-        placeholder: 'Enter routing changes, monitoring notes, or action items.',
+        defaultValue: '',
+        placeholder: 'Summarize routing changes, monitoring notes, or next actions.',
         required: true,
       },
     ],

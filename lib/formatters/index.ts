@@ -10,10 +10,10 @@ import {
   formatXShieldHourlyApproval,
   XShieldHourlyApprovalData,
 } from './xshield-hourly-approval';
-import { MidRowData } from '../templates';
+import { MidRowData, XShieldMerchantRow } from '../templates';
 import { FormatMode } from '../telegram-format';
 
-export type FormDataType = Record<string, string | number | MidRowData[]>;
+export type FormDataType = Record<string, string | number | MidRowData[] | XShieldMerchantRow[]>;
 
 export type { FormatMode } from '../telegram-format';
 export type { BatchRerunsProcessorConfig } from './batch-reruns';
@@ -49,6 +49,8 @@ export function formatMessage(
       return formatMintAdditionalSales(data as unknown as MintAdditionalSalesData, mode);
     case 'hourly-approval-rate':
       return formatHourlyApprovalRate(data as unknown as HourlyApprovalRateData, mode);
+    case 'xshield-hourly-approval':
+      return formatXShieldHourlyApproval(data as unknown as XShieldHourlyApprovalData, mode);
     default:
       return '';
   }
