@@ -6,10 +6,10 @@ export interface MidRowData {
 
 export interface XShieldMerchantRow {
   merchant_name: string;
-  visa_approved: number;
-  visa_total: number;
-  mc_approved: number;
-  mc_total: number;
+  visa_sales: number;
+  visa_declines: number;
+  mc_sales: number;
+  mc_declines: number;
 }
 
 export interface TemplateField {
@@ -420,19 +420,19 @@ export const TEMPLATES: TemplateDefinition[] = [
         defaultValue: [
           {
             merchant_name: '',
-            visa_approved: 0,
-            visa_total: 0,
-            mc_approved: 0,
-            mc_total: 0,
+            visa_sales: 0,
+            visa_declines: 0,
+            mc_sales: 0,
+            mc_declines: 0,
           },
         ],
         tableConfig: {
           columns: [
             { name: 'merchant_name', label: 'Merchant Account Name', type: 'text' },
-            { name: 'visa_approved', label: 'VISA Approved', type: 'number' },
-            { name: 'visa_total', label: 'VISA Total', type: 'number' },
-            { name: 'mc_approved', label: 'MC Approved', type: 'number' },
-            { name: 'mc_total', label: 'MC Total', type: 'number' },
+            { name: 'visa_sales', label: 'VISA Sales', type: 'number' },
+            { name: 'visa_declines', label: 'VISA Declines', type: 'number' },
+            { name: 'mc_sales', label: 'MC Sales', type: 'number' },
+            { name: 'mc_declines', label: 'MC Declines', type: 'number' },
           ],
         },
       },
@@ -457,19 +457,19 @@ export const TEMPLATES: TemplateDefinition[] = [
         defaultValue: [
           {
             merchant_name: '',
-            visa_approved: 0,
-            visa_total: 0,
-            mc_approved: 0,
-            mc_total: 0,
+            visa_sales: 0,
+            visa_declines: 0,
+            mc_sales: 0,
+            mc_declines: 0,
           },
         ],
         tableConfig: {
           columns: [
             { name: 'merchant_name', label: 'Merchant Account Name', type: 'text' },
-            { name: 'visa_approved', label: 'VISA Approved', type: 'number' },
-            { name: 'visa_total', label: 'VISA Total', type: 'number' },
-            { name: 'mc_approved', label: 'MC Approved', type: 'number' },
-            { name: 'mc_total', label: 'MC Total', type: 'number' },
+            { name: 'visa_sales', label: 'VISA Sales', type: 'number' },
+            { name: 'visa_declines', label: 'VISA Declines', type: 'number' },
+            { name: 'mc_sales', label: 'MC Sales', type: 'number' },
+            { name: 'mc_declines', label: 'MC Declines', type: 'number' },
           ],
         },
       },

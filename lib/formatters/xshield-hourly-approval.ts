@@ -18,10 +18,12 @@ const formatNumber = (value: number): number => {
   return Math.round(value);
 };
 
-const calculatePercent = (approved: number, total: number): string => {
-  if (!Number.isFinite(total) || total <= 0) return '0.00%';
-  if (!Number.isFinite(approved)) return '0.00%';
-  return ((approved / total) * 100).toFixed(2) + '%';
+const calculatePercent = (sales: number, declines: number): string => {
+  const safeSales = Number.isFinite(sales) ? sales : 0;
+  const safeDeclines = Number.isFinite(declines) ? declines : 0;
+  const total = safeSales + safeDeclines;
+  if (total <= 0) return '0.00%';
+  return ((safeSales / total) * 100).toFixed(2) + '%';
 };
 
 const formatTimeForReport = (timeValue: string): string => {
@@ -52,19 +54,19 @@ const formatTimeForReport = (timeValue: string): string => {
 const formatMerchantBlocks = (rows: XShieldMerchantRow[] = []): string[] => {
   const fallbackRow: XShieldMerchantRow = {
     merchant_name: '',
-    visa_approved: 0,
-    visa_total: 0,
-    mc_approved: 0,
-    mc_total: 0,
+    visa_sales: 0,
+    visa_declines: 0,
+    mc_sales: 0,
+    mc_declines: 0,
   };
   const normalizedRows = rows.length > 0 ? rows : [fallbackRow];
   const populatedRows = normalizedRows.filter(
     (row) =>
       row.merchant_name ||
-      row.visa_approved ||
-      row.visa_total ||
-      row.mc_approved ||
-      row.mc_total
+      row.visa_sales ||
+      row.visa_declines ||
+      row.mc_sales ||
+      row.mc_declines
   );
 
   const outputRows = populatedRows.length > 0 ? populatedRows : [fallbackRow];
@@ -72,16 +74,16 @@ const formatMerchantBlocks = (rows: XShieldMerchantRow[] = []): string[] => {
 
   outputRows.forEach((row, index) => {
     const merchantName = row.merchant_name?.trim() || '';
-    const visaApproved = formatNumber(row.visa_approved || 0);
-    const visaTotal = formatNumber(row.visa_total || 0);
-    const mcApproved = formatNumber(row.mc_approved || 0);
-    const mcTotal = formatNumber(row.mc_total || 0);
-    const visaPercent = calculatePercent(visaApproved, visaTotal);
-    const mcPercent = calculatePercent(mcApproved, mcTotal);
+    const visaSales = formatNumber(row.visa_sales || 0);
+    const visaDeclines = formatNumber(row.visa_declines || 0);
+    const mcSales = formatNumber(row.mc_sales || 0);
+    const mcDeclines = formatNumber(row.mc_declines || 0);
+    const visaPercent = calculatePercent(visaSales, visaDeclines);
+    const mcPercent = calculatePercent(mcSales, mcDeclines);
 
     lines.push(`Merchant Account Name: ${merchantName}`);
-    lines.push(`- VISA: ${visaApproved}/${visaTotal} trxns - ${visaPercent}`);
-    lines.push(`- MC:  ${mcApproved}/${mcTotal} trxns - ${mcPercent}`);
+    lines.push(`- VISA: ${visaSales}/${visaDeclines} trxns - ${visaPercent}`);
+    lines.push(`- MC:  ${mcSales}/${mcDeclines} trxns - ${mcPercent}`);
 
     if (index < outputRows.length - 1) {
       lines.push('');

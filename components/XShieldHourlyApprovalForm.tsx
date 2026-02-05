@@ -23,16 +23,17 @@ interface XShieldHourlyApprovalFormProps {
 
 const emptyMerchantRow: XShieldMerchantRow = {
   merchant_name: '',
-  visa_approved: 0,
-  visa_total: 0,
-  mc_approved: 0,
-  mc_total: 0,
+  visa_sales: 0,
+  visa_declines: 0,
+  mc_sales: 0,
+  mc_declines: 0,
 };
 
-const calculatePercent = (approved: number, total: number): string => {
-  if (!Number.isFinite(total) || total <= 0) return '0.00%';
-  if (!Number.isFinite(approved)) return '0.00%';
-  return ((approved / total) * 100).toFixed(2) + '%';
+const calculatePercent = (sales: number, declines: number): string => {
+  const total = (Number.isFinite(sales) ? sales : 0) + (Number.isFinite(declines) ? declines : 0);
+  if (total <= 0) return '0.00%';
+  const safeSales = Number.isFinite(sales) ? sales : 0;
+  return ((safeSales / total) * 100).toFixed(2) + '%';
 };
 
 export default function XShieldHourlyApprovalForm({
@@ -138,8 +139,8 @@ export default function XShieldHourlyApprovalForm({
         </div>
 
         {rows.map((row, index) => {
-          const visaPercent = calculatePercent(row.visa_approved || 0, row.visa_total || 0);
-          const mcPercent = calculatePercent(row.mc_approved || 0, row.mc_total || 0);
+          const visaPercent = calculatePercent(row.visa_sales || 0, row.visa_declines || 0);
+          const mcPercent = calculatePercent(row.mc_sales || 0, row.mc_declines || 0);
 
           return (
             <div
@@ -174,36 +175,36 @@ export default function XShieldHourlyApprovalForm({
                 </div>
                 <div className="md:col-span-4">
                   <label
-                    htmlFor={`visa-approved-${section}-${index}`}
+                    htmlFor={`visa-sales-${section}-${index}`}
                     className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1"
                   >
-                    Approved
+                    Sales
                   </label>
                   <input
-                    id={`visa-approved-${section}-${index}`}
+                    id={`visa-sales-${section}-${index}`}
                     type="number"
                     min="0"
-                    value={row.visa_approved ?? ''}
+                    value={row.visa_sales ?? ''}
                     onChange={(event) =>
-                      updateMerchantRow(section, index, 'visa_approved', event.target.value)
+                      updateMerchantRow(section, index, 'visa_sales', event.target.value)
                     }
                     className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
                 <div className="md:col-span-4">
                   <label
-                    htmlFor={`visa-total-${section}-${index}`}
+                    htmlFor={`visa-declines-${section}-${index}`}
                     className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1"
                   >
-                    Total
+                    Declines
                   </label>
                   <input
-                    id={`visa-total-${section}-${index}`}
+                    id={`visa-declines-${section}-${index}`}
                     type="number"
                     min="0"
-                    value={row.visa_total ?? ''}
+                    value={row.visa_declines ?? ''}
                     onChange={(event) =>
-                      updateMerchantRow(section, index, 'visa_total', event.target.value)
+                      updateMerchantRow(section, index, 'visa_declines', event.target.value)
                     }
                     className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
@@ -224,36 +225,36 @@ export default function XShieldHourlyApprovalForm({
                 </div>
                 <div className="md:col-span-4">
                   <label
-                    htmlFor={`mc-approved-${section}-${index}`}
+                    htmlFor={`mc-sales-${section}-${index}`}
                     className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1"
                   >
-                    Approved
+                    Sales
                   </label>
                   <input
-                    id={`mc-approved-${section}-${index}`}
+                    id={`mc-sales-${section}-${index}`}
                     type="number"
                     min="0"
-                    value={row.mc_approved ?? ''}
+                    value={row.mc_sales ?? ''}
                     onChange={(event) =>
-                      updateMerchantRow(section, index, 'mc_approved', event.target.value)
+                      updateMerchantRow(section, index, 'mc_sales', event.target.value)
                     }
                     className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
                 <div className="md:col-span-4">
                   <label
-                    htmlFor={`mc-total-${section}-${index}`}
+                    htmlFor={`mc-declines-${section}-${index}`}
                     className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1"
                   >
-                    Total
+                    Declines
                   </label>
                   <input
-                    id={`mc-total-${section}-${index}`}
+                    id={`mc-declines-${section}-${index}`}
                     type="number"
                     min="0"
-                    value={row.mc_total ?? ''}
+                    value={row.mc_declines ?? ''}
                     onChange={(event) =>
-                      updateMerchantRow(section, index, 'mc_total', event.target.value)
+                      updateMerchantRow(section, index, 'mc_declines', event.target.value)
                     }
                     className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
