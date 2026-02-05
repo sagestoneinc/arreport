@@ -1,9 +1,9 @@
 import Database from 'better-sqlite3';
 import path from 'path';
-import fs from 'fs';
 import { randomUUID } from 'crypto';
 import { Task, TaskFilter, TaskStatus } from './taskTypes';
 import { ITaskStorage } from './taskStorageInterface';
+import { resolveDataDir } from './storagePaths';
 
 export class SQLiteTaskStorage implements ITaskStorage {
   private db: Database.Database | null = null;
@@ -31,13 +31,11 @@ export class SQLiteTaskStorage implements ITaskStorage {
     if (this.useMemory) {
       this.db = new Database(':memory:');
     } else {
-      // Create /data directory if it doesn't exist
-      const dataDir = path.join(process.cwd(), 'data');
-      if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir, { recursive: true });
+      const { dir, isTemp } = resolveDataDir();
+      if (isTemp) {
+        console.warn('[TaskStorage] Using temporary data directory; tasks will not persist across restarts.');
       }
-
-      const dbPath = path.join(dataDir, 'tasks.db');
+      const dbPath = path.join(dir, 'tasks.db');
       this.db = new Database(dbPath);
     }
 

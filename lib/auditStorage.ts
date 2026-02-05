@@ -8,6 +8,7 @@ import path from 'path';
 import fs from 'fs';
 import { randomUUID, createHash } from 'crypto';
 import { AuditLogEntry, AuditLogFilter, CreateAuditLogParams } from './auditTypes';
+import { resolveDataDir } from './storagePaths';
 
 let db: Database.Database | null = null;
 let initialized = false;
@@ -17,14 +18,34 @@ function getDb(): Database.Database {
     return db;
   }
 
-  // Create /data directory if it doesn't exist
-  const dataDir = path.join(process.cwd(), 'data');
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+  const explicitDbPath = process.env.AUDIT_DB_PATH?.trim();
+  if (explicitDbPath) {
+    if (explicitDbPath === ':memory:' || explicitDbPath.toLowerCase() === 'memory') {
+      db = new Database(':memory:');
+      return db;
+    }
+    try {
+      fs.mkdirSync(path.dirname(explicitDbPath), { recursive: true });
+      db = new Database(explicitDbPath);
+      return db;
+    } catch (error) {
+      console.warn(`[AuditStorage] Failed to open AUDIT_DB_PATH at "${explicitDbPath}", falling back to in-memory.`, error);
+      db = new Database(':memory:');
+      return db;
+    }
   }
 
-  const dbPath = path.join(dataDir, 'audit.db');
-  db = new Database(dbPath);
+  try {
+    const { dir, isTemp } = resolveDataDir();
+    if (isTemp) {
+      console.warn('[AuditStorage] Using temporary data directory; audit logs will not persist across restarts.');
+    }
+    const dbPath = path.join(dir, 'audit.db');
+    db = new Database(dbPath);
+  } catch (error) {
+    console.warn('[AuditStorage] Failed to initialize file-backed audit storage, falling back to in-memory.', error);
+    db = new Database(':memory:');
+  }
   
   return db;
 }
