@@ -273,7 +273,7 @@ export default function XShieldHourlyApprovalForm({
 
         {rows.length === 0 && (
           <div className="rounded-lg border border-dashed border-gray-300 dark:border-gray-600 p-4 text-sm text-gray-500 dark:text-gray-400">
-            No merchant accounts added yet. Use \"Add Merchant\" to start.
+            No merchant accounts added yet. Use &quot;Add Merchant&quot; to start.
           </div>
         )}
       </div>
