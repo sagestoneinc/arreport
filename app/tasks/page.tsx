@@ -256,6 +256,9 @@ function groupTasksByDate(tasks: Task[]): { today: Task[]; yesterday: Task[]; ol
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [timedOut, setTimedOut] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [authRequired, setAuthRequired] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'all' | TaskStatus>('all');
   const [sourceFilter, setSourceFilter] = useState<'all' | TaskSource>('all');
   const [chatFilter, setChatFilter] = useState<string>('all');
@@ -269,6 +272,9 @@ export default function TasksPage() {
 
   const fetchTasks = useCallback(async () => {
     setLoading(true);
+    setError(null);
+    setAuthRequired(false);
+    setTimedOut(false);
     try {
       const params = new URLSearchParams();
       if (statusFilter !== 'all') {
@@ -285,23 +291,35 @@ export default function TasksPage() {
       }
 
       const response = await fetch(`/api/tasks?${params}`);
+
+      if (response.status === 401 || response.status === 403) {
+        setAuthRequired(true);
+        setTasks([]);
+        return;
+      }
+
       const data = await response.json();
 
-      if (data.ok) {
-        setTasks(data.tasks);
-
-        // Extract unique chats
-        const uniqueChats = new Map<string, string>();
-        data.tasks.forEach((task: Task) => {
-          if (!uniqueChats.has(task.chat_id)) {
-            uniqueChats.set(task.chat_id, task.chat_title || `Chat ${task.chat_id}`);
-          }
-        });
-
-        setChats(Array.from(uniqueChats.entries()).map(([id, title]) => ({ id, title })));
+      if (!data.ok) {
+        setError(data.error || 'Failed to load tasks');
+        setTasks([]);
+        return;
       }
+
+      setTasks(data.tasks);
+
+      // Extract unique chats
+      const uniqueChats = new Map<string, string>();
+      data.tasks.forEach((task: Task) => {
+        if (!uniqueChats.has(task.chat_id)) {
+          uniqueChats.set(task.chat_id, task.chat_title || `Chat ${task.chat_id}`);
+        }
+      });
+
+      setChats(Array.from(uniqueChats.entries()).map(([id, title]) => ({ id, title })));
     } catch (error) {
       console.error('Error fetching tasks:', error);
+      setError('Failed to load tasks');
       showToast('Failed to load tasks', 'error');
     } finally {
       setLoading(false);
@@ -311,6 +329,15 @@ export default function TasksPage() {
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
+
+  useEffect(() => {
+    if (!loading) {
+      setTimedOut(false);
+      return;
+    }
+    const timer = setTimeout(() => setTimedOut(true), 8000);
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   // Debounced search - fetchTasks is stable due to useCallback with its deps
   useEffect(() => {
@@ -420,11 +447,11 @@ export default function TasksPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8 sm:py-10">
+      <div className="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8 sm:py-10">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Tasks</h1>
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+          <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Tasks</h1>
+          <div className="flex flex-wrap items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-yellow-500" />
               {openTasksCount} open
@@ -445,7 +472,7 @@ export default function TasksPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-100 dark:border-gray-700 p-5 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-200 dark:border-gray-700 p-5 mb-6">
           {/* Search */}
           <div className="mb-4">
             <div className="relative">
@@ -530,7 +557,7 @@ export default function TasksPage() {
                 <button
                   onClick={exportOpenTasks}
                   disabled={openTasksCount === 0}
-                  className="flex-1 px-3 py-2 text-sm bg-gradient-to-r from-primary-600 to-accent-500 text-white rounded-lg hover:from-primary-700 hover:to-accent-600 transition-all duration-150 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-3 py-2 text-sm bg-gray-900 dark:bg-gray-100 dark:text-gray-900 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Copy
                 </button>
@@ -552,19 +579,58 @@ export default function TasksPage() {
         {/* Tasks List */}
         {loading ? (
           <div className="text-center py-16">
-            <div className="inline-block animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary-600 dark:border-primary-400"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">Loading tasks...</p>
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-600 dark:border-primary-400"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-400 text-sm">Loading tasks...</p>
+            {timedOut && (
+              <div className="mt-6 inline-flex flex-col items-center gap-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Taking longer than usual.
+                </p>
+                <button
+                  onClick={fetchTasks}
+                  className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+          </div>
+        ) : authRequired ? (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-200 dark:border-gray-700 p-12 text-center">
+            <div className="text-4xl mb-4">🔒</div>
+            <p className="text-gray-600 dark:text-gray-300 text-base font-medium mb-2">
+              Sign in to view tasks
+            </p>
+            <Link
+              href="/login"
+              className="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-gray-900 dark:bg-gray-100 dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+            >
+              Sign in
+            </Link>
+          </div>
+        ) : error ? (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-200 dark:border-gray-700 p-12 text-center">
+            <div className="text-4xl mb-4">⚠️</div>
+            <p className="text-gray-600 dark:text-gray-300 text-base font-medium mb-2">
+              {error}
+            </p>
+            <button
+              onClick={fetchTasks}
+              className="px-4 py-2 text-sm font-semibold text-white bg-gray-900 dark:bg-gray-100 dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+            >
+              Retry
+            </button>
           </div>
         ) : tasks.length === 0 ? (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-100 dark:border-gray-700 p-12 text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-200 dark:border-gray-700 p-12 text-center">
             <div className="text-5xl mb-4">📋</div>
-            <p className="text-gray-600 dark:text-gray-300 text-lg font-medium mb-2">
-              {statusFilter === 'open' ? 'No open tasks!' : 'No tasks found'}
+            <p className="text-gray-600 dark:text-gray-300 text-base font-medium mb-2">
+              {statusFilter === 'open' ? 'No open tasks' : 'No tasks found'}
             </p>
             <p className="text-gray-500 dark:text-gray-400 text-sm">
               {statusFilter === 'open'
-                ? "You're all caught up. Great job!"
-                : 'Tasks will appear here when you post them in Telegram'}
+                ? "You're all caught up."
+                : 'Tasks will appear here when you post them in Telegram.'}
             </p>
           </div>
         ) : (

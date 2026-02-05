@@ -288,7 +288,7 @@ export const TEMPLATES: TemplateDefinition[] = [
   },
   {
     slug: 'mint-additional-sales',
-    name: 'MInt Additional Sales',
+    name: 'Mint Additional Sales',
     description: "Report additional sales from re-running yesterday's declines",
     fields: [
       {

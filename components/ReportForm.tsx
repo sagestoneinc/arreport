@@ -83,9 +83,9 @@ export default function ReportForm({ fields, formData, onChange, onGenerate }: R
       ))}
       <button
         onClick={onGenerate}
-        className="w-full mt-8 px-8 py-4 bg-gradient-to-r from-primary-600 to-accent-500 text-white rounded-xl hover:from-primary-700 hover:to-accent-600 transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+        className="w-full mt-8 px-6 py-3 bg-gray-900 dark:bg-gray-100 dark:text-gray-900 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors font-semibold text-base shadow-sm"
       >
-        ✨ Generate Report
+        Generate Preview
       </button>
     </div>
   );

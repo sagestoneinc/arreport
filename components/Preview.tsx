@@ -61,11 +61,11 @@ export default function Preview({ message, slug }: PreviewProps) {
   if (!message) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Preview</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Preview</h2>
         <div className="text-center py-12">
-          <div className="text-5xl mb-4">📄</div>
-          <p className="text-gray-500 dark:text-gray-400 text-base">
-            Generate a report to see the preview here.
+          <div className="text-4xl mb-4">📄</div>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            Generate a preview to see the output here.
           </p>
         </div>
       </div>
@@ -73,11 +73,11 @@ export default function Preview({ message, slug }: PreviewProps) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 sticky top-24">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-200 dark:border-gray-700 sticky top-24">
       {/* Header with toggle */}
       <div className="border-b border-gray-100 dark:border-gray-700 px-6 py-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Preview</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Preview</h2>
           {/* Preview mode toggle */}
           <div className="flex rounded-lg bg-gray-100 dark:bg-gray-700 p-1">
             <button
@@ -88,7 +88,7 @@ export default function Preview({ message, slug }: PreviewProps) {
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
             >
-              📱 Telegram
+              Telegram
             </button>
             <button
               onClick={() => setPreviewMode('plain')}
@@ -98,7 +98,7 @@ export default function Preview({ message, slug }: PreviewProps) {
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
             >
-              📝 Plain Text
+              Plain Text
             </button>
           </div>
         </div>
@@ -121,21 +121,21 @@ export default function Preview({ message, slug }: PreviewProps) {
         <div className="flex flex-wrap gap-2">
           <button
             onClick={handleCopyReadable}
-            className="flex-1 min-w-[120px] px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-150 font-medium text-sm shadow-sm hover:shadow"
+            className="flex-1 min-w-[120px] px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-sm shadow-sm"
           >
-            {copied === 'readable' ? '✓ Copied!' : '📋 Copy Readable'}
+            {copied === 'readable' ? 'Copied' : 'Copy Readable'}
           </button>
           <button
             onClick={handleCopyPayload}
-            className="flex-1 min-w-[120px] px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-150 font-medium text-sm shadow-sm hover:shadow"
+            className="flex-1 min-w-[120px] px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-sm shadow-sm"
           >
-            {copied === 'payload' ? '✓ Copied!' : '🔧 Copy Payload'}
+            {copied === 'payload' ? 'Copied' : 'Copy Payload'}
           </button>
           <button
             onClick={handleDownload}
-            className="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-150 font-medium text-sm shadow-sm hover:shadow"
+            className="px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-sm shadow-sm"
           >
-            💾 Download
+            Download .txt
           </button>
         </div>
       </div>

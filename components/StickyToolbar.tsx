@@ -6,6 +6,7 @@ interface StickyToolbarProps {
   templateName: string;
   stepLabel?: string; // e.g. "Step 2 of 3"
   completionPct?: number; // e.g. 67
+  lastGeneratedAt?: string | null;
   lastSentAt?: string | null;
   generatedMessage?: string | null;
 
@@ -23,6 +24,7 @@ export default function StickyToolbar({
   templateName,
   stepLabel,
   completionPct,
+  lastGeneratedAt,
   lastSentAt,
   generatedMessage,
   onReset,
@@ -46,8 +48,8 @@ export default function StickyToolbar({
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 shadow-soft">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Left side: Template name and progress */}
           <div className="flex items-center gap-4">
@@ -76,18 +78,30 @@ export default function StickyToolbar({
 
           {/* Right side: Actions */}
           <div className="flex flex-col sm:flex-row items-center gap-3">
-            {/* Last sent timestamp */}
-            {lastSentAt && (
-              <span className="text-xs text-gray-500 dark:text-gray-400" aria-label={`Last sent to Telegram at ${lastSentAt}`}>
-                Last sent: {lastSentAt}
-              </span>
-            )}
+            <div className="flex flex-col items-end gap-0.5">
+              {lastGeneratedAt && (
+                <span
+                  className="text-xs text-gray-500 dark:text-gray-400"
+                  aria-label={`Last generated at ${lastGeneratedAt}`}
+                >
+                  Generated: {lastGeneratedAt}
+                </span>
+              )}
+              {lastSentAt && (
+                <span
+                  className="text-xs text-gray-500 dark:text-gray-400"
+                  aria-label={`Last sent to Telegram at ${lastSentAt}`}
+                >
+                  Sent: {lastSentAt}
+                </span>
+              )}
+            </div>
             
             <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
               {/* Reset button - secondary */}
               <button
                 onClick={onReset}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 Reset
               </button>
@@ -96,7 +110,7 @@ export default function StickyToolbar({
               <button
                 onClick={onGenerate}
                 disabled={isGenerating}
-                className="px-6 py-2 text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="px-6 py-2 text-sm font-semibold text-white bg-gray-900 dark:bg-gray-100 dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {isGenerating ? (
                   <span className="flex items-center gap-2">
@@ -104,7 +118,7 @@ export default function StickyToolbar({
                     Generating...
                   </span>
                 ) : (
-                  '✨ Generate Report'
+                  'Generate Preview'
                 )}
               </button>
               
@@ -112,7 +126,7 @@ export default function StickyToolbar({
               <button
                 onClick={onSendTelegram}
                 disabled={!canSendTelegram || isSendingTelegram}
-                className="px-6 py-2 text-sm font-semibold text-white bg-gradient-to-r from-accent-600 to-accent-700 rounded-lg hover:from-accent-700 hover:to-accent-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-accent-500"
+                className="px-6 py-2 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500"
                 aria-label="Send report to Telegram"
               >
                 {isSendingTelegram ? (
@@ -121,7 +135,7 @@ export default function StickyToolbar({
                     Sending...
                   </span>
                 ) : (
-                  '📱 Send to Telegram'
+                  'Send to Telegram'
                 )}
               </button>
 
@@ -130,9 +144,9 @@ export default function StickyToolbar({
                 <button
                   onClick={handleCopy}
                   disabled={!generatedMessage}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {copied ? '✓ Copied!' : '📋 Copy'}
+                  {copied ? 'Copied' : 'Copy Payload'}
                 </button>
               )}
 
@@ -141,9 +155,9 @@ export default function StickyToolbar({
                 <button
                   onClick={onDownload}
                   disabled={!generatedMessage}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  💾 Download
+                  Download .txt
                 </button>
               )}
             </div>

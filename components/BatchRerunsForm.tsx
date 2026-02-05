@@ -385,9 +385,9 @@ export default function BatchRerunsForm({
       {/* Generate Button */}
       <button
         onClick={onGenerate}
-        className="w-full px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-500 text-white rounded-lg hover:from-primary-700 hover:to-accent-600 transition-all duration-200 font-semibold text-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+        className="w-full px-6 py-3 bg-gray-900 dark:bg-gray-100 dark:text-gray-900 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors font-semibold text-base shadow-sm"
       >
-        ✨ Generate Report
+        Generate Preview
       </button>
     </div>
   );

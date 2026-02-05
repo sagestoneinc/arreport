@@ -88,14 +88,14 @@ export default function HistoryPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-6 py-10 sm:px-6 lg:px-8 sm:py-12">
+      <div className="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8 sm:py-10">
         {/* Header */}
         <div className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+            <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
               Report History
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               View and resend previously generated reports • {history.length} report
               {history.length !== 1 ? 's' : ''}
             </p>
@@ -111,17 +111,17 @@ export default function HistoryPage() {
         </div>
 
         {history.length === 0 ? (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-16 text-center">
-            <div className="text-6xl mb-4">📜</div>
-            <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-200 dark:border-gray-700 p-12 text-center">
+            <div className="text-5xl mb-4">📜</div>
+            <p className="text-gray-500 dark:text-gray-400 text-base font-medium">
               No reports in history
             </p>
-            <p className="text-gray-400 dark:text-gray-500 mt-2 mb-6">
+            <p className="text-gray-400 dark:text-gray-500 mt-2 mb-6 text-sm">
               Generated reports will appear here automatically
             </p>
             <Link
               href="/"
-              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-500 text-white rounded-xl hover:from-primary-700 hover:to-accent-600 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
+              className="inline-flex items-center px-6 py-3 bg-gray-900 dark:bg-gray-100 dark:text-gray-900 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors font-semibold shadow-sm"
             >
               Create a Report
             </Link>
@@ -134,10 +134,10 @@ export default function HistoryPage() {
                 <button
                   key={entry.id}
                   onClick={() => setSelectedEntry(entry)}
-                  className={`w-full text-left bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg border transition-all p-4 ${
+                  className={`w-full text-left bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover border transition-colors p-4 ${
                     selectedEntry?.id === entry.id
                       ? 'border-primary-500 dark:border-primary-400 ring-2 ring-primary-500/20'
-                      : 'border-gray-100 dark:border-gray-700'
+                      : 'border-gray-200 dark:border-gray-700'
                   }`}
                 >
                   <div className="flex items-start justify-between">
@@ -182,10 +182,10 @@ export default function HistoryPage() {
             {/* Preview Panel */}
             <div className="lg:col-span-2">
               {selectedEntry ? (
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 sticky top-24">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-200 dark:border-gray-700 sticky top-24">
                   <div className="border-b border-gray-100 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
                     <div>
-                      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                         {selectedEntry.templateName}
                       </h2>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -206,23 +206,23 @@ export default function HistoryPage() {
                     <div className="flex gap-3">
                       <button
                         onClick={() => handleCopy(selectedEntry.message)}
-                        className="flex-1 px-5 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-150 font-semibold shadow-sm hover:shadow"
+                        className="flex-1 px-5 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-semibold shadow-sm"
                       >
-                        {copied ? '✓ Copied!' : '📋 Copy'}
+                        {copied ? 'Copied' : 'Copy'}
                       </button>
                       <button
                         onClick={() => handleSendToTelegram(selectedEntry.message)}
-                        className="flex-1 px-5 py-3 bg-gradient-to-r from-accent-600 to-accent-700 text-white rounded-lg hover:from-accent-700 hover:to-accent-800 transition-all duration-150 font-semibold shadow-md hover:shadow-lg"
+                        className="flex-1 px-5 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold shadow-sm"
                       >
-                        📱 Send to Telegram
+                        Send to Telegram
                       </button>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-12 text-center">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-200 dark:border-gray-700 p-12 text-center">
                   <div className="text-5xl mb-4">👈</div>
-                  <p className="text-gray-500 dark:text-gray-400 text-base">
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">
                     Select a report from the list to preview
                   </p>
                 </div>

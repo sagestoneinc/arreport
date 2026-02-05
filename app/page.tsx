@@ -1,63 +1,27 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import TemplateCard from '@/components/TemplateCard';
 import { TEMPLATES } from '@/lib/templates';
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-    },
-  },
-};
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-6 py-10 sm:px-6 lg:px-8 sm:py-16 lg:py-20">
-        {/* Hero Section */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 mb-6 tracking-tight">
-            Report Templates
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+        <div className="mb-10">
+          <h1 className="text-3xl sm:text-4xl font-semibold text-gray-900 dark:text-gray-100">
+            Templates
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Build, preview, and send reports instantly.
+          <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
+            Build, preview, and send ops reports with a consistent format.
           </p>
-        </motion.div>
+        </div>
 
-        {/* Templates Grid */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {TEMPLATES.map((template) => (
-            <motion.div key={template.slug} variants={itemVariants}>
-              <TemplateCard template={template} />
-            </motion.div>
+            <TemplateCard key={template.slug} template={template} />
           ))}
-        </motion.div>
+        </div>
       </div>
     </main>
   );

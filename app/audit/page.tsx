@@ -148,7 +148,9 @@ function PayloadModal({
 export default function AuditPage() {
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [timedOut, setTimedOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [authRequired, setAuthRequired] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<AuditLogEntry | null>(null);
   
   // Filter states
@@ -186,6 +188,8 @@ export default function AuditPage() {
   const fetchLogs = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setAuthRequired(false);
+    setTimedOut(false);
     
     try {
       const params = new URLSearchParams();
@@ -196,8 +200,15 @@ export default function AuditPage() {
       params.set('limit', '100');
       
       const response = await fetch(`/api/audit?${params.toString()}`);
+
+      if (response.status === 401 || response.status === 403) {
+        setAuthRequired(true);
+        setLogs([]);
+        return;
+      }
+
       const data = await response.json();
-      
+
       if (data.ok) {
         setLogs(data.logs);
       } else {
@@ -215,6 +226,15 @@ export default function AuditPage() {
     fetchLogs();
   }, [fetchLogs]);
 
+  useEffect(() => {
+    if (!loading) {
+      setTimedOut(false);
+      return;
+    }
+    const timer = setTimeout(() => setTimedOut(true), 8000);
+    return () => clearTimeout(timer);
+  }, [loading]);
+
   const formatTime = (isoDate: string) => {
     const date = new Date(isoDate);
     return date.toLocaleString('en-US', {
@@ -228,19 +248,19 @@ export default function AuditPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            🧾 Audit Log
+          <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            Audit Log
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             Track who sent what reports, when, and to which channels.
           </p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-200 dark:border-gray-700 p-4 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Action Type Filter */}
             <div>
@@ -313,18 +333,44 @@ export default function AuditPage() {
         </div>
 
         {/* Logs Table */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-200 dark:border-gray-700 overflow-hidden">
           {loading ? (
             <div className="p-12 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-600 mx-auto"></div>
-              <p className="mt-4 text-gray-500 dark:text-gray-400">Loading audit logs...</p>
+              <p className="mt-4 text-gray-500 dark:text-gray-400 text-sm">Loading audit logs...</p>
+              {timedOut && (
+                <div className="mt-6 inline-flex flex-col items-center gap-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Taking longer than usual.
+                  </p>
+                  <button
+                    onClick={fetchLogs}
+                    className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : authRequired ? (
+            <div className="p-12 text-center">
+              <div className="text-4xl mb-4">🔒</div>
+              <p className="text-gray-600 dark:text-gray-300 text-base font-medium mb-2">
+                Sign in to view audit logs
+              </p>
+              <button
+                onClick={() => (window.location.href = '/login')}
+                className="px-4 py-2 text-sm font-semibold text-white bg-gray-900 dark:bg-gray-100 dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+              >
+                Sign in
+              </button>
             </div>
           ) : error ? (
             <div className="p-12 text-center">
               <p className="text-red-600 dark:text-red-400">{error}</p>
               <button 
                 onClick={fetchLogs}
-                className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                className="mt-4 px-4 py-2 text-sm font-semibold text-white bg-gray-900 dark:bg-gray-100 dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
               >
                 Retry
               </button>
@@ -332,60 +378,92 @@ export default function AuditPage() {
           ) : logs.length === 0 ? (
             <div className="p-12 text-center">
               <div className="text-4xl mb-4">📋</div>
-              <p className="text-gray-500 dark:text-gray-400">No audit logs found.</p>
+              <p className="text-gray-500 dark:text-gray-400 text-base">No audit logs found.</p>
               <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
                 Logs will appear here when reports are generated or sent to Telegram.
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Time</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">User</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Action</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Report</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Chat ID</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {logs.map((log) => (
-                    <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+            <div>
+              <div className="lg:hidden divide-y divide-gray-200 dark:divide-gray-700">
+                {logs.map((log) => (
+                  <div key={log.id} className="p-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         {formatTime(log.created_at)}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
-                        {log.user_email || '—'}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <ActionBadge action={log.action_type} />
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                      </span>
+                      <StatusBadge status={log.status} />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <ActionBadge action={log.action_type} />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">
                         {log.report_slug || '—'}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <StatusBadge status={log.status} />
-                      </td>
-                      <td className="px-4 py-3 text-sm font-mono text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                        {log.telegram_chat_id || '—'}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        {(log.telegram_message_preview || log.telegram_payload_full) && (
-                          <button
-                            onClick={() => setSelectedEntry(log)}
-                            className="px-3 py-1.5 text-xs font-medium text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-900/30 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors"
-                          >
-                            View Payload
-                          </button>
-                        )}
-                      </td>
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {log.user_email || '—'}
+                    </div>
+                    {(log.telegram_message_preview || log.telegram_payload_full) && (
+                      <button
+                        onClick={() => setSelectedEntry(log)}
+                        className="mt-2 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        View Payload
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="hidden lg:block overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Time</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">User</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Action</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Report</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Chat ID</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider"></th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                    {logs.map((log) => (
+                      <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                          {formatTime(log.created_at)}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                          {log.user_email || '—'}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <ActionBadge action={log.action_type} />
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                          {log.report_slug || '—'}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <StatusBadge status={log.status} />
+                        </td>
+                        <td className="px-4 py-3 text-sm font-mono text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                          {log.telegram_chat_id || '—'}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          {(log.telegram_message_preview || log.telegram_payload_full) && (
+                            <button
+                              onClick={() => setSelectedEntry(log)}
+                              className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                            >
+                              View Payload
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

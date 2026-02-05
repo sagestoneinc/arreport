@@ -74,7 +74,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo and header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-600 to-accent-500 rounded-2xl shadow-lg mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-gray-900 dark:bg-gray-100 rounded-2xl shadow-sm mb-4">
             <span className="text-3xl">📊</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -86,7 +86,7 @@ export default function LoginPage() {
         </div>
 
         {/* Login form */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-200 dark:border-gray-700 p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
@@ -139,7 +139,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full px-6 py-3 text-base font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-6 py-3 text-base font-semibold text-white bg-gray-900 dark:bg-gray-100 dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">

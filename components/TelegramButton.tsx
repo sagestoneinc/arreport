@@ -60,7 +60,7 @@ export default function TelegramButton({ message, disabled }: TelegramButtonProp
             className={`w-16 h-16 rounded-full shadow-lg font-semibold transition-all duration-200 flex items-center justify-center ${
               disabled || sending
                 ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-500 cursor-not-allowed'
-                : 'bg-gradient-to-br from-accent-600 to-accent-700 text-white hover:shadow-xl hover:scale-110'
+                : 'bg-primary-600 text-white hover:bg-primary-700'
             }`}
             title={disabled ? 'Generate a report first' : 'Send to Telegram'}
           >
